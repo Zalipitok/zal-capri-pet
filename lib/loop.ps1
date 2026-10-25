@@ -26,6 +26,9 @@ $script:tickBody={
   elseif($action.StartsWith('state:')){Prepare-ManualAction; $script:routine.Clear(); Begin-State ($action.Substring(6))}
   elseif($action.StartsWith('routine:')){Prepare-ManualAction; Start-Routine ($action.Substring(8))}
   elseif($action -eq 'random'){Prepare-ManualAction; $script:routine.Clear(); Choose-State}
+  elseif($action -eq 'catchgame'){Start-CatchGame}
+  elseif($action -eq 'settings'){Show-SettingsWindow}
+  elseif($action -eq 'selftest'){Start-SelfTestRun}
   elseif($action -eq 'speak'){Prepare-ManualAction; $script:voiceNext=0; Play-Voice 'random' $true}
   elseif($action -eq 'windowperch'){
    Prepare-ManualAction; $script:routine.Clear()
@@ -90,11 +93,14 @@ $script:tickBody={
  if($script:hotkeyOk -and [CapriHotkey]::TakePressed()){Invoke-Summon}
  if($script:memoryDirty -and $t -ge $script:nextMemorySave){$script:nextMemorySave=$t+30; Save-Memory}
  Update-Music $t
+ Update-BeatSync $t
+ Update-Battery $t
  Update-AppAwareness $t
  if($script:isHidden){
   $script:lastInteraction=$t
   $script:stateStart+=$elapsedTick; $script:until+=$elapsedTick
   $script:nextRetry+=$elapsedTick; $script:nextMood+=$elapsedTick
+  $script:game.ends+=$elapsedTick; $script:game.nextJump+=$elapsedTick
   return
  }
  # Recover a release delivered outside our window; a stale hold freezes the timer.
@@ -106,6 +112,7 @@ $script:tickBody={
   $script:nextHoldRemark=$t+5
  }
  if($script:dragging){
+  Update-Shadow $false $false
   if($script:shakeAngry){Set-Pose 20}else{Set-Pose 30}
   $rotation.Angle=[Math]::Sin($t*16)*9
   $scale.ScaleX=$script:direction*(1+[Math]::Sin($t*14)*0.025)
@@ -118,6 +125,7 @@ $script:tickBody={
   $script:lastInteraction=$t
   $script:stateStart+=$elapsedTick; $script:until+=$elapsedTick
   $script:nextRetry+=$elapsedTick; $script:nextMood+=$elapsedTick
+  $script:game.ends+=$elapsedTick; $script:game.nextJump+=$elapsedTick
   Apply-SpeechPose; return
  }
  # You: system-wide idle time (any keyboard or mouse input), not just interaction with Capri.
@@ -152,8 +160,10 @@ $script:tickBody={
    'peek' {Set-Pose 7; $rotation.Angle=[Math]::Sin($bp)*3}
    'rest' {Set-Pose 5}
   }
+  Update-Shadow $true $false
   return
  }
+ if($t -ge $script:nextUnlockCheck){$script:nextUnlockCheck=$t+30; Test-Unlocks}
  if($t -ge $script:nextMood){
   $moods=@('bored','curious','smug','irritated') | Where-Object {$_ -ne $script:mood}
   $script:mood=$moods[$rng.Next($moods.Count)]; $script:nextMood=$t+$rng.Next(90,181)
@@ -207,6 +217,7 @@ $script:tickBody={
  if($script:idleRest -eq 'awake' -and -not $away -and $t -ge $script:nextRemark -and $t -gt $script:messageUntil -and -not $script:spec.tags.Contains('noRemark')){
   if(-not $script:voiceBusy -and ($script:chatter -eq 'off' -or $script:muted -or $script:nextYap-$t -gt 6)){
    $kind=$script:spec.remark
+   if($kind -eq 'idle' -and $script:unlockPools.Count -gt 0 -and $rng.NextDouble() -lt 0.25){$kind=$script:unlockPools[$rng.Next($script:unlockPools.Count)]}
    if($kind -eq 'idle' -and $script:timeOfDay -and $rng.NextDouble() -lt 0.2){
     $hour=(Get-Date).Hour
     if($hour -lt 5){$kind='latenight'}elseif($hour -lt 10){$kind='morning'}
@@ -230,6 +241,11 @@ $script:tickBody={
  $script:musicFrameActive=$false
  if($script:musicPoseStart -ge 0 -and ($pose -eq 12 -or $pose -eq 13) -and (Test-MusicGroove)){
   $pose=Get-MusicPose $t; $script:musicFrameActive=$true
+ }
+ # Eyes follow the cursor in her round-eyed poses.
+ if($script:eyesFollow -and $null -ne $pose -and $script:eyePoses.ContainsKey([int]$pose) -and -not $script:voiceBusy){
+  $look=Get-EyeDirection $cursorX $cursorY
+  if($look -ge 0){$pose=$script:eyePoses[[int]$pose][$look]}
  }
  if($null -ne $pose){Set-Pose $pose}
  $scale.ScaleX=$script:direction; $scale.ScaleY=1; $rotation.Angle=0
@@ -264,6 +280,7 @@ $script:tickBody={
  }
  Apply-SpeechPose
  Clamp-Pet
+ Update-Shadow ($script:spec.tags.Contains('grounded') -and ($script:state -ne 'windowperch' -or $script:perchArrived)) ($script:state -eq 'windowperch')
  if(-not $script:spec.tags.Contains('noFace')){
   $faceDelta=$cursorX-($w.Left+$w.Width/2)
   # Six-pixel dead zone prevents rapid flipping while the cursor crosses center.
@@ -297,6 +314,7 @@ $w.Add_Closing({param($sender,$event)
 $w.Add_Closed({
  $timer.Stop(); Save-VoiceSettings; Save-Memory; Stop-Voice; $sfxPlayer.Close(); $cursorFx.Close()
  try{if($script:fxNative){[CapriHotkey]::Unregister($script:petHandle)}}catch{}
+ try{[CapriBeat]::Stop()}catch{}
  if($null -ne $script:tray){$script:tray.Visible=$false; $script:tray.Dispose()}
  if($script:trayIconHandle -ne [IntPtr]::Zero){[void][CapriDesktop]::DestroyIcon($script:trayIconHandle)}
 })

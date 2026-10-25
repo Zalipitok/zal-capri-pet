@@ -45,9 +45,20 @@ try {
  try { Add-Content -LiteralPath (Join-Path $script:AppRoot 'effects-error.log') -Value ('Native effects unavailable, using PowerShell fallback: '+$_.Exception.Message) -Encoding UTF8 } catch { }
 }
 
+# Experimental, off by default: per-monitor DPI (tuning.json "perMonitorDpi": true). Must happen
+# before any window exists.
+$script:perMonitorDpi = $false
+try {
+ $tuningFile = Join-Path $script:AppRoot 'tuning.json'
+ if((Test-Path -LiteralPath $tuningFile) -and [bool](Get-Content -LiteralPath $tuningFile -Raw | ConvertFrom-Json).perMonitorDpi){
+  [AppContext]::SetSwitch('Switch.System.Windows.DoNotScaleForDpiChanges', $false)
+  $script:perMonitorDpi = [CapriDesktop]::EnablePerMonitorDpi()
+ }
+} catch { }
+
 # Order matters: later parts use what earlier ones define. Out-Null keeps stray output from
 # becoming pop-ups in the .exe build.
-foreach($part in @('window','data','screens','speech','memory','states','awareness','menu','input','loop','selftest')){
+foreach($part in @('window','data','screens','speech','memory','states','awareness','play','settings','menu','input','loop','selftest')){
  . (Join-Path $script:AppRoot ('lib\'+$part+'.ps1')) | Out-Null
 }
 

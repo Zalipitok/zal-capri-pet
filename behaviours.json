@@ -10,7 +10,7 @@
     "target": "random (default) | bottom | taskbar | edge | cursor | cursorAnchor | otherMonitor | window.",
     "path / speed / clampTarget": "Per-frame target updater from the $paths table, travel speed (omit to stay put), keep target on screen.",
     "next / nextNoChase / setMood": "State to go to afterwards (default: pick something new). nextNoChase applies when cursor chasing is off. '@attack' resolves the pounce.",
-    "tags": "blink, mood, calm, noFace, noCaught, noSleep, noYap, noRemark, noSpeechPose, noWobble, noClamp, needsChase, blackwall, arcs, strong.",
+    "tags": "blink, mood, calm, noFace, noCaught, noSleep, noYap, noRemark, noSpeechPose, noWobble, noClamp, needsChase, blackwall, arcs, strong, grounded (shadow under her).",
     "remark": "Remark pool used while in this state (default idle).",
     "effect / quip": "Floating effect text; quip is kept for reference."
   },
@@ -167,7 +167,8 @@
       "tags": [
         "blink",
         "mood",
-        "calm"
+        "calm",
+        "grounded"
       ]
     },
     {
@@ -195,7 +196,8 @@
       "next": "taskpeek",
       "motion": "dock",
       "tags": [
-        "calm"
+        "calm",
+        "grounded"
       ]
     },
     {
@@ -204,7 +206,10 @@
       "seconds": 4,
       "target": "taskbar",
       "speed": 180,
-      "motion": "dock"
+      "motion": "dock",
+      "tags": [
+        "grounded"
+      ]
     },
     {
       "id": "sabotage",
@@ -247,7 +252,8 @@
       "speed": 180,
       "tags": [
         "blink",
-        "calm"
+        "calm",
+        "grounded"
       ]
     },
     {
@@ -543,6 +549,32 @@
       ]
     },
     {
+      "id": "catchgame",
+      "poses": [
+        [
+          6,
+          0.3
+        ],
+        [
+          1,
+          0.3
+        ]
+      ],
+      "loop": true,
+      "seconds": 40,
+      "path": "catchgame",
+      "speed": 1100,
+      "clampTarget": true,
+      "tags": [
+        "noCaught",
+        "noSleep",
+        "noYap",
+        "noRemark",
+        "noSpeechPose",
+        "noWobble"
+      ]
+    },
+    {
       "id": "beckon",
       "title": "Beckon closer",
       "menu": "New poses",
@@ -819,7 +851,10 @@
       "seconds": 3,
       "path": "landing",
       "speed": 160,
-      "clampTarget": true
+      "clampTarget": true,
+      "tags": [
+        "grounded"
+      ]
     },
     {
       "id": "sneak",

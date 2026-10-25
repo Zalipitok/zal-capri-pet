@@ -1,6 +1,7 @@
 """Builds Capri's music frames (headphones on, head bobbing) from her hover frame.
 Run after normalize_sprites.py:  python tools/make_music_frames.py
-Writes sprites/music-0..3.png (tilt left, up, tilt right, up) on the same canvas.
+Writes sprites/music-0..3.png (tilt left, up, tilt right, up) on the same canvas, and
+sprites/hp-<pose>.png: other poses with headphones on (no head bob; they keep their own motion).
 """
 import os, json
 import numpy as np
@@ -10,6 +11,7 @@ from scipy import ndimage
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SPR = os.path.join(ROOT, 'sprites')
 BASE = 12                 # hover pose
+HP_POSES = [21, 22, 23, 24, 25, 26, 27, 28, 5, 4]  # dance, walk, gaming, game win, sip, nap, smug, wave
 PIVOT = (340.0, 440.0)    # neck, in canvas pixels
 HEAD_END, NECK = 400.0, 500.0   # full head rotation above HEAD_END, none below NECK
 
@@ -72,11 +74,20 @@ def main():
     a = np.array(withphones)
     for n, (angle, dip) in enumerate([(-9, 12), (0, 0), (9, 12), (0, 0)]):
         Image.fromarray(bend(a, angle, dip)).save(os.path.join(SPR, f'music-{n}.png'), optimize=True)
+    hp = []
+    for p in HP_POSES:
+        im = Image.open(os.path.join(SPR, f'frame-{p:02d}.png')).convert('RGBA')
+        try:
+            add_headphones(im, np.array(im)).save(os.path.join(SPR, f'hp-{p}.png'), optimize=True)
+            hp.append(p)
+        except Exception as e:
+            print(f'pose {p}: no headphones ({e})')
     meta_path = os.path.join(SPR, 'frames.json')
     meta = json.load(open(meta_path))
     meta['music'] = {'frames': 4, 'base': BASE, 'feet': meta['feet'][BASE]}
+    meta['headphones'] = hp
     json.dump(meta, open(meta_path, 'w'), indent=1)
-    print('wrote sprites/music-0..3.png')
+    print('wrote sprites/music-0..3.png and headphones for poses', hp)
 
 if __name__ == '__main__':
     main()

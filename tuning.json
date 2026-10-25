@@ -1,5 +1,5 @@
 {
-  "_help": "Numbers Capri uses for feel. Change one, then right-click her > Debug and help > Reload tuning.json.",
+  "_help": "Numbers Capri uses for feel. Change one, then right-click her > Debug and help > Reload tuning.json. perMonitorDpi (experimental, true/false) applies at the next start.",
   "throwSpeed": 800,
   "gravity": 2600,
   "floorBounce": 0.38,
@@ -15,5 +15,6 @@
   "musicBpm": 108,
   "songRemarkMinutes": 3,
   "appRemarkMinutes": 2,
-  "hotkey": "Ctrl+Alt+C"
+  "hotkey": "Ctrl+Alt+C",
+  "perMonitorDpi": false
 }

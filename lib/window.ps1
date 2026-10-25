@@ -6,6 +6,9 @@
  ShowActivated="False">
  <Grid Name="Scene" Margin="18">
   <Grid.RowDefinitions><RowDefinition Height="Auto" MinHeight="100"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+  <Ellipse Grid.Row="1" Name="Shadow" VerticalAlignment="Bottom" HorizontalAlignment="Center" IsHitTestVisible="False" Visibility="Collapsed" Width="80" Height="12">
+   <Ellipse.Fill><RadialGradientBrush><GradientStop Color="#C0000000" Offset="0"/><GradientStop Color="#00000000" Offset="1"/></RadialGradientBrush></Ellipse.Fill>
+  </Ellipse>
   <Image Grid.Row="1" Name="Sprite" Stretch="Uniform" RenderTransformOrigin="0.5,0.5">
    <Image.RenderTransform><TransformGroup>
     <ScaleTransform/><RotateTransform/><TranslateTransform/>
@@ -39,7 +42,7 @@
 $w = [Windows.Markup.XamlReader]::Load([System.Xml.XmlNodeReader]::new($xaml))
 $effect = $w.FindName('Effect'); $effect.Visibility='Collapsed'
 $sprite = $w.FindName('Sprite'); $bubble = $w.FindName('Bubble'); $words = $w.FindName('Words')
-$scene = $w.FindName('Scene')
+$scene = $w.FindName('Scene'); $shadow = $w.FindName('Shadow')
 
 # ---------------------------------------------------------------------------
 # Effects layers
@@ -125,9 +128,13 @@ function Update-AttackArcs {
 # ---------------------------------------------------------------------------
 # Sprites. Cleaned sheets are cached as PNG frames in sprite-cache and rebuilt only when a sheet changes.
 $script:spriteCache=Join-Path $script:AppRoot 'sprite-cache'
+# Frames are decoded only as large as she can be shown (see $script:decodeHeight below); with ~100
+# frames, full-size decoding would cost a few hundred MB of memory for no visible gain.
+$script:decodeHeight=0
 function Read-Png([string]$path){
  $image=[Windows.Media.Imaging.BitmapImage]::new()
  $image.BeginInit(); $image.CacheOption=[Windows.Media.Imaging.BitmapCacheOption]::OnLoad
+ if($script:decodeHeight -gt 0){$image.DecodePixelHeight=$script:decodeHeight}
  $image.UriSource=[Uri]::new($path); $image.EndInit(); $image.Freeze()
  return $image
 }
@@ -178,32 +185,58 @@ function Get-CleanFrames([string]$sheetName){
 $poses = @()
 $script:spriteFeet = $null
 $script:musicPoseStart = -1
-$script:mouthPoses = @{}
+$script:mouthPoses = @{}     # speaking pose -> @(half-open pose, wide-open pose)
+$script:eyePoses = @{}       # pose -> 8 poses with the eyes turned (right, up-right, up, ... down-right)
+$script:hpPoses = @{}        # pose -> the same pose with headphones on
 $script:talkingMouth = $true
+$script:visorFraction = 0.41
 $script:spriteScale = 1.0
 $spriteDir = Join-Path $script:AppRoot 'sprites'
 $spriteMeta = Join-Path $spriteDir 'frames.json'
 $framePaths = @(foreach($n in 0..32){Join-Path $spriteDir ('frame-{0:D2}.png' -f $n)})
+# Adds a set of frames; returns their pose numbers, or $null if any file is missing.
+function Add-FrameSet([string[]]$names,[double[]]$feet){
+ $paths=@(foreach($name in $names){Join-Path $spriteDir $name})
+ if(@($paths | Where-Object {-not (Test-Path -LiteralPath $_)}).Count -gt 0){return $null}
+ $first=$poses.Count
+ for($i=0;$i -lt $paths.Count;$i++){$script:poses += Read-Png $paths[$i]; $script:spriteFeet += $feet[[Math]::Min($i,$feet.Count-1)]}
+ return @($first..($poses.Count-1))
+}
 if((Test-Path -LiteralPath $spriteMeta) -and @($framePaths | Where-Object {-not (Test-Path -LiteralPath $_)}).Count -eq 0){
  $meta = Get-Content -LiteralPath $spriteMeta -Raw | ConvertFrom-Json
+ # Decode size: tall enough for her saved size on this screen's scaling, with some headroom.
+ $savedSize=100.0
+ try{$settingsFile=Join-Path $script:AppRoot 'voice-settings.json'; if(Test-Path -LiteralPath $settingsFile){$v=(Get-Content -LiteralPath $settingsFile -Raw | ConvertFrom-Json).petSize; if($null -ne $v){$savedSize=[double]$v}}}catch{}
+ $dpi=1.0; try{$g=[Drawing.Graphics]::FromHwnd([IntPtr]::Zero); $dpi=$g.DpiY/96.0; $g.Dispose()}catch{}
+ $script:decodeHeight=[int][Math]::Min([double]$meta.height,[Math]::Max(320.0,[Math]::Ceiling(300.0*([double]$meta.height/768.0)*$savedSize/100.0*$dpi*1.25)))
  foreach($path in $framePaths){$poses += Read-Png $path}
  $script:spriteFeet = @($meta.feet | ForEach-Object {[double]$_})
- # Music frames (headphones, head bobbing), made by tools\make_music_frames.py. They follow the
- # 33 regular frames, so they are poses 33-36.
- $musicPaths = @(foreach($n in 0..3){Join-Path $spriteDir ('music-{0}.png' -f $n)})
- if($null -ne $meta.music -and @($musicPaths | Where-Object {-not (Test-Path -LiteralPath $_)}).Count -eq 0){
-  $script:musicPoseStart = $poses.Count
-  foreach($path in $musicPaths){$poses += Read-Png $path; $script:spriteFeet += [double]$meta.music.feet}
+ $script:visorFraction = [double]$meta.visor[1]
+ # Music frames (headphones, head bobbing), made by tools\make_music_frames.py.
+ if($null -ne $meta.music){
+  $set=Add-FrameSet @(0..3 | ForEach-Object {'music-'+$_+'.png'}) @([double]$meta.music.feet)
+  if($null -ne $set){$script:musicPoseStart=$set[0]}
  }
- # Talking-mouth frames (half open, wide open) for each pose she speaks in, made by
- # tools\make_mouth_frames.py. Map: speaking pose -> @(half-open pose, wide-open pose).
+ # Other poses with headphones on, used while music plays (tools\make_music_frames.py).
+ foreach($base in @($meta.headphones)){
+  if($null -eq $base){continue}
+  $set=Add-FrameSet @('hp-'+[int]$base+'.png') @($script:spriteFeet[[int]$base])
+  if($null -ne $set){$script:hpPoses[[int]$base]=$set[0]}
+ }
+ # Talking-mouth frames for each pose she speaks in (tools\make_mouth_frames.py).
  if($null -ne $meta.mouths){
   foreach($property in $meta.mouths.PSObject.Properties){
    $base=[int]$property.Name
-   $mouthPaths=@(foreach($level in 1..2){Join-Path $spriteDir ('mouth-{0}-{1}.png' -f $base,$level)})
-   if(@($mouthPaths | Where-Object {-not (Test-Path -LiteralPath $_)}).Count -gt 0){continue}
-   $script:mouthPoses[$base]=@($poses.Count,($poses.Count+1))
-   foreach($path in $mouthPaths){$poses += Read-Png $path; $script:spriteFeet += $script:spriteFeet[$base]}
+   $set=Add-FrameSet @(1..2 | ForEach-Object {'mouth-'+$base+'-'+$_+'.png'}) @($script:spriteFeet[$base])
+   if($null -ne $set){$script:mouthPoses[$base]=$set}
+  }
+ }
+ # Eyes turned toward 8 directions (tools\make_eye_frames.py).
+ if($null -ne $meta.eyes){
+  foreach($property in $meta.eyes.PSObject.Properties){
+   $base=[int]$property.Name
+   $set=Add-FrameSet @(0..7 | ForEach-Object {'eye-'+$base+'-'+$_+'.png'}) @($script:spriteFeet[$base])
+   if($null -ne $set){$script:eyePoses[$base]=$set}
   }
  }
  # The shared canvas has more room around her than the old 768 px cells; grow the window to match
@@ -235,6 +268,8 @@ $ghost=$w.FindName('Ghost'); $ghost.RenderTransform=$sprite.RenderTransform
 [Windows.Media.RenderOptions]::SetBitmapScalingMode($ghost,[Windows.Media.BitmapScalingMode]::HighQuality)
 $script:smoothPoses=$true; $script:lastPoseChange=0.0; $script:fadeStart=-1.0
 function Set-Pose([int]$index,[switch]$Instant) {
+ # While music plays she keeps her headphones on (not mid-sentence, so they don't flicker).
+ if($script:musicEnabled -and $script:musicPlaying -and -not $script:voiceBusy -and $script:hpPoses.ContainsKey($index)){$index=$script:hpPoses[$index]}
  if($index -eq $script:poseIndex){return}
  $now=$clock.Elapsed.TotalSeconds
  $fade=[double]$script:tuning.crossfadeSeconds

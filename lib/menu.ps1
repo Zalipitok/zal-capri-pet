@@ -106,6 +106,7 @@ Add-MenuSeparator $menu
 $interact=New-SubMenu $menu 'Interact'
 [void](New-MenuEntry $interact 'Do something!' {$script:pendingAction='random'})
 [void](New-MenuEntry $interact 'Pet her (Ctrl-click)' {$script:pendingAction='pet'})
+[void](New-MenuEntry $interact 'Play catch me (30 s)' {$script:pendingAction='catchgame'})
 [void](New-MenuEntry $interact 'Cartoon swat (Shift-click)' {$script:pendingAction='swat'})
 [void](New-MenuEntry $interact 'Say a line now' {$script:pendingAction='speak'})
 [void](New-MenuEntry $interact 'Attack cursor (Blackwall)' {$script:pendingAction='attack'})
@@ -127,6 +128,7 @@ foreach($name in $script:routines.Keys){
 }
 [void](New-MenuEntry $animations 'Stop routine' $stateClick $null 'float')
 
+[void](New-MenuEntry $menu 'Settings window...' {$script:pendingAction='settings'})
 $settings=New-SubMenu $menu 'Settings'
 $voiceMenu=New-SubMenu $settings 'Voice and subtitles'
 foreach($entry in @(@('English','en'),@('Japanese','ja'))){
@@ -167,6 +169,8 @@ $sizeLabel=New-MenuSlider $sizeMenu ('Size: '+[int]$script:petSize+'%') 65 160 5
  Register-Interaction; Set-PetSize ([double]$sender.Value)
  $sizeLabel.Text=('Size: '+[int]$script:petSize+'%')
 }
+[void](New-MenuEntry $appearance 'Shadow when perched' {$script:shadowEnabled=-not $script:shadowEnabled; Save-VoiceSettings} {$script:shadowEnabled})
+[void](New-MenuEntry $appearance 'Eyes follow the cursor' {$script:eyesFollow=-not $script:eyesFollow; Save-VoiceSettings} {$script:eyesFollow})
 [void](New-MenuEntry $appearance 'Talking mouth' {$script:talkingMouth=-not $script:talkingMouth; Save-VoiceSettings} {$script:talkingMouth})
 [void](New-MenuEntry $appearance 'Smooth pose changes' {$script:smoothPoses=-not $script:smoothPoses; Save-VoiceSettings} {$script:smoothPoses})
 [void](New-MenuEntry $appearance 'Idle blinking' {$script:facialMotion=-not $script:facialMotion} {$script:facialMotion})
@@ -184,6 +188,8 @@ $behaviour=New-SubMenu $settings 'Behaviour'
 [void](New-MenuEntry $behaviour 'Sit on windows' {$script:windowPerch=-not $script:windowPerch; Save-VoiceSettings} {$script:windowPerch})
 [void](New-MenuEntry $behaviour 'Throwing physics' {$script:throwPhysics=-not $script:throwPhysics; Save-VoiceSettings} {$script:throwPhysics})
 [void](New-MenuEntry $behaviour 'Time-of-day moods' {$script:timeOfDay=-not $script:timeOfDay; Save-VoiceSettings} {$script:timeOfDay})
+[void](New-MenuEntry $behaviour 'Battery reactions (laptops)' {$script:batteryReactions=-not $script:batteryReactions; Save-VoiceSettings} {$script:batteryReactions})
+[void](New-MenuEntry $behaviour 'Bob to the real beat (listens to your PC''s sound)' {$script:beatSync=-not $script:beatSync; Save-VoiceSettings} {$script:beatSync})
 [void](New-MenuEntry $behaviour 'React to music' {$script:musicEnabled=-not $script:musicEnabled; Save-VoiceSettings; if($script:musicEnabled -and -not $script:musicAvailable){Show-Status ('Music reactions are not available here: '+$script:musicError)}} {$script:musicEnabled})
 [void](New-MenuEntry $behaviour 'Notice which app I''m using (stays on this PC)' {$script:appAware=-not $script:appAware; $script:appCategory=''; $script:appAnnounced=''; Save-VoiceSettings; if($script:appAware){Show-Status 'I''ll only look at which app is in front. Nothing leaves this PC.' 5}} {$script:appAware})
 $hotkeyItem=New-MenuEntry $behaviour 'Summon hotkey' {
@@ -220,17 +226,11 @@ Add-MenuSeparator $settings
 $debugMenu=New-SubMenu $menu 'Debug and help'
 [void](New-MenuEntry $debugMenu 'Movement status' {
  $areas=@(Get-AllWorkAreas); $idle=0; try{$idle=[int][CapriDesktop]::IdleSeconds()}catch{}
- $status="State: $($script:state)`nPaused: $($script:paused)`nBusy mode: $($script:busyMode)`nHidden: $($script:isHidden) (fullscreen: $($script:hiddenFullscreen))`nSleep: $($script:idleRest) $($script:sleepReason)`nHeld: $($script:mouseDown)`nDragging: $($script:dragging)`nVoice playing: $($script:voiceBusy)`nLive volume: $($script:liveVolume)`nMonitors: $($areas.Count)`nYou idle for: $idle s`nNative effects: $($script:fxNative)`nFrame time: $($script:tickMs) ms`nWandering: $($script:activityRates.wandering)%"
+ $status="State: $($script:state)`nPaused: $($script:paused)`nBusy mode: $($script:busyMode)`nHidden: $($script:isHidden) (fullscreen: $($script:hiddenFullscreen))`nSleep: $($script:idleRest) $($script:sleepReason)`nHeld: $($script:mouseDown)`nDragging: $($script:dragging)`nVoice playing: $($script:voiceBusy)`nLive volume: $($script:liveVolume)`nMonitors: $($areas.Count)`nYou idle for: $idle s`nNative effects: $($script:fxNative)`nBeat: $(try{if([CapriBeat]::Running){'{0:0} BPM, confidence {1:0.00}' -f [CapriBeat]::Bpm,[CapriBeat]::Confidence}else{'not listening'}}catch{'unavailable'})`nFrame time: $($script:tickMs) ms`nWandering: $($script:activityRates.wandering)%"
  [void][Windows.MessageBox]::Show($status,'Capri movement status')
 })
-[void](New-MenuEntry $debugMenu 'Our history' {[void][Windows.MessageBox]::Show((Get-MemorySummary),'What Capri remembers')})
-[void](New-MenuEntry $debugMenu 'Run self-test' {
- try {
-  if($script:IsExe){Start-Process -FilePath $script:LaunchPath -ArgumentList '-SelfTest'}
-  else{Start-Process -FilePath (Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe') -ArgumentList @('-NoProfile','-STA','-ExecutionPolicy','Bypass','-WindowStyle','Hidden','-File',('"'+$script:LaunchPath+'"'),'-SelfTest')}
-  Show-Status 'Self-test started. A second me will appear briefly, then show the results.' 5
- } catch { Show-Problem ('Could not start the self-test: '+$_.Exception.Message) }
-})
+[void](New-MenuEntry $debugMenu 'Our history' {[void][Windows.MessageBox]::Show((Get-MemorySummary)+"`n`nBest catch-me score: "+$script:memory.bestCatch+"`n`n"+(Get-UnlockSummary),'What Capri remembers')})
+[void](New-MenuEntry $debugMenu 'Run self-test' {$script:pendingAction='selftest'})
 [void](New-MenuEntry $debugMenu 'Reload tuning.json' {
  Import-Tuning; Register-SummonHotkey
  if($script:tuningError){Show-Problem ('tuning.json has a problem: '+$script:tuningError); $script:tuningError=''}else{Show-Status 'Tuning reloaded.'}
@@ -299,7 +299,8 @@ try {
  $trayBusy=$trayMenu.Items.Add('Busy (quiet corner)'); $trayBusy.Add_Click({Set-BusyMode (-not $script:busyMode)})
  $trayMute=$trayMenu.Items.Add('Mute'); $trayMute.Add_Click({Set-Muted (-not $script:muted)})
  [void]$trayMenu.Items.Add([Windows.Forms.ToolStripSeparator]::new())
- $trayFull=$trayMenu.Items.Add('Capri menu and settings...'); $trayFull.Add_Click({
+ $traySettings=$trayMenu.Items.Add('Settings...'); $traySettings.Add_Click({Show-SettingsWindow})
+ $trayFull=$trayMenu.Items.Add('Capri menu...'); $trayFull.Add_Click({
   Set-Hidden $false
   try{[void]$w.Activate()}catch{}
   $menu.PlacementTarget=$w; $menu.Placement=[Windows.Controls.Primitives.PlacementMode]::MousePoint; $menu.IsOpen=$true

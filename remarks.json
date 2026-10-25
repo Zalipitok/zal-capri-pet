@@ -215,5 +215,80 @@
     "{0} out of 10. Mildly suspicious.",
     "{0}/10. I'd keep an eye on that one.",
     "Verdict: {0}. It knows what it did."
+  ],
+  "pluggedin": [
+    "Ahh. Power.",
+    "Charging at {0}%. Finally.",
+    "Plugged in. Good. I was getting worried.",
+    "Mmm, electricity."
+  ],
+  "unplugged": [
+    "Unplugged? Living dangerously.",
+    "On battery now. {0}%. Choose wisely.",
+    "Cutting the cord. Bold."
+  ],
+  "batterylow": [
+    "{0}% battery. Just saying.",
+    "We're at {0}%. Find a charger.",
+    "Battery's getting low. I'm getting nervous."
+  ],
+  "batterycritical": [
+    "{0}%! Plug me in. Now.",
+    "{0}%. This is not a drill.",
+    "I'm fading. {0}%. Charger. Please."
+  ],
+  "batteryfull": [
+    "Fully charged. You can unplug me now.",
+    "100%. I feel unstoppable."
+  ],
+  "gamestart": [
+    "Catch me if you can. 30 seconds.",
+    "Ready? Try to keep up.",
+    "Go. Click me. If you can."
+  ],
+  "gameover": [
+    "{0} catches. Your best is {1}.",
+    "Only {0}? Your record is {1}, you know.",
+    "{0}. Not bad. Not {1} either."
+  ],
+  "gamenewbest": [
+    "{0}?! New record. I let you win.",
+    "{0}. Fine. That's a record. Don't get used to it.",
+    "New best: {0}. I'm demanding a rematch."
+  ],
+  "gamezero": [
+    "Zero. I didn't even try.",
+    "Not one. Embarrassing.",
+    "You were supposed to click me, you know."
+  ],
+  "unlocked": [
+    "New unlock: {0}.",
+    "I learned something new: {0}.",
+    "You earned it: {0}."
+  ],
+  "rivalry": [
+    "You're a worthy cursor. Almost.",
+    "I've caught you so many times. Still fun.",
+    "One day you'll dodge me. Not today."
+  ],
+  "regular": [
+    "You always come back. I like that.",
+    "Away again? I'll be here.",
+    "You're reliable. Don't let it go to your head."
+  ],
+  "bond": [
+    "You're alright, you know.",
+    "I like it here. Don't tell anyone.",
+    "Thanks for keeping me around."
+  ],
+  "arcade": [
+    "Rematch later? I'm warmed up.",
+    "My dodging is getting better. Have you noticed?",
+    "Arcade's open whenever you are."
+  ],
+  "casefiles": [
+    "I've scanned so many of your files. Some of them were... interesting.",
+    "Case file update: still suspicious.",
+    "Bring me more files. I'm on a streak."
   ]
 }

@@ -59,6 +59,7 @@ $script:tuning=[ordered]@{
  songRemarkMinutes=3.0   # at least this long between comments on songs
  appRemarkMinutes=2.0    # at least this long between comments on apps
  hotkey='Ctrl+Alt+C'     # summon / hide shortcut
+ perMonitorDpi=0.0       # experimental: 1 = sharp on mixed-scale monitors (applies at next start)
 }
 $script:tuningPath=Join-Path $script:AppRoot 'tuning.json'
 function Import-Tuning {

@@ -77,6 +77,11 @@ public static class CapriDesktop {
   if(!GetLastInputInfo(ref info)) return 0;
   unchecked { uint now=(uint)Environment.TickCount; return (now-info.dwTime)/1000.0; }
  }
+ // Opt-in (tuning.json perMonitorDpi): sharp rendering on monitors with different scale settings.
+ [DllImport("user32.dll")] static extern IntPtr SetThreadDpiAwarenessContext(IntPtr context);
+ public static bool EnablePerMonitorDpi() {
+  try { return SetThreadDpiAwarenessContext(new IntPtr(-4))!=IntPtr.Zero; } catch(Exception) { return false; }
+ }
  public static bool SetAppVolume(double volume) {
   uint level=(uint)(Math.Max(0,Math.Min(1,volume))*0xFFFF);
   try { return waveOutSetVolume(IntPtr.Zero,(level<<16)|level)==0; } catch(Exception) { return false; }
@@ -127,6 +132,221 @@ public static class CapriDesktop {
   if(IsZoomed(fg) && (GetWindowLong(fg,-16)&0x00040000)!=0) return false;
   return self==IntPtr.Zero || mon==MonitorFromWindow(self,2);
  }
+}
+// Beat tracking from whatever the PC is playing (WASAPI loopback). Audio is analysed in memory only:
+// nothing is recorded or saved. Bass energy at 100 frames/s -> onset strength -> tempo by
+// autocorrelation (70-180 BPM) -> beat timing by matching a comb of beats to recent onsets.
+public static class CapriBeat {
+ [ComImport, Guid("A95664D2-9614-4F35-A746-DE8DB63617E6"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+ interface IMMDeviceEnumerator {
+  [PreserveSig] int EnumAudioEndpoints(int dataFlow,int stateMask,out IntPtr devices);
+  [PreserveSig] int GetDefaultAudioEndpoint(int dataFlow,int role,out IMMDevice device);
+ }
+ [ComImport, Guid("D666063F-1587-4E43-81F1-B948E807363F"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+ interface IMMDevice {
+  [PreserveSig] int Activate(ref Guid iid,int clsCtx,IntPtr activationParams,[MarshalAs(UnmanagedType.IUnknown)] out object iface);
+ }
+ [ComImport, Guid("1CB9AD4C-DBFA-4c32-B178-C2F568A703B2"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+ interface IAudioClient {
+  [PreserveSig] int Initialize(int shareMode,int streamFlags,long bufferDuration,long periodicity,IntPtr format,IntPtr sessionGuid);
+  [PreserveSig] int GetBufferSize(out uint frames);
+  [PreserveSig] int GetStreamLatency(out long latency);
+  [PreserveSig] int GetCurrentPadding(out uint padding);
+  [PreserveSig] int IsFormatSupported(int shareMode,IntPtr format,out IntPtr closest);
+  [PreserveSig] int GetMixFormat(out IntPtr format);
+  [PreserveSig] int GetDevicePeriod(out long defaultPeriod,out long minimumPeriod);
+  [PreserveSig] int Start();
+  [PreserveSig] int Stop();
+  [PreserveSig] int Reset();
+  [PreserveSig] int SetEventHandle(IntPtr handle);
+  [PreserveSig] int GetService(ref Guid iid,[MarshalAs(UnmanagedType.IUnknown)] out object service);
+ }
+ [ComImport, Guid("C8ADBD64-E71E-48a0-A4DE-185C395CD317"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+ interface IAudioCaptureClient {
+  [PreserveSig] int GetBuffer(out IntPtr data,out uint frames,out uint flags,out ulong devicePosition,out ulong qpcPosition);
+  [PreserveSig] int ReleaseBuffer(uint frames);
+  [PreserveSig] int GetNextPacketSize(out uint frames);
+ }
+
+ const int Fps=100, History=600;            // 6 s of onset history
+ static readonly System.Diagnostics.Stopwatch clock=System.Diagnostics.Stopwatch.StartNew();
+ static readonly object sync=new object();
+ static System.Threading.Thread thread;
+ static volatile bool stopRequested;
+ static double[] onset=new double[History];
+ static double[] energy=new double[History];
+ static int count;                           // frames analysed so far
+ static double lowpass, hopEnergy, prevLog;
+ static int hopFill, hopSize=480, rate=48000;
+ static double lastFrameTime;
+ static int framesSinceEstimate;
+ static double candidatePeriod;
+ static int candidateVotes;
+
+ public static volatile bool Running;
+ public static string LastError="";
+ public static double Bpm;                    // current tempo, 0 when unsure
+ public static double Confidence;             // 0..1
+ public static double Level;                  // recent loudness, 0..1-ish
+ static double period;                        // seconds per beat
+ static double lastBeat;                      // clock time of the most recent beat
+
+ public static double Now() { return clock.Elapsed.TotalSeconds; }
+ // Position inside the current beat (0..1), or -1 when there is no reliable beat.
+ public static double Phase() {
+  double p=period, b=lastBeat;
+  if(!Running || p<=0 || Confidence<0.4 || Level<0.002) return -1;
+  double x=(Now()-b)/p; x-=Math.Floor(x);
+  return x;
+ }
+ // Whole beats since the last detected beat (used to alternate left/right on each beat).
+ public static long BeatNumber() {
+  double p=period; if(p<=0) return 0;
+  return (long)Math.Floor((Now()-lastBeat)/p);
+ }
+
+ public static void Start() {
+  if(thread!=null && thread.IsAlive) return;
+  stopRequested=false; LastError="";
+  thread=new System.Threading.Thread(Run); thread.IsBackground=true; thread.Name="CapriBeat"; thread.Start();
+ }
+ public static void Stop() { stopRequested=true; }
+
+ public static void Reset(int sampleRate) {
+  lock(sync) {
+   rate=Math.Max(8000,sampleRate); hopSize=rate/Fps; hopFill=0; hopEnergy=0; lowpass=0; prevLog=0;
+   onset=new double[History]; energy=new double[History]; count=0; framesSinceEstimate=0;
+   Bpm=0; Confidence=0; period=0; candidatePeriod=0; candidateVotes=0;
+  }
+ }
+
+ // Feeds mono samples (-1..1). Public so the analysis can be tested without a sound card.
+ public static void Feed(float[] samples,int n,double endTime) {
+  lock(sync) {
+   double a=1.0-Math.Exp(-2*Math.PI*150.0/rate);       // ~150 Hz low-pass: kick drum and bass
+   int framesInBuffer=(n+hopFill)/hopSize, frameIndex=0;
+   for(int i=0;i<n;i++) {
+    lowpass+=a*(samples[i]-lowpass);
+    hopEnergy+=lowpass*lowpass;
+    if(++hopFill>=hopSize) {
+     double e=hopEnergy/hopSize; hopFill=0; hopEnergy=0;
+     double lg=Math.Log(1e-7+e);
+     double o=Math.Max(0,lg-prevLog); prevLog=0.7*prevLog+0.3*lg;
+     onset[count%History]=o; energy[count%History]=e; count++;
+     frameIndex++;
+     lastFrameTime=endTime-(double)(framesInBuffer-frameIndex)/Fps;
+     if(++framesSinceEstimate>=25) { framesSinceEstimate=0; Estimate(); }
+    }
+   }
+  }
+ }
+
+ static double At(double[] ring,int age) { return ring[((count-1-age)%History+History)%History]; }
+
+ static void Estimate() {
+  int n=Math.Min(count,History);
+  if(n<300) return;                                  // need 3 s
+  double level=0; for(int i=0;i<100;i++) level+=At(energy,i); Level=Math.Sqrt(level/100);
+  int minLag=Fps*60/180, maxLag=Fps*60/70;
+  double best=0, sum=0, sum2=0; int bestLag=0; int lags=0;
+  double[] ac=new double[maxLag+2];
+  for(int lag=minLag-1;lag<=maxLag+1;lag++) {
+   double s=0; for(int i=0;i+lag<n;i++) s+=At(onset,i)*At(onset,i+lag);
+   ac[lag]=s;
+  }
+  for(int lag=minLag;lag<=maxLag;lag++) {
+   double bpm=60.0*Fps/lag;
+   double prior=Math.Exp(-0.5*Math.Pow(Math.Log(bpm/120.0,2)/0.9,2));    // gentle preference for ~120
+   double v=ac[lag]*prior;
+   sum+=ac[lag]; sum2+=ac[lag]*ac[lag]; lags++;
+   if(v>best) { best=v; bestLag=lag; }
+  }
+  if(bestLag==0) { Confidence=0; return; }
+  double mean=sum/lags, sd=Math.Sqrt(Math.Max(1e-12,sum2/lags-mean*mean));
+  double conf=Math.Max(0,Math.Min(1,(ac[bestLag]-mean)/(sd*4)));
+  // Sub-frame lag from the neighbours (parabolic peak).
+  double y0=ac[bestLag-1], y1=ac[bestLag], y2=ac[bestLag+1], den=y0-2*y1+y2;
+  double lagF=bestLag+(Math.Abs(den)>1e-12 ? 0.5*(y0-y2)/den : 0);
+  double newPeriod=lagF/Fps;
+  // Only switch tempo when two estimates in a row agree; otherwise smooth.
+  if(period>0 && Math.Abs(newPeriod-period)/period<0.04) newPeriod=0.85*period+0.15*newPeriod;
+  else if(Math.Abs(newPeriod-candidatePeriod)/Math.Max(1e-6,candidatePeriod)<0.04) { if(++candidateVotes<2 && period>0) { Confidence=conf*0.5; return; } }
+  else { candidatePeriod=newPeriod; candidateVotes=1; if(period>0) { Confidence=conf*0.5; return; } }
+  // Beat position: the offset whose comb of beats lines up with the strongest onsets.
+  int L=(int)Math.Round(newPeriod*Fps); double bestPhase=-1; int phase=0;
+  for(int ph=0;ph<L;ph++) {
+   double s=0; int k=0;
+   for(int age=ph;age<n && k<8;age+=L,k++) s+=At(onset,age)+0.5*(age>0?At(onset,age-1):0)+0.5*At(onset,age+1<n?age+1:age);
+   if(s>bestPhase) { bestPhase=s; phase=ph; }
+  }
+  // Bass energy peaks ~20 ms after the kick starts; shift back so she moves on the hit.
+  period=newPeriod; lastBeat=lastFrameTime-(double)phase/Fps-0.02;
+  Bpm=60.0/period; Confidence=conf;
+ }
+
+ static void Run() {
+  Running=true;
+  while(!stopRequested) {
+   try { Capture(); }
+   catch(Exception e) { LastError=e.Message; }
+   if(!stopRequested) System.Threading.Thread.Sleep(2000);    // device changed or failed: retry
+  }
+  Running=false; Bpm=0; Confidence=0;
+ }
+
+ static void Capture() {
+  IMMDeviceEnumerator enumerator=(IMMDeviceEnumerator)Activator.CreateInstance(Type.GetTypeFromCLSID(new Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")));
+  IMMDevice device; Check(enumerator.GetDefaultAudioEndpoint(0,1,out device),"no playback device");
+  Guid clientId=typeof(IAudioClient).GUID; object o;
+  Check(device.Activate(ref clientId,23,IntPtr.Zero,out o),"cannot open playback device");
+  IAudioClient client=(IAudioClient)o;
+  IntPtr format; Check(client.GetMixFormat(out format),"no mix format");
+  int channels=Marshal.ReadInt16(format,2), sampleRate=Marshal.ReadInt32(format,4), bits=Marshal.ReadInt16(format,14);
+  int tag=Marshal.ReadInt16(format,0)&0xFFFF;
+  bool isFloat=tag==3;
+  if(tag==0xFFFE) { byte[] g=new byte[16]; Marshal.Copy(new IntPtr(format.ToInt64()+24),g,0,16); isFloat=new Guid(g)==new Guid("00000003-0000-0010-8000-00aa00389b71"); }
+  try { Check(client.Initialize(0,0x00020000,10000000,0,format,IntPtr.Zero),"cannot start loopback"); }
+  finally { Marshal.FreeCoTaskMem(format); }
+  Guid captureId=typeof(IAudioCaptureClient).GUID; object c;
+  Check(client.GetService(ref captureId,out c),"no capture service");
+  IAudioCaptureClient capture=(IAudioCaptureClient)c;
+  Reset(sampleRate);
+  float[] mono=new float[sampleRate];
+  Check(client.Start(),"cannot start capture");
+  double lastData=Now();
+  try {
+   while(!stopRequested) {
+    System.Threading.Thread.Sleep(10);
+    uint packet; Check(capture.GetNextPacketSize(out packet),"capture failed");
+    if(packet==0) {
+     // Nothing playing: feed silence so the timeline keeps moving and confidence drops.
+     double gap=Now()-lastData;
+     if(gap>0.05) { int z=Math.Min(mono.Length,(int)(gap*sampleRate)); Array.Clear(mono,0,z); Feed(mono,z,Now()); lastData=Now(); }
+     continue;
+    }
+    while(packet>0) {
+     IntPtr data; uint frames, flags; ulong p1, p2;
+     Check(capture.GetBuffer(out data,out frames,out flags,out p1,out p2),"capture failed");
+     int n=(int)Math.Min(frames,(uint)mono.Length);
+     if((flags&2)!=0 || data==IntPtr.Zero) Array.Clear(mono,0,n);
+     else if(isFloat && bits==32) {
+      float[] raw=new float[n*channels]; Marshal.Copy(data,raw,0,raw.Length);
+      for(int i=0;i<n;i++) { float m=0; for(int ch=0;ch<channels;ch++) m+=raw[i*channels+ch]; mono[i]=m/channels; }
+     } else if(bits==16) {
+      short[] raw=new short[n*channels]; Marshal.Copy(data,raw,0,raw.Length);
+      for(int i=0;i<n;i++) { float m=0; for(int ch=0;ch<channels;ch++) m+=raw[i*channels+ch]/32768f; mono[i]=m/channels; }
+     } else Array.Clear(mono,0,n);
+     Check(capture.ReleaseBuffer(frames),"capture failed");
+     Feed(mono,n,Now()); lastData=Now();
+     Check(capture.GetNextPacketSize(out packet),"capture failed");
+    }
+   }
+  } finally {
+   client.Stop();
+   Marshal.ReleaseComObject(capture); Marshal.ReleaseComObject(client); Marshal.ReleaseComObject(device); Marshal.ReleaseComObject(enumerator);
+  }
+ }
+ static void Check(int hr,string what) { if(hr<0) throw new Exception(what+" (0x"+hr.ToString("X8")+")"); }
 }
 public sealed class CapriVoicePlayback {
  private readonly System.Media.SoundPlayer player;

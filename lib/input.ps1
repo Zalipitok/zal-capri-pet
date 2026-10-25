@@ -28,6 +28,7 @@ $w.Add_LocationChanged({
 $w.Add_PreviewMouseLeftButtonDown({
  param($sender,$event)
  Register-Interaction
+ if(Register-GameCatch){$script:mouseDown=$false; $event.Handled=$true; return}
  if(([Windows.Input.Keyboard]::Modifiers -band [Windows.Input.ModifierKeys]::Shift) -ne 0){
   Invoke-Swat; $script:mouseDown=$false; $event.Handled=$true; return
  }

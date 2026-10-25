@@ -63,16 +63,90 @@ function Update-Music([double]$t){
 function Test-MusicGroove {
  return $script:musicEnabled -and $script:musicPlaying -and -not $script:voiceBusy -and $script:spec.tags.Contains('calm')
 }
-# With headphones on: the hover pose becomes the four head-bob frames, one per half beat.
+# With headphones on: the hover pose becomes the four head-bob frames (tilt, up, other tilt, up).
+# With beat sync, each tilt lands on a real beat; otherwise she bobs at musicBpm from tuning.json.
+$script:beatSync=$true; $script:nextBeatCheck=0.0
+function Get-BeatPhase {
+ if(-not $script:beatSync){return -1.0}
+ try{return [CapriBeat]::Phase()}catch{return -1.0}
+}
 function Get-MusicPose([double]$t){
- $step=[int][Math]::Floor($t*[Math]::Max(30.0,[double]$script:tuning.musicBpm)/30.0)%4
+ $phase=Get-BeatPhase
+ if($phase -ge 0){
+  $beat=[long][CapriBeat]::BeatNumber()
+  $step=([int]([Math]::Abs($beat)%2))*2+$(if($phase -lt 0.5){0}else{1})
+ }else{
+  $step=[int][Math]::Floor($t*[Math]::Max(30.0,[double]$script:tuning.musicBpm)/30.0)%4
+ }
  return $script:musicPoseStart+$step
+}
+# Listens for the beat only while music is playing and the option is on.
+function Update-BeatSync([double]$t){
+ if($t -lt $script:nextBeatCheck){return}
+ $script:nextBeatCheck=$t+2
+ $want=$script:beatSync -and $script:musicEnabled -and $script:musicPlaying -and -not $script:isHidden
+ try{
+  if($want -and -not [CapriBeat]::Running){[CapriBeat]::Start()}
+  elseif(-not $want -and [CapriBeat]::Running){[CapriBeat]::Stop()}
+ }catch{}
 }
 function Apply-MusicGroove([double]$t){
  if($script:musicFrameActive -or -not (Test-MusicGroove)){return}
  $k=[double]$script:tuning.musicBob
+ $phase=Get-BeatPhase
+ if($phase -ge 0){
+  # Dip on each beat, sway to alternate sides on alternate beats.
+  $side=if(([long][CapriBeat]::BeatNumber())%2 -eq 0){1.0}else{-1.0}
+  $shift.Y+=[Math]::Cos(2*[Math]::PI*$phase)*3.0*$k
+  $rotation.Angle+=$side*[Math]::Sin([Math]::PI*$phase)*2.5*$k
+  return
+ }
  $shift.Y+=[Math]::Sin($t*11.3)*3.0*$k
  $rotation.Angle+=[Math]::Sin($t*5.65)*2.5*$k
+}
+
+# --- Battery ---------------------------------------------------------------
+# Laptops only: she reacts to unplugging, plugging in, a low and a nearly empty battery, and a full charge.
+$script:batteryReactions=$true
+$script:batteryState=@{known=$false; online=$false; percent=-1; low=$false; critical=$false; full=$false}
+$script:nextBatteryPoll=5.0
+# True when she can drop what she's doing for a reaction.
+function Test-CanReact {
+ return $script:idleRest -eq 'awake' -and -not $script:busyMode -and -not $script:dragging -and -not $script:paused -and -not $script:isHidden -and -not $script:spec.tags.Contains('noCaught')
+}
+function Update-Battery([double]$t){
+ if(-not $script:batteryReactions -or $t -lt $script:nextBatteryPoll){return}
+ $script:nextBatteryPoll=$t+15
+ $power=$null; try{$power=[Windows.Forms.SystemInformation]::PowerStatus}catch{return}
+ $status=$power.BatteryChargeStatus
+ if($status.HasFlag([Windows.Forms.BatteryChargeStatus]::NoSystemBattery) -or $status -eq [Windows.Forms.BatteryChargeStatus]::Unknown){return}
+ $percent=[int][Math]::Round($power.BatteryLifePercent*100)
+ $online=$power.PowerLineStatus -eq [Windows.Forms.PowerLineStatus]::Online
+ $b=$script:batteryState
+ if(-not $b.known){$b.known=$true; $b.online=$online; $b.percent=$percent; $b.low=$percent -le 20; $b.critical=$percent -le 10; $b.full=$percent -ge 100; return}
+ if($online -and -not $b.online){
+  $b.low=$false; $b.critical=$false
+  if(Test-CanReact){Begin-State 'celebrate'}
+  [void](Show-Remark 'pluggedin' -Value $percent)
+ }elseif(-not $online -and $b.online){
+  $b.full=$false
+  [void](Show-Remark 'unplugged' -Value $percent)
+ }
+ if(-not $online){
+  if($percent -le 10 -and -not $b.critical){
+   $b.critical=$true; $b.low=$true
+   if(Test-CanReact){Begin-State 'dizzy'}
+   [void](Show-Remark 'batterycritical' -Force -Value $percent)
+   if($null -ne $script:tray){try{$script:tray.ShowBalloonTip(6000,'Capri','Battery at '+$percent+'%. Plug me in!',[Windows.Forms.ToolTipIcon]::Warning)}catch{}}
+  }elseif($percent -le 20 -and -not $b.low){
+   $b.low=$true
+   if(Test-CanReact){Begin-State 'shiver'}
+   [void](Show-Remark 'batterylow' -Value $percent)
+  }
+ }elseif($percent -ge 100 -and -not $b.full){
+  $b.full=$true; [void](Show-Remark 'batteryfull')
+ }
+ $b.online=$online; $b.percent=$percent
 }
 
 # --- Apps (opt-in) ---------------------------------------------------------

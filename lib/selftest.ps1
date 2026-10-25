@@ -25,13 +25,15 @@ function Invoke-SelfTest {
 
  # --- Files and data
  Test-Step 'Required files' {
-  $missing=@('behaviours.json','remarks.json','voice-pack.json','menu-theme.xaml','tuning.json','app-reactions.json','sounds\cartoon-swat.wav','pose-shaken.png',
+  $missing=@('behaviours.json','remarks.json','voice-pack.json','menu-theme.xaml','tuning.json','app-reactions.json','unlocks.json','sounds\cartoon-swat.wav','pose-shaken.png',
    'poses-clean.png','poses-extra-clean.png','poses-life-clean.png','poses-faces-clean.png','poses-casting-clean.png','poses-motion.png','poses-daily.png','poses-interaction.png') |
    Where-Object {-not (Test-Path -LiteralPath (Join-Path $script:AppRoot $_))}
   if(@($missing).Count -gt 0){'missing: '+(@($missing) -join ', ')}
  }
  Test-Step 'Sprite frames' {if($poses.Count -lt 33){'expected at least 33 frames, found '+$poses.Count}}
  Test-Step 'Talking-mouth frames' {if($script:mouthPoses.Count -eq 0){'WARN: no mouth frames (sprites\mouth-*.png); her mouth stays still while she talks'}}
+ Test-Step 'Eye frames' {if($script:eyePoses.Count -eq 0){'WARN: no eye frames (sprites\eye-*.png); her eyes stay still'}}
+ Test-Step 'Headphone poses' {if($script:hpPoses.Count -eq 0){'WARN: no headphone poses (sprites\hp-*.png)'}}
  Test-Step 'Music frames' {if($script:musicPoseStart -lt 0){'WARN: no headphone frames (sprites\music-0..3.png); she sways to music instead'}}
  Test-Step 'Normalised sprites' {
   if($null -eq $script:spriteFeet){return 'WARN: sprites\ folder missing, so frames are cut from the sheets (clipped hair, size jumps)'}
@@ -92,6 +94,35 @@ function Invoke-SelfTest {
   $script:paused=$true; & $script:tickBody; $script:paused=$false
   $script:hiddenManual=$true; Apply-Visibility; & $script:tickBody; $script:hiddenManual=$false; Apply-Visibility
   if($script:selfTestErrors.Count -gt 0){$script:selfTestErrors -join '; '}
+ }
+ Test-Step 'Unlocks' {
+  if($script:unlocksError){return 'unlocks.json: '+$script:unlocksError}
+  if($script:unlocks.Count -eq 0){return 'WARN: unlocks.json missing or empty'}
+  $bad=@(foreach($u in $script:unlocks){foreach($s in @($u.routine)){if($s -and -not $script:specs.Contains([string]$s)){$u.id+': unknown state '+$s}}; if($u.remarks -and $null -eq $remarkPack.($u.remarks)){$u.id+': remark pool '+$u.remarks+' missing'}})
+  if($bad.Count -gt 0){$bad -join '; '}else{[void](Get-UnlockSummary)}
+ }
+ Test-Step 'Catch-me game' {
+  $script:selfTestErrors.Clear()
+  Start-CatchGame; & $script:tickBody; [void](Register-GameCatch); & $script:tickBody
+  if($script:game.score -ne 1){return 'a click did not count'}
+  Stop-CatchGame; & $script:tickBody
+  if($script:game.active){return 'the game did not end'}
+  if($script:selfTestErrors.Count -gt 0){$script:selfTestErrors -join '; '}
+ }
+ Test-Step 'Settings window' {
+  Show-SettingsWindow
+  if($null -eq $script:settingsWindow){return 'window did not open'}
+  $script:settingsWindow.Close()
+ }
+ Test-Step 'Eyes follow the cursor' {$c=Get-LocalCursor; [void](Get-EyeDirection ($w.Left+$c.X) ($w.Top+$c.Y))}
+ Test-Step 'Battery check' {$script:nextBatteryPoll=0; Update-Battery 1.0}
+ Test-Step 'Beat sync' {
+  if(-not $script:beatSync){return 'WARN: turned off in settings'}
+  [CapriBeat]::Start()
+  $deadline=[DateTime]::Now.AddSeconds(2.5)
+  while([DateTime]::Now -lt $deadline -and -not [CapriBeat]::LastError){Start-Sleep -Milliseconds 100}
+  $problem=[CapriBeat]::LastError; [CapriBeat]::Stop()
+  if($problem){'WARN: cannot listen to the PC''s sound ('+$problem+'); she bobs at a fixed tempo instead'}
  }
  Test-Step 'Routines start' {foreach($name in @($script:routines.Keys)){Start-Routine $name}; $script:routine.Clear()}
  Test-Step 'File drop scan' {Start-FileScan 'C:\example\test file.txt'; & $script:tickBody; if($script:state -ne 'filescan'){'scan did not start'}}

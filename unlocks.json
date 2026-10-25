@@ -1,0 +1,116 @@
+[
+  {
+    "id": "victorylap",
+    "title": "Victory lap",
+    "need": {
+      "days": 3
+    },
+    "routine": [
+      "charge",
+      "rocket",
+      "figure8",
+      "landing",
+      "celebrate",
+      "bow"
+    ]
+  },
+  {
+    "id": "spa",
+    "title": "Spa day",
+    "need": {
+      "pets": 25
+    },
+    "routine": [
+      "stretch",
+      "sip",
+      "meditate",
+      "heartbeat",
+      "nap"
+    ]
+  },
+  {
+    "id": "stunts",
+    "title": "Stunt show",
+    "need": {
+      "throws": 10
+    },
+    "routine": [
+      "hop",
+      "rocket",
+      "tumble",
+      "landing",
+      "dizzy",
+      "bow"
+    ]
+  },
+  {
+    "id": "rival",
+    "title": "Rival respect (new lines)",
+    "need": {
+      "catches": 10
+    },
+    "remarks": "rivalry"
+  },
+  {
+    "id": "regular",
+    "title": "Welcome-back regular (new lines)",
+    "need": {
+      "returns": 10
+    },
+    "remarks": "regular"
+  },
+  {
+    "id": "bond",
+    "title": "Softer side (new lines)",
+    "need": {
+      "days": 7
+    },
+    "remarks": "bond"
+  },
+  {
+    "id": "champion",
+    "title": "Champion's encore",
+    "need": {
+      "bestCatch": 15
+    },
+    "routine": [
+      "gamerwin",
+      "celebrate",
+      "cheers",
+      "laughing",
+      "smug"
+    ]
+  },
+  {
+    "id": "gamer",
+    "title": "Arcade regular (new lines)",
+    "need": {
+      "games": 10
+    },
+    "remarks": "arcade"
+  },
+  {
+    "id": "anniversary",
+    "title": "Anniversary party",
+    "need": {
+      "days": 30
+    },
+    "routine": [
+      "wave",
+      "dance",
+      "spin",
+      "celebrate",
+      "cheers",
+      "heartbeat",
+      "bow"
+    ]
+  },
+  {
+    "id": "detective",
+    "title": "Case files (new lines)",
+    "need": {
+      "scans": 20
+    },
+    "remarks": "casefiles"
+  }
+]

@@ -55,6 +55,22 @@ WHAT SHE DOES ON HER OWN
     quiet while you code. It reads only the name and title of the window in front; nothing
     is stored or sent anywhere. The app lists are in app-reactions.json.
 
+NEWER FEATURES
+  Settings window   right-click > Settings window... (or the tray menu): every option in tabs.
+  Eyes              her eyes follow your cursor in her hover, beckon and wave poses.
+  Talking mouth     while she speaks, her squiggle mouth switches to her open grin with the words.
+  Music             headphones on while something plays; she bobs on the real beat of the song
+                    (she listens to your PC's sound in memory only; nothing is recorded or saved).
+                    Turn that off in Settings > Music and apps to use the fixed musicBpm tempo.
+  Shadow            a soft shadow under her when she sits on a window or the bottom of the screen.
+  Battery           on laptops she reacts to unplugging, plugging in, low and nearly empty battery.
+  Catch me          Interact > Play catch me: click her as often as you can in 30 seconds.
+  Unlocks           days together, pats, throws, cursor catches, welcome-backs, scans and game scores
+                    unlock new routines and new lines (unlocks.json). Debug and help > Our history
+                    shows what's unlocked and hints for the rest.
+  Mixed-scale monitors (experimental): set "perMonitorDpi": true in tuning.json and restart for
+                    sharp rendering on monitors with different scale settings.
+
 FILES YOU CAN EDIT
   behaviours.json      every state: pose, timing, movement, what comes next, routines
   remarks.json         her text lines, by situation ({0} is filled in with a number or name)
@@ -62,6 +78,7 @@ FILES YOU CAN EDIT
                        crossfade, music bob, how often she comments, the hotkey.
                        After editing: Debug and help > Reload tuning.json.
   app-reactions.json   which programs count as games, code, video, browsers
+  unlocks.json         what can be unlocked and what it takes
 Saved automatically: voice-settings.json (preferences), memory.json (history).
 sprite-cache\ is rebuilt from the sprite sheets when they change; safe to delete.
 
@@ -87,6 +104,9 @@ sprites\frames.json records where her feet are in each frame, which is how she s
 After editing a sheet, rebuild the frames (needs Python):
   pip install pillow numpy scipy scikit-image
   python tools\normalize_sprites.py
+  python tools\make_music_frames.py     (headphones)
+  python tools\make_mouth_frames.py     (talking mouth)
+  python tools\make_eye_frames.py       (eyes)
 Without the sprites folder she falls back to cutting the sheets as before.
 
 LOGS (in this folder, only when something goes wrong)
@@ -104,7 +124,9 @@ CODE LAYOUT
   lib\speech.ps1     bubble, remarks, settings, voice playback
   lib\memory.ps1     memory.json
   lib\states.ps1     state machine, paths, animations, throws, hiding, modes
-  lib\awareness.ps1  music, app awareness, file drops, hotkey
+  lib\awareness.ps1  music, beat sync, battery, app awareness, file drops, hotkey
+  lib\play.ps1       catch-me game and unlocks
+  lib\settings.ps1   the settings window
   lib\menu.ps1       voice library, menu, tray icon
   lib\input.ps1      mouse
   lib\loop.ps1       the per-frame loop

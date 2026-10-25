@@ -97,7 +97,7 @@ try {
   if($null -ne $saved.rivalWins){$script:rivalWins=[Math]::Max(0.0,[int]$saved.rivalWins)}
   if($null -ne $saved.escapeStreak){$script:escapeStreak=[Math]::Max(0.0,[Math]::Min(5.0,[int]$saved.escapeStreak))}
   if($null -ne $saved.petSize){$script:petSize=[Math]::Max(65.0,[Math]::Min(160.0,[double]$saved.petSize))}
-  foreach($setting in @('facialMotion','chase','blackwallEnabled','sfxEnabled','windowPerch','throwPhysics','timeOfDay','remarksEnabled','subtitles','muted','smoothPoses','musicEnabled','appAware','hotkeyEnabled','talkingMouth')){
+  foreach($setting in @('facialMotion','chase','blackwallEnabled','sfxEnabled','windowPerch','throwPhysics','timeOfDay','remarksEnabled','subtitles','muted','smoothPoses','musicEnabled','appAware','hotkeyEnabled','talkingMouth','eyesFollow','batteryReactions','shadowEnabled','beatSync')){
    if($saved.$setting -is [bool]){Set-Variable -Name $setting -Scope Script -Value $saved.$setting}
   }
   if($saved.idleSleepAfter -in @(0,120,300,600)){$script:idleSleepAfter=[double]$saved.idleSleepAfter}
@@ -114,7 +114,7 @@ try {
 } catch { } # Invalid settings reset to defaults.
 function Save-VoiceSettings {
  if($script:SelfTestMode){return} # the self-test never overwrites your settings
- try { @{activityRates=$script:activityRates; rivalEscapes=$script:rivalEscapes; rivalWins=$script:rivalWins; escapeStreak=$script:escapeStreak; facialMotion=$script:facialMotion; chase=$script:chase; blackwallEnabled=$script:blackwallEnabled; sfxEnabled=$script:sfxEnabled; idleSleepAfter=$script:idleSleepAfter; petSize=$script:petSize; language=$script:language; muted=$script:muted; volume=$script:volume; chatter=$script:chatter; subtitles=$script:subtitles; approvedVoices=@($script:approvedVoices); voicePackRevision=3; remarksEnabled=$script:remarksEnabled; fullscreenMode=$script:fullscreenMode; windowPerch=$script:windowPerch; throwPhysics=$script:throwPhysics; timeOfDay=$script:timeOfDay; breakMinutes=$script:breakMinutes; smoothPoses=$script:smoothPoses; musicEnabled=$script:musicEnabled; appAware=$script:appAware; hotkeyEnabled=$script:hotkeyEnabled; talkingMouth=$script:talkingMouth} | ConvertTo-Json | Set-Content -LiteralPath $settingsPath -Encoding UTF8 }
+ try { @{activityRates=$script:activityRates; rivalEscapes=$script:rivalEscapes; rivalWins=$script:rivalWins; escapeStreak=$script:escapeStreak; facialMotion=$script:facialMotion; chase=$script:chase; blackwallEnabled=$script:blackwallEnabled; sfxEnabled=$script:sfxEnabled; idleSleepAfter=$script:idleSleepAfter; petSize=$script:petSize; language=$script:language; muted=$script:muted; volume=$script:volume; chatter=$script:chatter; subtitles=$script:subtitles; approvedVoices=@($script:approvedVoices); voicePackRevision=3; remarksEnabled=$script:remarksEnabled; fullscreenMode=$script:fullscreenMode; windowPerch=$script:windowPerch; throwPhysics=$script:throwPhysics; timeOfDay=$script:timeOfDay; breakMinutes=$script:breakMinutes; smoothPoses=$script:smoothPoses; musicEnabled=$script:musicEnabled; appAware=$script:appAware; hotkeyEnabled=$script:hotkeyEnabled; talkingMouth=$script:talkingMouth; eyesFollow=$script:eyesFollow; batteryReactions=$script:batteryReactions; shadowEnabled=$script:shadowEnabled; beatSync=$script:beatSync} | ConvertTo-Json | Set-Content -LiteralPath $settingsPath -Encoding UTF8 }
  catch { Show-Problem 'Settings could not be saved.' }
 }
 # Volume is applied to Capri's audio session, so changes reach a clip that is already playing.

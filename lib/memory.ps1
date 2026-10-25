@@ -2,7 +2,7 @@
 $script:memoryPath=Join-Path $script:AppRoot 'memory.json'
 $script:memory=[ordered]@{
  firstMet=''; lastSeen=''; lastDay=''; days=0; sessions=0
- pets=0; throws=0; shakes=0; swats=0; returns=0; scans=0
+ pets=0; throws=0; shakes=0; swats=0; returns=0; scans=0; games=0; bestCatch=0; unlocked=''
  todayDate=''; todayPets=0; todayThrows=0; todaySwats=0
 }
 $script:memoryDirty=$false; $script:nextMemorySave=0.0; $script:greeting=$null
