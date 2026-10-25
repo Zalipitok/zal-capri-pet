@@ -12,7 +12,7 @@ A little Capri from *Cyberpunk: Edgerunners 2* who lives on your Windows desktop
 2. Run **Capri.exe**. If Windows SmartScreen warns you, click *More info → Run anyway* (the exe isn't code-signed).
 3. She appears near the bottom right. Right-click her for everything; she also has a tray icon next to the clock.
 
-Needs Windows 10 (1809 or newer) or Windows 11. Nothing to install: she runs on the PowerShell that comes with Windows. Updates: she checks once a day and can install new versions herself (*right-click → Debug and help → Install update*).
+Needs Windows 10 (1809 or newer) or Windows 11. Nothing to install: she's a small native app (.NET Framework 4.8, already part of Windows) and stays light even on older PCs. Updates: she checks once a day and can install new versions herself (*right-click → Debug and help → Install update*).
 
 > Voice clips aren't included (they're recorded from the show and not ours to share). She works fine without them: text bubbles instead of her voice, and chat replies can be read aloud by a Windows voice.
 
@@ -40,7 +40,7 @@ Beat detection listens to your PC's sound in memory only; nothing is recorded or
 
 ## For tinkerers
 
-Behaviour, lines, tuning, unlocks and trivia are plain JSON files next to the exe (`behaviours.json`, `remarks.json`, `tuning.json`, `unlocks.json`, `games.json`). The code is PowerShell 5.1 + WPF in `lib\`; `Run-SelfTest.bat` checks everything and writes `selftest-report.txt`. Pushing to the `release` branch builds a new release (version from `VERSION`).
+Behaviour, lines, tuning, unlocks and trivia are plain JSON files next to the exe (`behaviours.json`, `remarks.json`, `tuning.json`, `unlocks.json`, `games.json`). The code is C# (WPF, .NET Framework 4.8) in `src\Capri`; GitHub Actions builds it on every push. `Run-SelfTest.bat` checks everything and writes `selftest-report.txt`. Pushing to the `release` branch builds a new release (version from `VERSION`).
 
 ---
 

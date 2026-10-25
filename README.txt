@@ -1,10 +1,10 @@
 CAPRI COMPANION - GUIDE
 
 START
-  Capri.vbs            starts her with no console window (use this normally)
-  Start-Capri.bat      starts her with a console window, so startup errors stay visible
+  Capri.exe            starts her (Capri.vbs and Start-Capri.bat do the same, for old shortcuts)
   Run-SelfTest.bat     checks everything on this PC and writes selftest-report.txt
-  Capri.exe            only after you build it (see BUILDING THE EXE)
+Capri is a native Windows app (.NET Framework 4.8, already part of Windows 10 and 11), so there is
+nothing to install. Windows SmartScreen may warn the first time: More info > Run anyway.
 Only one Capri runs at a time. Settings > Start with Windows adds her to startup.
 
 FINDING HER
@@ -137,16 +137,11 @@ hotkey, music and app detection, then shows a summary and writes selftest-report
 It never changes your settings or memory. Send that report when something is wrong.
 
 BUILDING THE EXE
-  powershell -ExecutionPolicy Bypass -File tools\Build-Exe.ps1
-Installs the ps2exe module for your user (once), makes capri.ico from her hover pose
-(or uses your own capri.ico), and writes Capri.exe here. The exe still needs this folder
-around it (lib\, images, voices, json files). Windows SmartScreen may warn the first time
-because the exe is not signed.
-
-SHARING WITH FRIENDS
-On GitHub, every push to the 'release' branch builds Capri.exe on a Windows machine and publishes
-Capri-Companion.zip under Releases, named after the VERSION file. The zip has no voices folder
-(recorded dialogue isn't ours to share); she works fine without it, just with text instead of voice.
+The code is C# in src\Capri. GitHub builds it on every push (Actions > Native build); to build it
+yourself install the .NET SDK and run:
+  dotnet build src\Capri\Capri.csproj -c Release
+The exe lands in src\Capri\bin\Release\net48\. It needs this folder's data files beside it
+(json files, menu-theme.xaml, sprites\, sounds\, voices\).
 
 SPRITES
 Capri draws from sprites\frame-00..32.png. They are made from the sprite sheets by
@@ -160,7 +155,7 @@ After editing a sheet, rebuild the frames (needs Python):
   python tools\make_music_frames.py     (headphones)
   python tools\make_mouth_frames.py     (talking mouth)
   python tools\make_eye_frames.py       (eyes)
-Without the sprites folder she falls back to cutting the sheets as before.
+The pose sheets (poses-*.png) are only needed by these tools; Capri herself reads sprites\.
 
 LOGS (in this folder, only when something goes wrong)
   startup-error.log  runtime-error.log  audio-error.log  effects-error.log  cursor-error.log
@@ -169,30 +164,19 @@ There is no telemetry. Nothing leaves this PC unless you turn on weather (city n
 or chat replies (your messages to Anthropic, with your own key). The daily update check asks GitHub
 for the latest version number only.
 
-CODE LAYOUT
-  Capri.ps1          starts everything (loads lib\ in order)
-  lib\native.cs      Windows APIs: cursor, monitors, windows, fullscreen, idle time, volume, audio
-  lib\effects.cs     fast effect drawing and the global hotkey (needs WPF; falls back if not)
-  lib\window.ps1     window, effect layers, sprites, pose crossfade
-  lib\data.ps1       state variables, behaviours.json, tuning.json
-  lib\screens.ps1    monitors, work areas, window perching
-  lib\speech.ps1     bubble, remarks, settings, voice playback
-  lib\memory.ps1     memory.json
-  lib\states.ps1     state machine, paths, animations, throws, hiding, modes
-  lib\awareness.ps1  music, beat sync, battery, Do Not Disturb, app awareness, file drops, hotkey
-  lib\play.ps1       catch-me game and unlocks
-  lib\toys.ps1       the toy ball
-  lib\reminders.ps1  reminders
-  lib\weather.ps1    weather
-  lib\friend.ps1     the second Capri
-  lib\chat.ps1       the chat window, chat games
-  lib\powers.ps1     possession, cursor trail, peeking
-  lib\focus.ps1      focus timer
-  lib\notes.ps1      sticky notes
-  lib\update.ps1     updates from GitHub
-  lib\tts.cs         Windows voice for chat replies
-  lib\settings.ps1   the settings window
-  lib\menu.ps1       voice library, menu, tray icon
-  lib\input.ps1      mouse
-  lib\loop.ps1       the per-frame loop
-  lib\selftest.ps1   the self-test
+CODE LAYOUT (src\Capri)
+  App.cs             start-up, one Capri at a time, crash logs
+  Pet.cs             window, sprites, poses          Data.cs      tuning.json, behaviours.json
+  Screens.cs         monitors, windows, shadow, eyes Speech.cs    remarks, settings, voices
+  Memory.cs          memory.json                     States.cs    state machine, throws, modes
+  Motions.cs         paths and animations            Awareness.cs music, beat, battery, Do Not Disturb, apps
+  Play.cs            catch me, unlocks               Toys.cs      the toy ball
+  Reminders.cs       reminders                       Weather.cs   weather
+  Friend.cs          the second Capri                Powers.cs    possession, cursor trail, peeking
+  Focus.cs           focus timer                     Notes.cs     sticky notes
+  Update.cs          updates from GitHub             Chat.cs      chat, chat games, Claude API
+  SettingsWindow.cs  the settings window             Menu.cs      menu, tray, voice library
+  Input.cs           mouse                           Loop.cs      the per-frame loop
+  SelfTest.cs        the self-test
+  Native.cs, Effects.cs, Tts.cs   Windows APIs, effect drawing, hotkey, speech
+  Ui\*.xml           window layouts

@@ -1,6 +1,6 @@
-' Starts Capri without a console window. Double-click this file, or put a shortcut to it in Startup.
+' Starts Capri. (Capri.exe can also be started directly; this file is kept for old shortcuts.)
 Set fso = CreateObject("Scripting.FileSystemObject")
 dir = fso.GetParentFolderName(WScript.ScriptFullName)
 Set shell = CreateObject("WScript.Shell")
 shell.CurrentDirectory = dir
-shell.Run "powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -WindowStyle Hidden -File """ & dir & "\Capri.ps1""", 0, False
+shell.Run """" & dir & "\Capri.exe""", 1, False

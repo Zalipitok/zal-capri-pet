@@ -1,6 +1,7 @@
 # Push to the 'release' branch to build Capri.exe on Windows and publish a ready-to-run zip as a
 # release named after the VERSION file (bump it for each new release).
 # The zip has no voices folder (recorded dialogue is not ours to share); Capri runs without it.
+# It also leaves out the pose sheets, which only the sprite tools need.
 name: Release
 on:
   push:
@@ -14,20 +15,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build Capri.exe
-        shell: powershell
-        run: |
-          Set-PSRepository PSGallery -InstallationPolicy Trusted
-          Install-Module ps2exe -Scope CurrentUser -Force
-          powershell -NoProfile -ExecutionPolicy Bypass -File tools\Build-Exe.ps1
+        shell: pwsh
+        run: dotnet build src/Capri/Capri.csproj -c Release -nologo
       - name: Package
         shell: pwsh  # PowerShell 7's Compress-Archive writes standard forward-slash zip paths
         run: |
           $out = 'Capri-Companion'
           New-Item -ItemType Directory $out | Out-Null
-          foreach($item in @('Capri.exe','capri.ico','Capri.ps1','Capri.vbs','Start-Capri.bat','Run-SelfTest.bat','README.txt','VERSION','menu-theme.xaml','lib','sprites','sounds','tools')){
-            if(Test-Path $item){ Copy-Item $item $out -Recurse }
+          Copy-Item src/Capri/bin/Release/net48/Capri.exe $out
+          foreach($item in @('Capri.ps1','Capri.vbs','Start-Capri.bat','Run-SelfTest.bat','README.txt','VERSION','menu-theme.xaml','sprites','sounds')){
+            Copy-Item $item $out -Recurse
           }
-          Get-ChildItem *.png, *.json | Copy-Item -Destination $out
+          Get-ChildItem *.json | Copy-Item -Destination $out
           Compress-Archive -Path $out -DestinationPath Capri-Companion.zip
       - name: Publish release
         env:
@@ -35,4 +34,4 @@ jobs:
         shell: bash
         run: |
           version="v$(tr -d '[:space:]' < VERSION)"
-          gh release create "$version" Capri-Companion.zip --target "$GITHUB_SHA" --title "Capri $version" --notes "Unzip anywhere and run Capri.exe (or Capri.vbs). Windows may show a SmartScreen warning the first time because the exe is not signed. Voices are not included."
+          gh release create "$version" Capri-Companion.zip --target "$GITHUB_SHA" --title "Capri $version" --notes "Unzip anywhere and run Capri.exe. Windows may show a SmartScreen warning the first time because the exe is not signed (More info > Run anyway). Voices are not included."
