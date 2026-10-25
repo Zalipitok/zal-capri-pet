@@ -20,7 +20,7 @@ jobs:
           Install-Module ps2exe -Scope CurrentUser -Force
           powershell -NoProfile -ExecutionPolicy Bypass -File tools\Build-Exe.ps1
       - name: Package
-        shell: powershell
+        shell: pwsh  # PowerShell 7's Compress-Archive writes standard forward-slash zip paths
         run: |
           $out = 'Capri-Companion'
           New-Item -ItemType Directory $out | Out-Null
