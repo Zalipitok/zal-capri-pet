@@ -6,7 +6,7 @@ on:
     paths: ['src/**', '.github/workflows/native.yml']
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
   checks: write
 jobs:
   build:
@@ -33,11 +33,15 @@ jobs:
           $conclusion = if ('${{ steps.build.outcome }}' -eq 'success') { 'success' } else { 'failure' }
           $body = @{ name = 'native-build'; head_sha = '${{ github.sha }}'; status = 'completed'; conclusion = $conclusion; output = @{ title = "$($errors.Count) errors"; summary = "Build $conclusion"; text = $text } } | ConvertTo-Json -Depth 5
           $body | gh api repos/${{ github.repository }}/check-runs --method POST --input - | Out-Null
-      - uses: actions/upload-artifact@v4
-        if: steps.build.outcome == 'success'
-        with:
-          name: Capri-native
-          path: src/Capri/bin/Release/net48/Capri.exe
+      # A test build as a pre-release (never offered as an update: updates use the latest full release).
+      - name: Publish test build
+        if: steps.build.outcome == 'success' && github.ref_name != 'release'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete native-test --yes --cleanup-tag || true
+          gh release create native-test src/Capri/bin/Release/net48/Capri.exe --prerelease --target "$GITHUB_SHA" --title "Native test build" --notes "Test build of the native Capri.exe from $GITHUB_SHA. Not an update."
       - name: Fail if the build failed
         if: steps.build.outcome != 'success'
         run: exit 1
