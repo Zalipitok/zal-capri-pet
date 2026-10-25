@@ -1,0 +1,15 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ Title="Capri's ball" Width="44" Height="44" WindowStyle="None" ResizeMode="NoResize"
+ AllowsTransparency="True" Background="Transparent" Topmost="True" ShowInTaskbar="False" ShowActivated="False">
+ <Grid Name="Ball" RenderTransformOrigin="0.5,0.5" Cursor="Hand">
+  <Grid.RenderTransform><TransformGroup><ScaleTransform/><RotateTransform/></TransformGroup></Grid.RenderTransform>
+  <Ellipse Stroke="#0A0A0A" StrokeThickness="2">
+   <Ellipse.Fill><RadialGradientBrush GradientOrigin="0.35,0.3">
+    <GradientStop Color="#FFFBC8" Offset="0"/><GradientStop Color="#FCEE0A" Offset="0.45"/><GradientStop Color="#B89C00" Offset="1"/>
+   </RadialGradientBrush></Ellipse.Fill>
+  </Ellipse>
+  <Path Data="M 4,22 Q 22,10 40,22" Stroke="#0A0A0A" StrokeThickness="3"/>
+  <Path Data="M 6,27 Q 22,16 38,27" Stroke="#00E5FF" StrokeThickness="1.5"/>
+  <Ellipse Width="7" Height="7" Fill="#FF2A6D" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,9,8"/>
+ </Grid>
+</Window>

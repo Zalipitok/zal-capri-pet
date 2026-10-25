@@ -1,0 +1,41 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ Title="Capri" Width="260" Height="430" WindowStyle="None" ResizeMode="NoResize"
+ AllowsTransparency="True" Background="Transparent" Topmost="True" ShowInTaskbar="False"
+ ShowActivated="False">
+ <Grid Name="Scene" Margin="18">
+  <Grid.RowDefinitions><RowDefinition Height="Auto" MinHeight="100"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+  <Ellipse Grid.Row="1" Name="Shadow" VerticalAlignment="Bottom" HorizontalAlignment="Center" IsHitTestVisible="False" Visibility="Collapsed" Width="80" Height="12">
+   <Ellipse.Fill><RadialGradientBrush><GradientStop Color="#C0000000" Offset="0"/><GradientStop Color="#00000000" Offset="1"/></RadialGradientBrush></Ellipse.Fill>
+  </Ellipse>
+  <Image Grid.Row="1" Name="Sprite" Stretch="Uniform" RenderTransformOrigin="0.5,0.5">
+   <Image.RenderTransform><TransformGroup>
+    <ScaleTransform/><RotateTransform/><TranslateTransform/>
+   </TransformGroup></Image.RenderTransform>
+  </Image>
+  <Image Grid.Row="1" Name="Ghost" Stretch="Uniform" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False" Visibility="Collapsed"/>
+  <Canvas Name="Blackwall" Grid.Row="1" IsHitTestVisible="False" ClipToBounds="True"/>
+  <Border Name="SabotagePanel" Grid.Row="1" VerticalAlignment="Top" Background="#E510070C" BorderBrush="#D02246" BorderThickness="1" Padding="8" Visibility="Collapsed" IsHitTestVisible="False">
+   <TextBlock Name="SabotageText" Foreground="#FF4564" FontFamily="Consolas" FontSize="11" TextWrapping="Wrap" Text="SIGNAL LOST"/>
+  </Border>
+  <Border Name="FocusBadge" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Background="#E5070A12" BorderBrush="#FCEE0A" BorderThickness="1" Padding="6,1" Margin="0,0,0,2" Visibility="Collapsed" IsHitTestVisible="False">
+   <TextBlock Name="FocusText" Foreground="#FCEE0A" FontFamily="Consolas" FontSize="12" FontWeight="Bold"/>
+  </Border>
+  <TextBlock Name="Effect" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,10,0,0" Foreground="#FF75D6" FontFamily="Segoe UI Symbol" FontSize="24" IsHitTestVisible="False"/>
+  <Border Grid.Row="0" Name="Bubble" VerticalAlignment="Bottom" HorizontalAlignment="Center" MaxWidth="{Binding ActualWidth, ElementName=Scene}" Margin="6,0,6,8" IsHitTestVisible="False"
+   Background="#F2070A12" BorderBrush="#00E5FF" BorderThickness="1" CornerRadius="0" Visibility="Collapsed">
+   <Border.Effect><DropShadowEffect Color="#00E5FF" BlurRadius="12" ShadowDepth="0" Opacity="0.55"/></Border.Effect>
+   <Grid>
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <Border Grid.Row="0" Background="#FCEE0A" Padding="8,1">
+     <DockPanel LastChildFill="False">
+      <TextBlock DockPanel.Dock="Left" Text="CAPRI // LIVE" Foreground="#0A0A0A" FontFamily="Consolas" FontSize="10" FontWeight="Bold"/>
+      <TextBlock DockPanel.Dock="Right" Text="[ LINK OK ]" Foreground="#B0000000" FontFamily="Consolas" FontSize="10"/>
+     </DockPanel>
+    </Border>
+    <Rectangle Grid.Row="1" Width="3" HorizontalAlignment="Left" Fill="#FF2A6D"/>
+    <Rectangle Grid.Row="1" Width="22" Height="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Fill="#FF2A6D"/>
+    <TextBlock Grid.Row="1" Name="Words" Margin="14,8,12,11" Foreground="#E8FBFF" FontFamily="Consolas" FontSize="14" TextWrapping="Wrap" TextAlignment="Left"/>
+   </Grid>
+  </Border>
+ </Grid>
+</Window>

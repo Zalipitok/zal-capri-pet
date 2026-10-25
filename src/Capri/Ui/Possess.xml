@@ -1,0 +1,16 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ WindowStyle="None" ResizeMode="NoResize" AllowsTransparency="True" Background="Transparent"
+ Topmost="True" ShowInTaskbar="False" ShowActivated="False" IsHitTestVisible="False">
+ <Grid>
+  <Rectangle Name="Tint" Fill="#40FF1040"/>
+  <Rectangle>
+   <Rectangle.Fill>
+    <DrawingBrush TileMode="Tile" Viewport="0,0,4,4" ViewportUnits="Absolute">
+     <DrawingBrush.Drawing><GeometryDrawing Brush="#55B50025"><GeometryDrawing.Geometry><RectangleGeometry Rect="0,0,4,1"/></GeometryDrawing.Geometry></GeometryDrawing></DrawingBrush.Drawing>
+    </DrawingBrush>
+   </Rectangle.Fill>
+  </Rectangle>
+  <Border BorderBrush="#FF2246" BorderThickness="3"/>
+  <TextBlock Name="Label" Text="SIGNAL HIJACKED // CAPRI" Foreground="#FF4564" FontFamily="Consolas" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+ </Grid>
+</Window>

@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Capri as a native Windows app: .NET Framework 4.8 is part of every Windows 10 and 11, so the
+       exe needs nothing installed. Data files (json, sprites, sounds) stay next to the exe. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AssemblyName>Capri</AssemblyName>
+    <RootNamespace>Capri</RootNamespace>
+    <ApplicationIcon>capri.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>3.0.0</Version>
+    <Product>Capri</Product>
+    <Description>Capri desktop companion</Description>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DebugType>none</DebugType>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>CS0162;CS0168;CS0219;CS0414;CS0649;CS0169;CS8632</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Speech" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Ui\*.xml" LogicalName="%(Filename).xml" />
+  </ItemGroup>
+</Project>

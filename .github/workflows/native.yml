@@ -1,0 +1,43 @@
+# Builds the native Capri.exe (src/Capri) on every push that touches it, and publishes the compiler
+# output as a "native-build" check so problems are easy to read.
+name: Native build
+on:
+  push:
+    paths: ['src/**', '.github/workflows/native.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  checks: write
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        id: build
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          dotnet build src/Capri/Capri.csproj -c Release -nologo -clp:NoSummary 2>&1 | Tee-Object -FilePath build.log
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+      - name: Report
+        if: always()
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $lines = Get-Content build.log | Where-Object { $_ -match ': (error|warning) [A-Z]+[0-9]+' } | ForEach-Object { ($_ -replace '^.*src[\\/]Capri[\\/]', '') -replace '\s*\[.*\]$','' } | Select-Object -Unique
+          $errors = @($lines | Where-Object { $_ -match ': error ' })
+          $text = if ($lines) { ($lines -join "`n") } else { (Get-Content build.log -Tail 60) -join "`n" }
+          if ($text.Length -gt 60000) { $text = $text.Substring(0, 60000) }
+          $conclusion = if ('${{ steps.build.outcome }}' -eq 'success') { 'success' } else { 'failure' }
+          $body = @{ name = 'native-build'; head_sha = '${{ github.sha }}'; status = 'completed'; conclusion = $conclusion; output = @{ title = "$($errors.Count) errors"; summary = "Build $conclusion"; text = $text } } | ConvertTo-Json -Depth 5
+          $body | gh api repos/${{ github.repository }}/check-runs --method POST --input - | Out-Null
+      - uses: actions/upload-artifact@v4
+        if: steps.build.outcome == 'success'
+        with:
+          name: Capri-native
+          path: src/Capri/bin/Release/net48/Capri.exe
+      - name: Fail if the build failed
+        if: steps.build.outcome != 'success'
+        run: exit 1
