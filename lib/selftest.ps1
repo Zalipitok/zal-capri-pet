@@ -36,7 +36,7 @@ function Invoke-SelfTest {
   if($null -eq $script:spriteFeet){return 'WARN: sprites\ folder missing, so frames are cut from the sheets (clipped hair, size jumps)'}
   $sizes=@($poses | ForEach-Object {''+$_.PixelWidth+'x'+$_.PixelHeight} | Select-Object -Unique)
   if($sizes.Count -ne 1){'frames have different sizes: '+($sizes -join ', ')}
-  elseif($script:spriteFeet.Count -ne 33){'frames.json lists '+$script:spriteFeet.Count+' feet positions'}
+  elseif($script:spriteFeet.Count -ne $poses.Count){'frames.json lists '+$script:spriteFeet.Count+' feet positions for '+$poses.Count+' frames'}
  }
  Test-Step 'Files are read from the Capri folder' {if((Split-Path -Leaf $settingsPath) -ne 'voice-settings.json' -or (Split-Path -Parent $settingsPath) -ne $script:AppRoot){'settings path is '+$settingsPath}}
  Test-Step 'Sprite cache is writable' {
