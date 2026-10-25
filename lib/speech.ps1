@@ -97,7 +97,7 @@ try {
   if($null -ne $saved.rivalWins){$script:rivalWins=[Math]::Max(0.0,[int]$saved.rivalWins)}
   if($null -ne $saved.escapeStreak){$script:escapeStreak=[Math]::Max(0.0,[Math]::Min(5.0,[int]$saved.escapeStreak))}
   if($null -ne $saved.petSize){$script:petSize=[Math]::Max(65.0,[Math]::Min(160.0,[double]$saved.petSize))}
-  foreach($setting in @('facialMotion','chase','blackwallEnabled','sfxEnabled','windowPerch','throwPhysics','timeOfDay','remarksEnabled','subtitles','muted','smoothPoses','musicEnabled','appAware','hotkeyEnabled')){
+  foreach($setting in @('facialMotion','chase','blackwallEnabled','sfxEnabled','windowPerch','throwPhysics','timeOfDay','remarksEnabled','subtitles','muted','smoothPoses','musicEnabled','appAware','hotkeyEnabled','talkingMouth')){
    if($saved.$setting -is [bool]){Set-Variable -Name $setting -Scope Script -Value $saved.$setting}
   }
   if($saved.idleSleepAfter -in @(0,120,300,600)){$script:idleSleepAfter=[double]$saved.idleSleepAfter}
@@ -114,7 +114,7 @@ try {
 } catch { } # Invalid settings reset to defaults.
 function Save-VoiceSettings {
  if($script:SelfTestMode){return} # the self-test never overwrites your settings
- try { @{activityRates=$script:activityRates; rivalEscapes=$script:rivalEscapes; rivalWins=$script:rivalWins; escapeStreak=$script:escapeStreak; facialMotion=$script:facialMotion; chase=$script:chase; blackwallEnabled=$script:blackwallEnabled; sfxEnabled=$script:sfxEnabled; idleSleepAfter=$script:idleSleepAfter; petSize=$script:petSize; language=$script:language; muted=$script:muted; volume=$script:volume; chatter=$script:chatter; subtitles=$script:subtitles; approvedVoices=@($script:approvedVoices); voicePackRevision=3; remarksEnabled=$script:remarksEnabled; fullscreenMode=$script:fullscreenMode; windowPerch=$script:windowPerch; throwPhysics=$script:throwPhysics; timeOfDay=$script:timeOfDay; breakMinutes=$script:breakMinutes; smoothPoses=$script:smoothPoses; musicEnabled=$script:musicEnabled; appAware=$script:appAware; hotkeyEnabled=$script:hotkeyEnabled} | ConvertTo-Json | Set-Content -LiteralPath $settingsPath -Encoding UTF8 }
+ try { @{activityRates=$script:activityRates; rivalEscapes=$script:rivalEscapes; rivalWins=$script:rivalWins; escapeStreak=$script:escapeStreak; facialMotion=$script:facialMotion; chase=$script:chase; blackwallEnabled=$script:blackwallEnabled; sfxEnabled=$script:sfxEnabled; idleSleepAfter=$script:idleSleepAfter; petSize=$script:petSize; language=$script:language; muted=$script:muted; volume=$script:volume; chatter=$script:chatter; subtitles=$script:subtitles; approvedVoices=@($script:approvedVoices); voicePackRevision=3; remarksEnabled=$script:remarksEnabled; fullscreenMode=$script:fullscreenMode; windowPerch=$script:windowPerch; throwPhysics=$script:throwPhysics; timeOfDay=$script:timeOfDay; breakMinutes=$script:breakMinutes; smoothPoses=$script:smoothPoses; musicEnabled=$script:musicEnabled; appAware=$script:appAware; hotkeyEnabled=$script:hotkeyEnabled; talkingMouth=$script:talkingMouth} | ConvertTo-Json | Set-Content -LiteralPath $settingsPath -Encoding UTF8 }
  catch { Show-Problem 'Settings could not be saved.' }
 }
 # Volume is applied to Capri's audio session, so changes reach a clip that is already playing.
@@ -131,14 +131,26 @@ Set-Volume $script:volume
 
 $script:speechPose=-1; $script:speechMotion='still'; $script:speechTempo=1.0; $script:speechStarted=0.0
 $script:speechVisible=$false; $script:speechRestorePose=0
+$script:speechEnvelope=$null
 function End-SpeechPose {
- if($script:speechVisible -and $script:poseIndex -eq $script:speechPose){Set-Pose $script:speechRestorePose}
+ $mouth=if($script:mouthPoses.ContainsKey($script:speechPose)){$script:mouthPoses[$script:speechPose]}else{@()}
+ if($script:speechVisible -and ($script:poseIndex -eq $script:speechPose -or $mouth -contains $script:poseIndex)){Set-Pose $script:speechRestorePose}
+ $script:speechEnvelope=$null
  $script:speechVisible=$false; $script:speechPose=-1
 }
 function Apply-SpeechPose {
  if(-not $script:speechVisible -or -not $script:voiceBusy -or $script:speechPose -lt 0){return}
  if($script:dragging -or $script:mouseDown -or $script:spec.tags.Contains('noSpeechPose')){return}
- Set-Pose $script:speechPose
+ # Talking mouth: this moment of the clip (from its loudness) picks closed, half-open or wide-open.
+ $pose=$script:speechPose
+ if($script:talkingMouth -and $null -ne $script:speechEnvelope -and $script:mouthPoses.ContainsKey($pose)){
+  $i=[int][Math]::Floor(($clock.Elapsed.TotalSeconds-$script:speechStarted-[double]$script:tuning.mouthDelay)*30.0)
+  if($i -ge 0 -and $i -lt $script:speechEnvelope.Length){
+   $level=$script:speechEnvelope[$i]
+   if($level -gt 0){$pose=$script:mouthPoses[$pose][$level-1]}
+  }
+ }
+ Set-Pose $pose -Instant
  $v=($clock.Elapsed.TotalSeconds-$script:speechStarted)*$script:speechTempo
  # Replace unrelated spin/squash transforms while this line is speaking.
  $scale.ScaleX=$script:direction; $scale.ScaleY=1
@@ -208,6 +220,8 @@ function Play-Voice([string]$eventName, [bool]$preview=$false, [string]$clipId='
   # All bundled recordings are 16-bit PCM WAV: use native playback directly.
   $bytes=[IO.File]::ReadAllBytes($audioPath)
   if(-not $script:liveVolume){$bytes=[CapriPcmAudio]::WithVolume($bytes,$script:volume)}
+  $script:speechEnvelope=$null
+  try{$script:speechEnvelope=[CapriPcmAudio]::MouthLevels([CapriPcmAudio]::Envelope($bytes,30.0),[double]$script:tuning.mouthHalf,[double]$script:tuning.mouthWide)}catch{}
   $script:voiceJob=[CapriVoicePlayback]::new($bytes)
   $script:voiceBusy=$true
   $script:speechVisible=$true; $script:speechStarted=$clock.Elapsed.TotalSeconds

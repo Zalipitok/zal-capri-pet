@@ -51,6 +51,9 @@ $script:tuning=[ordered]@{
  perchSink=0.0           # px to lower her onto a title bar (raise if she floats above it)
  roamChance=0.2          # chance a wander goes to another monitor
  crossfadeSeconds=0.12   # pose-change fade; 0 = off
+ mouthHalf=0.25          # how readily her mouth half-opens while she speaks (0-1, lower = more)
+ mouthWide=0.6           # how readily it opens wide (0-1, lower = more)
+ mouthDelay=0.06         # seconds the mouth waits for the sound to start
  musicBob=1.0            # strength of her swaying to music (poses without music frames)
  musicBpm=108.0          # head-bob tempo with headphones on (Windows does not report a song's tempo)
  songRemarkMinutes=3.0   # at least this long between comments on songs

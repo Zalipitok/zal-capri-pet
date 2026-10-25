@@ -167,6 +167,7 @@ $sizeLabel=New-MenuSlider $sizeMenu ('Size: '+[int]$script:petSize+'%') 65 160 5
  Register-Interaction; Set-PetSize ([double]$sender.Value)
  $sizeLabel.Text=('Size: '+[int]$script:petSize+'%')
 }
+[void](New-MenuEntry $appearance 'Talking mouth' {$script:talkingMouth=-not $script:talkingMouth; Save-VoiceSettings} {$script:talkingMouth})
 [void](New-MenuEntry $appearance 'Smooth pose changes' {$script:smoothPoses=-not $script:smoothPoses; Save-VoiceSettings} {$script:smoothPoses})
 [void](New-MenuEntry $appearance 'Idle blinking' {$script:facialMotion=-not $script:facialMotion} {$script:facialMotion})
 [void](New-MenuEntry $appearance 'Blackwall effects' {$script:blackwallEnabled=-not $script:blackwallEnabled} {$script:blackwallEnabled})

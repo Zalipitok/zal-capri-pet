@@ -178,6 +178,8 @@ function Get-CleanFrames([string]$sheetName){
 $poses = @()
 $script:spriteFeet = $null
 $script:musicPoseStart = -1
+$script:mouthPoses = @{}
+$script:talkingMouth = $true
 $script:spriteScale = 1.0
 $spriteDir = Join-Path $script:AppRoot 'sprites'
 $spriteMeta = Join-Path $spriteDir 'frames.json'
@@ -192,6 +194,17 @@ if((Test-Path -LiteralPath $spriteMeta) -and @($framePaths | Where-Object {-not 
  if($null -ne $meta.music -and @($musicPaths | Where-Object {-not (Test-Path -LiteralPath $_)}).Count -eq 0){
   $script:musicPoseStart = $poses.Count
   foreach($path in $musicPaths){$poses += Read-Png $path; $script:spriteFeet += [double]$meta.music.feet}
+ }
+ # Talking-mouth frames (half open, wide open) for each pose she speaks in, made by
+ # tools\make_mouth_frames.py. Map: speaking pose -> @(half-open pose, wide-open pose).
+ if($null -ne $meta.mouths){
+  foreach($property in $meta.mouths.PSObject.Properties){
+   $base=[int]$property.Name
+   $mouthPaths=@(foreach($level in 1..2){Join-Path $spriteDir ('mouth-{0}-{1}.png' -f $base,$level)})
+   if(@($mouthPaths | Where-Object {-not (Test-Path -LiteralPath $_)}).Count -gt 0){continue}
+   $script:mouthPoses[$base]=@($poses.Count,($poses.Count+1))
+   foreach($path in $mouthPaths){$poses += Read-Png $path; $script:spriteFeet += $script:spriteFeet[$base]}
+  }
  }
  # The shared canvas has more room around her than the old 768 px cells; grow the window to match
  # so she stays the same size on screen.

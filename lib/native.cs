@@ -148,6 +148,59 @@ public sealed class CapriVoicePlayback {
 }
 // Fallback only: used when Windows refuses per-app volume, so gain is baked into the clip.
 public static class CapriPcmAudio {
+ // Loudness of a 16-bit PCM WAV, fps values per second, scaled so ordinary speech reaches about 1.
+ // Drives the talking mouth. Falls quickly, so syllables read as separate mouth movements.
+ public static double[] Envelope(byte[] wav, double fps) {
+  if(wav==null || wav.Length<44 || fps<=0) return new double[0];
+  int channels=1, rate=22050, bits=16;
+  for(int pos=12;pos+8<=wav.Length;) {
+   int length=BitConverter.ToInt32(wav,pos+4);
+   if(length<0 || length>wav.Length-pos-8) length=wav.Length-pos-8;
+   string kind=System.Text.Encoding.ASCII.GetString(wav,pos,4);
+   if(kind=="fmt " && length>=16) { channels=Math.Max(1,(int)BitConverter.ToInt16(wav,pos+10)); rate=BitConverter.ToInt32(wav,pos+12); bits=BitConverter.ToInt16(wav,pos+22); }
+   if(kind=="data") {
+    if(bits!=16 || rate<=0) return new double[0];
+    int frameBytes=2*channels, perWindow=Math.Max(1,(int)(rate/fps)), frames=length/frameBytes;
+    int windows=frames/perWindow+1;
+    double[] env=new double[windows];
+    for(int w=0;w<windows;w++) {
+     double sum=0; int count=0;
+     for(int f=w*perWindow;f<Math.Min(frames,(w+1)*perWindow);f++) { double v=BitConverter.ToInt16(wav,pos+8+f*frameBytes)/32768.0; sum+=v*v; count++; }
+     env[w]=count>0 ? Math.Sqrt(sum/count) : 0;
+    }
+    double[] sorted=(double[])env.Clone(); Array.Sort(sorted);
+    double peak=sorted[Math.Max(0,(int)(sorted.Length*0.9)-1)];
+    if(peak<=1e-6) return new double[windows];
+    for(int k=0;k<windows;k++) { env[k]=Math.Min(1.0,env[k]/peak); if(k>0) env[k]=Math.Max(env[k],env[k-1]*0.55); }
+    return env;
+   }
+   pos+=8+length+(length%2);
+  }
+  return new double[0];
+ }
+ // Mouth openness per frame (0 closed, 1 half, 2 wide) from an Envelope. Loudness is judged against
+ // the surrounding ~0.3 s so each syllable opens and closes, and a wide mouth eases to half after
+ // a few frames, so long loud stretches still look like talking.
+ public static int[] MouthLevels(double[] env, double half, double wide) {
+  if(env==null) return new int[0];
+  int n=env.Length, win=4, hold=4, rest=2;
+  int[] levels=new int[n];
+  for(int i=0;i<n;i++) {
+   double lo=double.MaxValue, hi=double.MinValue;
+   for(int j=Math.Max(0,i-win);j<=Math.Min(n-1,i+win);j++) { lo=Math.Min(lo,env[j]); hi=Math.Max(hi,env[j]); }
+   double rel=hi-lo>0.08 ? (env[i]-lo)/(hi-lo) : 0.5;
+   double x=rel*Math.Min(1.0,env[i]*1.5);
+   levels[i]=x>=wide ? 2 : (x>=half ? 1 : 0);
+  }
+  int run=0, cool=0;
+  for(int i=0;i<n;i++) {
+   if(levels[i]==2) {
+    if(cool>0) { levels[i]=1; cool--; }
+    else { run++; if(run>hold) { levels[i]=1; run=0; cool=rest-1; } }
+   } else { run=0; cool=0; }
+  }
+  return levels;
+ }
  public static byte[] WithVolume(byte[] source, double volume) {
   byte[] data=(byte[])source.Clone();
   if(data.Length<44) throw new ArgumentException("Invalid WAV file");

@@ -31,6 +31,7 @@ function Invoke-SelfTest {
   if(@($missing).Count -gt 0){'missing: '+(@($missing) -join ', ')}
  }
  Test-Step 'Sprite frames' {if($poses.Count -lt 33){'expected at least 33 frames, found '+$poses.Count}}
+ Test-Step 'Talking-mouth frames' {if($script:mouthPoses.Count -eq 0){'WARN: no mouth frames (sprites\mouth-*.png); her mouth stays still while she talks'}}
  Test-Step 'Music frames' {if($script:musicPoseStart -lt 0){'WARN: no headphone frames (sprites\music-0..3.png); she sways to music instead'}}
  Test-Step 'Normalised sprites' {
   if($null -eq $script:spriteFeet){return 'WARN: sprites\ folder missing, so frames are cut from the sheets (clipped hair, size jumps)'}
@@ -108,7 +109,7 @@ function Invoke-SelfTest {
   foreach($clip in $voicePack){
    $path=Join-Path $script:AppRoot ([string]$clip.file)
    if(-not (Test-Path -LiteralPath $path -PathType Leaf)){$bad+="$($clip.id): missing"; continue}
-   try{[void][CapriPcmAudio]::WithVolume([IO.File]::ReadAllBytes($path),1.0)}catch{$bad+="$($clip.id): $($_.Exception.Message)"}
+   try{$bytes=[IO.File]::ReadAllBytes($path); [void][CapriPcmAudio]::WithVolume($bytes,1.0); if([CapriPcmAudio]::Envelope($bytes,30.0).Length -eq 0){$bad+="$($clip.id): no loudness data for the mouth"}}catch{$bad+="$($clip.id): $($_.Exception.Message)"}
   }
   if($bad.Count -gt 0){(@($bad | Select-Object -First 8) -join '; ')+$(if($bad.Count -gt 8){" (+$($bad.Count-8) more)"}else{''})}
  }
