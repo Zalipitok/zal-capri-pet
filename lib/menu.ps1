@@ -175,7 +175,7 @@ $sizeLabel=New-MenuSlider $sizeMenu ('Size: '+[int]$script:petSize+'%') 65 160 5
 [void](New-MenuEntry $appearance 'Smooth pose changes' {$script:smoothPoses=-not $script:smoothPoses; Save-VoiceSettings} {$script:smoothPoses})
 [void](New-MenuEntry $appearance 'Idle blinking' {$script:facialMotion=-not $script:facialMotion} {$script:facialMotion})
 [void](New-MenuEntry $appearance 'Blackwall effects' {$script:blackwallEnabled=-not $script:blackwallEnabled} {$script:blackwallEnabled})
-[void](New-MenuEntry $appearance 'Swat sound' {$script:sfxEnabled=-not $script:sfxEnabled; if(-not $script:sfxEnabled){$sfxPlayer.Close()}} {$script:sfxEnabled})
+[void](New-MenuEntry $appearance 'Sound effects (swat, head pat)' {$script:sfxEnabled=-not $script:sfxEnabled; if(-not $script:sfxEnabled){$sfxPlayer.Close()}} {$script:sfxEnabled})
 
 $behaviour=New-SubMenu $settings 'Behaviour'
 [void](New-MenuEntry $behaviour 'Cursor chasing' {

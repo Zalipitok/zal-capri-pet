@@ -139,22 +139,14 @@
       "title": "Wander",
       "auto": true,
       "category": "wandering",
-      "poses": [
-        [
-          23,
-          0.55
-        ],
-        [
-          24,
-          0.55
-        ]
-      ],
-      "loop": true,
       "speed": 65,
       "tags": [
+        "blink",
         "mood",
         "calm"
-      ]
+      ],
+      "pose": 12,
+      "motion": "glide"
     },
     {
       "id": "perch",
@@ -260,24 +252,16 @@
       "id": "roam",
       "title": "Visit another screen",
       "category": "wandering",
-      "poses": [
-        [
-          23,
-          0.55
-        ],
-        [
-          24,
-          0.55
-        ]
-      ],
-      "loop": true,
       "target": "otherMonitor",
       "speed": 220,
       "tags": [
+        "blink",
         "mood",
         "calm",
         "noClamp"
-      ]
+      ],
+      "pose": 12,
+      "motion": "glide"
     },
     {
       "id": "watch",
@@ -744,22 +728,12 @@
       "menu": "Move around",
       "auto": true,
       "category": "wandering",
-      "poses": [
-        [
-          23,
-          0.55
-        ],
-        [
-          24,
-          0.55
-        ]
-      ],
-      "loop": true,
       "quip": "very stealthy.",
       "effect": "...",
       "seconds": 7,
       "speed": 35,
-      "clampTarget": true
+      "clampTarget": true,
+      "pose": 7
     },
     {
       "id": "patrol",
@@ -767,23 +741,13 @@
       "menu": "Move around",
       "auto": true,
       "category": "wandering",
-      "poses": [
-        [
-          23,
-          0.55
-        ],
-        [
-          24,
-          0.55
-        ]
-      ],
-      "loop": true,
       "quip": "perimeter secured.",
       "effect": "[ patrol ]",
       "seconds": 9,
       "path": "patrol",
       "speed": 160,
-      "clampTarget": true
+      "clampTarget": true,
+      "pose": 5
     },
     {
       "id": "zigzag",
@@ -862,22 +826,12 @@
       "menu": "Move around",
       "auto": true,
       "category": "wandering",
-      "poses": [
-        [
-          23,
-          0.55
-        ],
-        [
-          24,
-          0.55
-        ]
-      ],
-      "loop": true,
       "quip": "you saw nothing.",
       "effect": "...",
       "seconds": 8,
       "speed": 35,
-      "clampTarget": true
+      "clampTarget": true,
+      "pose": 7
     },
     {
       "id": "stretch",

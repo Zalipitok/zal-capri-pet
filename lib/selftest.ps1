@@ -25,7 +25,7 @@ function Invoke-SelfTest {
 
  # --- Files and data
  Test-Step 'Required files' {
-  $missing=@('behaviours.json','remarks.json','voice-pack.json','menu-theme.xaml','tuning.json','app-reactions.json','unlocks.json','sounds\cartoon-swat.wav','pose-shaken.png',
+  $missing=@('behaviours.json','remarks.json','voice-pack.json','menu-theme.xaml','tuning.json','app-reactions.json','unlocks.json','sounds\cartoon-swat.wav','sounds\headpat.wav','pose-shaken.png',
    'poses-clean.png','poses-extra-clean.png','poses-life-clean.png','poses-faces-clean.png','poses-casting-clean.png','poses-motion.png','poses-daily.png','poses-interaction.png') |
    Where-Object {-not (Test-Path -LiteralPath (Join-Path $script:AppRoot $_))}
   if(@($missing).Count -gt 0){'missing: '+(@($missing) -join ', ')}
@@ -33,7 +33,7 @@ function Invoke-SelfTest {
  Test-Step 'Sprite frames' {if($poses.Count -lt 33){'expected at least 33 frames, found '+$poses.Count}}
  Test-Step 'Talking-mouth frames' {if($script:mouthPoses.Count -eq 0){'WARN: no mouth frames (sprites\mouth-*.png); her mouth stays still while she talks'}}
  Test-Step 'Eye frames' {if($script:eyePoses.Count -eq 0){'WARN: no eye frames (sprites\eye-*.png); her eyes stay still'}}
- Test-Step 'Headphone poses' {if($script:hpPoses.Count -eq 0){'WARN: no headphone poses (sprites\hp-*.png)'}}
+ Test-Step 'Headphone poses' {if($script:hpPoses.Count -eq 0){'WARN: no headphone poses (sprites\hp-*.png)'}elseif($script:hpBobPoses.Count -eq 0){'WARN: no head-bob tilts (sprites\hpbob-*.png)'}}
  Test-Step 'Music frames' {if($script:musicPoseStart -lt 0){'WARN: no headphone frames (sprites\music-0..3.png); she sways to music instead'}}
  Test-Step 'Normalised sprites' {
   if($null -eq $script:spriteFeet){return 'WARN: sprites\ folder missing, so frames are cut from the sheets (clipped hair, size jumps)'}

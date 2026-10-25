@@ -265,6 +265,7 @@ $motions=@{
  'dance'={$rotation.Angle=-3+[Math]::Sin($phase*1.3)*2; $scale.ScaleY=1+[Math]::Sin($phase*1.5)*0.008; $shift.Y=[Math]::Sin($phase*1.6)*3}
  'glitch'={if($rng.NextDouble() -lt 0.28){$shift.X=$rng.Next(-9,10); $sprite.Opacity=0.55; $scale.ScaleX=$script:direction*1.08}}
  'nap'={$rotation.Angle=[Math]::Sin($t*0.8)*2; $scale.ScaleY=0.94+[Math]::Sin($t*1.6)*0.02; $shift.Y=0; $sprite.Opacity=0.8}
+ 'glide'={$rotation.Angle=-$script:direction*6; $scale.ScaleY=1+[Math]::Sin($t*2)*0.012}
  'float'={$rotation.Angle=[Math]::Sin($t*1.7)*4; $scale.ScaleY=1+[Math]::Sin($t*2)*0.015}
  'arrive'={$sprite.Opacity=[Math]::Min(1.0,$phase/1.6); $shift.X=[Math]::Sin($phase*18)*4*(1-[Math]::Min(1.0,$phase/1.6))}
  'dock'={$shift.Y=[Math]::Sin($phase)*1.5; $rotation.Angle=0}
@@ -420,6 +421,7 @@ function Invoke-HeadPat {
  Prepare-ManualAction; $script:routine.Clear(); Begin-State 'headpat'
  $script:caughtCooldown=$script:until+1
  $script:nextPet=$clock.Elapsed.TotalSeconds+2
+ Play-Sfx 'headpat.wav' 0.8
  $count=Add-Memory 'pets'
  if(Test-Milestone $count @(3,10,25,50,100)){[void](Show-Remark 'memorypets' -Value $count)}else{[void](Show-Remark 'pet')}
 }
@@ -496,6 +498,16 @@ function Set-PetSize([double]$percent){
  if(-not [double]::IsNaN($oldCenter)){$w.Left=$oldCenter-$w.Width/2}
  Clamp-Pet
 }
+# Sound effects (swat, head pat, catch) share one player; they follow mute and the sound-effects setting.
+function Play-Sfx([string]$file,[double]$gain=1.0){
+ if(-not $script:sfxEnabled -or $script:muted -or $script:busyMode -or $script:isHidden){return}
+ $path=Join-Path $script:AppRoot ('sounds\'+$file)
+ if(-not (Test-Path -LiteralPath $path)){return}
+ try{
+  $sfxPlayer.Close(); Update-SfxVolume; $sfxPlayer.Volume=[Math]::Min(1.0,$sfxPlayer.Volume*$gain)
+  $sfxPlayer.Open([Uri]::new($path,[UriKind]::Absolute)); $sfxPlayer.Play()
+ }catch{}
+}
 function Invoke-Swat {
  Prepare-ManualAction
  $now=$clock.Elapsed.TotalSeconds
@@ -505,8 +517,7 @@ function Invoke-Swat {
  $count=Add-Memory 'swats'
  if(Test-Milestone $count @(10,30,60)){[void](Show-Remark 'memoryswats' -Value $count)}
  if($script:sfxEnabled -and -not $script:muted -and -not $script:busyMode){
-  $sfxPlayer.Close(); Update-SfxVolume
-  $sfxPlayer.Open([Uri]::new((Join-Path $script:AppRoot 'sounds/cartoon-swat.wav'),[UriKind]::Absolute)); $sfxPlayer.Play()
+  Play-Sfx 'cartoon-swat.wav'
  }
 }
 # Brings Capri next to the pointer, on whichever monitor it is on.

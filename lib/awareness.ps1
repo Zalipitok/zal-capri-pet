@@ -70,16 +70,16 @@ function Get-BeatPhase {
  if(-not $script:beatSync){return -1.0}
  try{return [CapriBeat]::Phase()}catch{return -1.0}
 }
-function Get-MusicPose([double]$t){
+# 0 = tilt one way, 1 = up, 2 = tilt the other way, 3 = up; on the real beat when there is one.
+function Get-MusicStep([double]$t){
  $phase=Get-BeatPhase
  if($phase -ge 0){
   $beat=[long][CapriBeat]::BeatNumber()
-  $step=([int]([Math]::Abs($beat)%2))*2+$(if($phase -lt 0.5){0}else{1})
- }else{
-  $step=[int][Math]::Floor($t*[Math]::Max(30.0,[double]$script:tuning.musicBpm)/30.0)%4
+  return ([int]([Math]::Abs($beat)%2))*2+$(if($phase -lt 0.5){0}else{1})
  }
- return $script:musicPoseStart+$step
+ return [int][Math]::Floor($t*[Math]::Max(30.0,[double]$script:tuning.musicBpm)/30.0)%4
 }
+function Get-MusicPose([double]$t){return $script:musicPoseStart+(Get-MusicStep $t)}
 # Listens for the beat only while music is playing and the option is on.
 function Update-BeatSync([double]$t){
  if($t -lt $script:nextBeatCheck){return}

@@ -36,7 +36,7 @@ $script:settingDefs=@(
  (New-BoolSetting 'Look' 'Shadow when perched' {$script:shadowEnabled} {param($v) $script:shadowEnabled=$v})
  (New-BoolSetting 'Look' 'Idle blinking' {$script:facialMotion} {param($v) $script:facialMotion=$v})
  (New-BoolSetting 'Look' 'Blackwall effects' {$script:blackwallEnabled} {param($v) $script:blackwallEnabled=$v})
- (New-BoolSetting 'Look' 'Swat sound' {$script:sfxEnabled} {param($v) $script:sfxEnabled=$v; if(-not $v){$sfxPlayer.Close()}})
+ (New-BoolSetting 'Look' 'Sound effects (swat, head pat)' {$script:sfxEnabled} {param($v) $script:sfxEnabled=$v; if(-not $v){$sfxPlayer.Close()}})
  # Behaviour
  (New-BoolSetting 'Behaviour' 'Cursor chasing' {$script:chase} {param($v) $script:chase=$v; if(-not $v){$script:nextRetry=[double]::PositiveInfinity; if($script:spec.tags.Contains('needsChase')){Begin-State 'float'}}; $script:autoBag.Clear()})
  (New-BoolSetting 'Behaviour' 'Cursor knockback (moves your pointer)' {$script:cursorKnockback} {param($v) $script:cursorKnockback=$v} 'Not saved: always starts off.')

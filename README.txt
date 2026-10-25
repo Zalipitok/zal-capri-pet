@@ -17,7 +17,7 @@ She has a tray icon (next to the clock), not a taskbar button.
 CONTROLS
   Click: reaction.  Double-click: dance.  Drag: carry her.
   Flick and let go: throw her (she bounces and lands; turn off in Settings > Behaviour).
-  Shake while dragging: she gets angry.  Shift-click: cartoon swat.  Ctrl-click: head pat.
+  Shake while dragging: she gets angry.  Shift-click: cartoon swat.  Ctrl-click: head pat (with a little sound).
   Drop a file on her: a mock "threat scan" of its name. She never opens, moves or changes it.
   Right-click: the menu.  Escape or Quit: short dissolve and exit.
 
@@ -59,7 +59,8 @@ NEWER FEATURES
   Settings window   right-click > Settings window... (or the tray menu): every option in tabs.
   Eyes              her eyes follow your cursor in her hover, beckon and wave poses.
   Talking mouth     while she speaks, her squiggle mouth switches to her open grin with the words.
-  Music             headphones on while something plays; she bobs on the real beat of the song
+  Music             headphones on while something plays; she nods on the real beat of the song,
+                    whatever she's doing (hovering, dancing, gaming, sipping, waving)
                     (she listens to your PC's sound in memory only; nothing is recorded or saved).
                     Turn that off in Settings > Music and apps to use the fixed musicBpm tempo.
   Shadow            a soft shadow under her when she sits on a window or the bottom of the screen.

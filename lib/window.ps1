@@ -188,6 +188,7 @@ $script:musicPoseStart = -1
 $script:mouthPoses = @{}     # speaking pose -> @(half-open pose, wide-open pose)
 $script:eyePoses = @{}       # pose -> 8 poses with the eyes turned (right, up-right, up, ... down-right)
 $script:hpPoses = @{}        # pose -> the same pose with headphones on
+$script:hpBobPoses = @{}     # pose -> @(head tilted left, head tilted right), both with headphones
 $script:talkingMouth = $true
 $script:visorFraction = 0.41
 $script:spriteScale = 1.0
@@ -222,6 +223,11 @@ if((Test-Path -LiteralPath $spriteMeta) -and @($framePaths | Where-Object {-not 
   if($null -eq $base){continue}
   $set=Add-FrameSet @('hp-'+[int]$base+'.png') @($script:spriteFeet[[int]$base])
   if($null -ne $set){$script:hpPoses[[int]$base]=$set[0]}
+ }
+ foreach($base in @($meta.headphoneBob)){
+  if($null -eq $base -or -not $script:hpPoses.ContainsKey([int]$base)){continue}
+  $set=Add-FrameSet @(('hpbob-'+[int]$base+'-L.png'),('hpbob-'+[int]$base+'-R.png')) @($script:spriteFeet[[int]$base])
+  if($null -ne $set){$script:hpBobPoses[[int]$base]=$set}
  }
  # Talking-mouth frames for each pose she speaks in (tools\make_mouth_frames.py).
  if($null -ne $meta.mouths){
@@ -269,7 +275,14 @@ $ghost=$w.FindName('Ghost'); $ghost.RenderTransform=$sprite.RenderTransform
 $script:smoothPoses=$true; $script:lastPoseChange=0.0; $script:fadeStart=-1.0
 function Set-Pose([int]$index,[switch]$Instant) {
  # While music plays she keeps her headphones on (not mid-sentence, so they don't flicker).
- if($script:musicEnabled -and $script:musicPlaying -and -not $script:voiceBusy -and $script:hpPoses.ContainsKey($index)){$index=$script:hpPoses[$index]}
+ # Poses that have head-bob tilts nod on the beat: tilt, up, other tilt, up.
+ if($script:musicEnabled -and $script:musicPlaying -and -not $script:voiceBusy -and $script:hpPoses.ContainsKey($index)){
+  $base=$index; $index=$script:hpPoses[$base]
+  if($script:hpBobPoses.ContainsKey($base)){
+   $step=Get-MusicStep $clock.Elapsed.TotalSeconds
+   if($step -eq 0){$index=$script:hpBobPoses[$base][0]}elseif($step -eq 2){$index=$script:hpBobPoses[$base][1]}
+  }
+ }
  if($index -eq $script:poseIndex){return}
  $now=$clock.Elapsed.TotalSeconds
  $fade=[double]$script:tuning.crossfadeSeconds

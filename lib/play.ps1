@@ -27,9 +27,7 @@ function Register-GameCatch {
  if(-not $script:game.active -or $script:state -ne 'catchgame'){return $false}
  $script:game.score++
  $script:game.flash=$clock.Elapsed.TotalSeconds
- if($script:sfxEnabled -and -not $script:muted){
-  try{$sfxPlayer.Close(); Update-SfxVolume; $sfxPlayer.Open([Uri]::new((Join-Path $script:AppRoot 'sounds/cartoon-swat.wav'),[UriKind]::Absolute)); $sfxPlayer.Play()}catch{}
- }
+ Play-Sfx 'cartoon-swat.wav' 0.7
  Move-GameTarget
  return $true
 }
