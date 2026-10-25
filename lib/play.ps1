@@ -73,7 +73,11 @@ $script:unlockPools=@()   # remark pools that have been unlocked; mixed into her
 $script:nextUnlockCheck=20.0
 try {
  $unlockPath=Join-Path $script:AppRoot 'unlocks.json'
- if(Test-Path -LiteralPath $unlockPath){$script:unlocks=@(Get-Content -LiteralPath $unlockPath -Raw -Encoding UTF8 | ConvertFrom-Json)}
+ if(Test-Path -LiteralPath $unlockPath){
+  # Windows PowerShell 5.1 returns a JSON array as one object: assign first, then enumerate.
+  $decodedUnlocks=Get-Content -LiteralPath $unlockPath -Raw -Encoding UTF8 | ConvertFrom-Json
+  $script:unlocks=@(foreach($entry in $decodedUnlocks){$entry})
+ }
 } catch { $script:unlocksError=$_.Exception.Message }
 $script:statNames=@{days='days together'; pets='head pats'; throws='throws'; swats='swats'; shakes='shakes'; returns='welcome-backs'; scans='file scans'; sessions='sessions'; bestCatch='best catch-me score'; games='catch-me games'; catches='cursor catches'}
 function Get-Stat([string]$name){

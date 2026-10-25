@@ -169,7 +169,13 @@ function Invoke-SelfTest {
  Test-Step 'Fullscreen detection' {[void][CapriDesktop]::FullscreenBlocks($script:petHandle)}
  Test-Step 'Idle time' {$idle=[CapriDesktop]::IdleSeconds(); if($idle -lt 0){"negative idle time $idle"}}
  Test-Step 'Native effects' {if(-not $script:fxNative){'WARN: using the slower PowerShell effects (see effects-error.log)'}}
- Test-Step 'Summon hotkey' {if($script:hotkeyEnabled -and -not $script:hotkeyOk){'WARN: '+$script:hotkeyError}}
+ Test-Step 'Summon hotkey' {
+  if(-not $script:hotkeyEnabled -or $script:hotkeyOk){return}
+  # The self-test runs next to a normal Capri, which already holds the hotkey: that's fine.
+  $running=$null
+  if([Threading.Mutex]::TryOpenExisting('Local\CapriDesktopCompanion',[ref]$running)){$running.Dispose(); return}
+  'WARN: '+$script:hotkeyError
+ }
  Test-Step 'Music reactions' {
   if(-not $script:musicAvailable){return 'WARN: not available ('+$script:musicError+')'}
   $deadline=[DateTime]::Now.AddSeconds(3)
