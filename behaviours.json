@@ -1,0 +1,1143 @@
+{
+  "version": 2,
+  "_fields": {
+    "id": "State name. A matching entry in the $motions table of Capri.ps1 adds custom animation (or set 'motion' to share one).",
+    "title / menu": "Menu label and the Animations submenu it appears in (omit menu to keep it out of the menu).",
+    "auto / rare": "auto = part of the random rotation; rare = drawn from the rare-antics timer instead.",
+    "category": "attacks | wandering | resting | antics. Drives the Activity frequency sliders (default antics).",
+    "pose / poses / loop": "One sprite index, or a timeline [[pose, seconds], ...]; the last step can omit seconds. loop repeats it.",
+    "seconds": "Duration: a number, or [min, max] for a random whole number of seconds (default [5, 10]).",
+    "target": "random (default) | bottom | taskbar | edge | cursor | cursorAnchor | otherMonitor | window.",
+    "path / speed / clampTarget": "Per-frame target updater from the $paths table, travel speed (omit to stay put), keep target on screen.",
+    "next / nextNoChase / setMood": "State to go to afterwards (default: pick something new). nextNoChase applies when cursor chasing is off. '@attack' resolves the pounce.",
+    "tags": "blink, mood, calm, noFace, noCaught, noSleep, noYap, noRemark, noSpeechPose, noWobble, noClamp, needsChase, blackwall, arcs, strong.",
+    "remark": "Remark pool used while in this state (default idle).",
+    "effect / quip": "Floating effect text; quip is kept for reference."
+  },
+  "states": [
+    {
+      "id": "float",
+      "title": "Hover",
+      "menu": "Basic",
+      "auto": true,
+      "pose": 12,
+      "tags": [
+        "blink",
+        "mood",
+        "calm"
+      ]
+    },
+    {
+      "id": "wave",
+      "title": "Wave",
+      "menu": "Basic",
+      "auto": true,
+      "pose": 4
+    },
+    {
+      "id": "smug",
+      "title": "Smug",
+      "menu": "Basic",
+      "auto": true,
+      "pose": 5,
+      "tags": [
+        "calm"
+      ]
+    },
+    {
+      "id": "tumble",
+      "title": "Tumble",
+      "menu": "Basic",
+      "auto": true,
+      "pose": 6,
+      "seconds": 3.6,
+      "tags": [
+        "noFace",
+        "noWobble"
+      ]
+    },
+    {
+      "id": "peek",
+      "title": "Peek",
+      "menu": "Basic",
+      "auto": true,
+      "pose": 7,
+      "target": "edge",
+      "speed": 65
+    },
+    {
+      "id": "dash",
+      "title": "Dash",
+      "menu": "Basic",
+      "auto": true,
+      "category": "wandering",
+      "pose": 6,
+      "seconds": 3,
+      "speed": 360
+    },
+    {
+      "id": "orbit",
+      "title": "Orbit cursor",
+      "menu": "Basic",
+      "auto": true,
+      "category": "attacks",
+      "pose": 6,
+      "seconds": 7,
+      "target": "cursorAnchor",
+      "path": "orbit",
+      "speed": 180,
+      "tags": [
+        "needsChase"
+      ]
+    },
+    {
+      "id": "dance",
+      "title": "Folded-arms hover",
+      "menu": "Basic",
+      "auto": true,
+      "poses": [
+        [
+          21,
+          0.55
+        ],
+        [
+          22,
+          0.55
+        ]
+      ],
+      "loop": true
+    },
+    {
+      "id": "nap",
+      "title": "Sleep",
+      "menu": "Basic",
+      "auto": true,
+      "category": "resting",
+      "pose": 28,
+      "seconds": [
+        18,
+        30
+      ],
+      "tags": [
+        "noYap",
+        "noRemark",
+        "noFace",
+        "noWobble",
+        "noCaught"
+      ]
+    },
+    {
+      "id": "glitch",
+      "title": "Glitch",
+      "menu": "Basic",
+      "auto": true,
+      "pose": 0,
+      "remark": "mischief"
+    },
+    {
+      "id": "wander",
+      "title": "Wander",
+      "auto": true,
+      "category": "wandering",
+      "poses": [
+        [
+          23,
+          0.55
+        ],
+        [
+          24,
+          0.55
+        ]
+      ],
+      "loop": true,
+      "speed": 65,
+      "tags": [
+        "mood",
+        "calm"
+      ]
+    },
+    {
+      "id": "perch",
+      "title": "Perch at the bottom",
+      "auto": true,
+      "category": "resting",
+      "pose": 12,
+      "target": "bottom",
+      "speed": 65,
+      "tags": [
+        "blink",
+        "mood",
+        "calm"
+      ]
+    },
+    {
+      "id": "chase",
+      "title": "Chase the cursor",
+      "auto": true,
+      "category": "attacks",
+      "pose": 7,
+      "path": "chase",
+      "speed": 100,
+      "tags": [
+        "needsChase"
+      ],
+      "remark": "stalk"
+    },
+    {
+      "id": "taskbar",
+      "title": "Perch at taskbar",
+      "auto": true,
+      "category": "resting",
+      "pose": 5,
+      "seconds": 18,
+      "target": "taskbar",
+      "speed": 180,
+      "next": "taskpeek",
+      "motion": "dock",
+      "tags": [
+        "calm"
+      ]
+    },
+    {
+      "id": "taskpeek",
+      "pose": 7,
+      "seconds": 4,
+      "target": "taskbar",
+      "speed": 180,
+      "motion": "dock"
+    },
+    {
+      "id": "sabotage",
+      "title": "Fake sabotage / repair",
+      "auto": true,
+      "pose": 14,
+      "seconds": 5,
+      "next": "repairshow",
+      "motion": "sabotage",
+      "tags": [
+        "noSpeechPose",
+        "blackwall"
+      ],
+      "remark": "mischief"
+    },
+    {
+      "id": "repairshow",
+      "pose": 5,
+      "seconds": 3,
+      "next": "smug",
+      "setMood": "smug",
+      "motion": "sabotage",
+      "tags": [
+        "noSpeechPose",
+        "blackwall"
+      ],
+      "remark": "mischief"
+    },
+    {
+      "id": "windowperch",
+      "title": "Sit on the active window",
+      "category": "resting",
+      "pose": 12,
+      "seconds": [
+        15,
+        30
+      ],
+      "target": "window",
+      "path": "windowperch",
+      "speed": 180,
+      "tags": [
+        "blink",
+        "mood",
+        "calm"
+      ]
+    },
+    {
+      "id": "roam",
+      "title": "Visit another screen",
+      "category": "wandering",
+      "poses": [
+        [
+          23,
+          0.55
+        ],
+        [
+          24,
+          0.55
+        ]
+      ],
+      "loop": true,
+      "target": "otherMonitor",
+      "speed": 220,
+      "tags": [
+        "mood",
+        "calm",
+        "noClamp"
+      ]
+    },
+    {
+      "id": "watch",
+      "category": "attacks",
+      "auto": true,
+      "pose": 19,
+      "seconds": 1.6,
+      "path": "watch",
+      "next": "creep",
+      "nextNoChase": "float",
+      "tags": [
+        "blink",
+        "needsChase",
+        "noSleep",
+        "noYap",
+        "noCaught",
+        "noSpeechPose",
+        "blackwall",
+        "arcs"
+      ],
+      "remark": "stalk"
+    },
+    {
+      "id": "creep",
+      "category": "attacks",
+      "pose": 14,
+      "seconds": 4.5,
+      "path": "creep",
+      "speed": 38,
+      "next": "windup",
+      "nextNoChase": "float",
+      "tags": [
+        "blink",
+        "needsChase",
+        "noSleep",
+        "noYap",
+        "noCaught",
+        "noSpeechPose",
+        "blackwall",
+        "arcs"
+      ],
+      "remark": "stalk"
+    },
+    {
+      "id": "windup",
+      "category": "attacks",
+      "pose": 17,
+      "seconds": 0.65,
+      "next": "pounce",
+      "nextNoChase": "choose",
+      "tags": [
+        "needsChase",
+        "noSleep",
+        "noYap",
+        "noCaught",
+        "noSpeechPose",
+        "blackwall",
+        "arcs",
+        "strong"
+      ]
+    },
+    {
+      "id": "pounce",
+      "category": "attacks",
+      "pose": 31,
+      "seconds": 1.0,
+      "target": "cursor",
+      "speed": 1400,
+      "next": "@attack",
+      "tags": [
+        "needsChase",
+        "noSleep",
+        "noYap",
+        "noRemark",
+        "noCaught",
+        "noSpeechPose",
+        "blackwall",
+        "arcs",
+        "strong"
+      ]
+    },
+    {
+      "id": "impact",
+      "category": "attacks",
+      "pose": 31,
+      "seconds": 0.55,
+      "next": "smug",
+      "tags": [
+        "needsChase",
+        "noSleep",
+        "noYap",
+        "noCaught",
+        "noSpeechPose",
+        "blackwall",
+        "arcs",
+        "strong"
+      ]
+    },
+    {
+      "id": "rivalsneak",
+      "category": "attacks",
+      "pose": 7,
+      "seconds": 2.5,
+      "next": "creep",
+      "nextNoChase": "choose",
+      "tags": [
+        "needsChase",
+        "noCaught"
+      ]
+    },
+    {
+      "id": "rivalglare",
+      "pose": 2,
+      "seconds": 1.8,
+      "motion": "glare",
+      "tags": [
+        "noCaught",
+        "noSpeechPose"
+      ]
+    },
+    {
+      "id": "caught",
+      "pose": 15,
+      "seconds": 1.4,
+      "tags": [
+        "blink",
+        "noCaught",
+        "noSpeechPose",
+        "noWobble"
+      ],
+      "remark": "caught"
+    },
+    {
+      "id": "swat",
+      "poses": [
+        [
+          32,
+          2.1
+        ],
+        [
+          5
+        ]
+      ],
+      "seconds": 2.6,
+      "tags": [
+        "noSleep",
+        "noYap",
+        "noCaught",
+        "noSpeechPose"
+      ]
+    },
+    {
+      "id": "headpat",
+      "poses": [
+        [
+          15,
+          0.5
+        ],
+        [
+          29
+        ]
+      ],
+      "seconds": 3.2,
+      "tags": [
+        "noCaught"
+      ]
+    },
+    {
+      "id": "shaken",
+      "pose": 20,
+      "seconds": 4,
+      "tags": [
+        "noCaught"
+      ]
+    },
+    {
+      "id": "thrown",
+      "pose": 6,
+      "seconds": 30,
+      "path": "thrown",
+      "tags": [
+        "noClamp",
+        "noCaught",
+        "noSleep",
+        "noYap",
+        "noRemark",
+        "noFace",
+        "noSpeechPose",
+        "noWobble"
+      ]
+    },
+    {
+      "id": "arrive",
+      "pose": 14,
+      "seconds": 1.6,
+      "tags": [
+        "noSleep",
+        "noCaught",
+        "noSpeechPose",
+        "blackwall"
+      ]
+    },
+    {
+      "id": "depart",
+      "seconds": 1.2,
+      "tags": [
+        "blackwall"
+      ]
+    },
+    {
+      "id": "wakeglare",
+      "pose": 2,
+      "seconds": 1.4,
+      "next": "stretch",
+      "motion": "glare",
+      "tags": [
+        "noCaught",
+        "noSpeechPose"
+      ]
+    },
+    {
+      "id": "welcomeback",
+      "pose": 4,
+      "seconds": 2.5,
+      "motion": "wave",
+      "tags": [
+        "noCaught"
+      ]
+    },
+    {
+      "id": "breaktime",
+      "poses": [
+        [
+          16,
+          1.35
+        ],
+        [
+          19,
+          0.65
+        ]
+      ],
+      "loop": true,
+      "seconds": 6,
+      "next": "stretch",
+      "motion": "beckon",
+      "tags": [
+        "noCaught"
+      ]
+    },
+    {
+      "id": "filescan",
+      "pose": 17,
+      "seconds": 4,
+      "next": "scanverdict",
+      "tags": [
+        "noCaught",
+        "noSpeechPose",
+        "blackwall"
+      ],
+      "remark": "mischief"
+    },
+    {
+      "id": "scanverdict",
+      "pose": 5,
+      "seconds": 3.5,
+      "tags": [
+        "noCaught",
+        "noSpeechPose"
+      ]
+    },
+    {
+      "id": "beckon",
+      "title": "Beckon closer",
+      "menu": "New poses",
+      "auto": true,
+      "poses": [
+        [
+          16,
+          1.35
+        ],
+        [
+          19,
+          0.65
+        ]
+      ],
+      "loop": true,
+      "quip": "come closer.",
+      "effect": "",
+      "seconds": 6
+    },
+    {
+      "id": "casting",
+      "title": "Blackwall casting gesture",
+      "menu": "New poses",
+      "auto": true,
+      "poses": [
+        [
+          17,
+          1.2
+        ],
+        [
+          31,
+          1.8
+        ]
+      ],
+      "loop": true,
+      "quip": "watch closely.",
+      "effect": "",
+      "seconds": 6
+    },
+    {
+      "id": "sideglance",
+      "title": "Sideways glance",
+      "menu": "New poses",
+      "auto": true,
+      "pose": 19,
+      "quip": "...really?",
+      "effect": "",
+      "seconds": 5
+    },
+    {
+      "id": "sip",
+      "title": "Sip a drink",
+      "menu": "New poses",
+      "auto": true,
+      "poses": [
+        [
+          27,
+          2.5
+        ],
+        [
+          8,
+          1.5
+        ]
+      ],
+      "loop": true,
+      "quip": "mandatory drink break.",
+      "effect": "~ ~",
+      "seconds": 10,
+      "remark": "drink"
+    },
+    {
+      "id": "gaming",
+      "title": "Handheld gaming",
+      "menu": "New poses",
+      "auto": true,
+      "pose": 25,
+      "quip": "one more level.",
+      "effect": "LEVEL 01",
+      "seconds": 12,
+      "remark": "gaming"
+    },
+    {
+      "id": "laughing",
+      "title": "Laughing fit",
+      "menu": "New poses",
+      "auto": true,
+      "pose": 10,
+      "quip": "that was way too funny.",
+      "effect": "ha ha",
+      "seconds": 6
+    },
+    {
+      "id": "yawn",
+      "title": "Big sleepy yawn",
+      "menu": "New poses",
+      "auto": true,
+      "category": "resting",
+      "pose": 11,
+      "quip": "five more minutes...",
+      "effect": "z z",
+      "seconds": 6
+    },
+    {
+      "id": "cheers",
+      "title": "Cheers!",
+      "menu": "New poses",
+      "auto": true,
+      "pose": 27,
+      "quip": "to excellent bad decisions.",
+      "effect": "CHEERS",
+      "seconds": 6,
+      "remark": "drink"
+    },
+    {
+      "id": "bossfight",
+      "title": "Boss fight",
+      "menu": "New poses",
+      "auto": true,
+      "pose": 25,
+      "quip": "oh, it is ON.",
+      "effect": "BOSS!",
+      "seconds": 10,
+      "remark": "gaming"
+    },
+    {
+      "id": "sleepy",
+      "title": "Fighting sleep",
+      "menu": "New poses",
+      "auto": true,
+      "category": "resting",
+      "pose": 28,
+      "quip": "totally awake.",
+      "effect": "z",
+      "seconds": 9,
+      "tags": [
+        "noRemark",
+        "noFace",
+        "noCaught"
+      ]
+    },
+    {
+      "id": "gamerwin",
+      "title": "Game victory",
+      "menu": "New poses",
+      "auto": true,
+      "pose": 26,
+      "quip": "new high score. obviously.",
+      "effect": "HIGH SCORE",
+      "seconds": 8,
+      "remark": "gaming"
+    },
+    {
+      "id": "hop",
+      "title": "Bunny hops",
+      "menu": "Move around",
+      "auto": true,
+      "pose": 1,
+      "quip": "boing. boing.",
+      "effect": "",
+      "seconds": 5,
+      "speed": 160,
+      "clampTarget": true
+    },
+    {
+      "id": "tiptoe",
+      "title": "Tiptoe",
+      "menu": "Move around",
+      "auto": true,
+      "category": "wandering",
+      "poses": [
+        [
+          23,
+          0.55
+        ],
+        [
+          24,
+          0.55
+        ]
+      ],
+      "loop": true,
+      "quip": "very stealthy.",
+      "effect": "...",
+      "seconds": 7,
+      "speed": 35,
+      "clampTarget": true
+    },
+    {
+      "id": "patrol",
+      "title": "Screen patrol",
+      "menu": "Move around",
+      "auto": true,
+      "category": "wandering",
+      "poses": [
+        [
+          23,
+          0.55
+        ],
+        [
+          24,
+          0.55
+        ]
+      ],
+      "loop": true,
+      "quip": "perimeter secured.",
+      "effect": "[ patrol ]",
+      "seconds": 9,
+      "path": "patrol",
+      "speed": 160,
+      "clampTarget": true
+    },
+    {
+      "id": "zigzag",
+      "title": "Zigzag zoomies",
+      "menu": "Move around",
+      "auto": true,
+      "category": "wandering",
+      "pose": 1,
+      "quip": "the shortest route is boring.",
+      "effect": ">>",
+      "seconds": 7,
+      "path": "zigzag",
+      "speed": 250,
+      "clampTarget": true
+    },
+    {
+      "id": "figure8",
+      "title": "Figure-eight flight",
+      "menu": "Move around",
+      "auto": true,
+      "category": "wandering",
+      "pose": 0,
+      "quip": "watch this.",
+      "effect": "∞",
+      "seconds": 8,
+      "path": "figure8",
+      "speed": 160,
+      "clampTarget": true
+    },
+    {
+      "id": "bounce",
+      "title": "Bouncy flight",
+      "menu": "Move around",
+      "auto": true,
+      "pose": 1,
+      "quip": "floor is lava.",
+      "effect": "",
+      "seconds": 7,
+      "path": "bounce",
+      "speed": 160,
+      "clampTarget": true
+    },
+    {
+      "id": "rocket",
+      "title": "Rocket launch",
+      "menu": "Move around",
+      "auto": true,
+      "category": "wandering",
+      "pose": 6,
+      "quip": "three... two...",
+      "effect": "↑ ↑",
+      "seconds": 4,
+      "path": "rocket",
+      "speed": 250,
+      "clampTarget": true
+    },
+    {
+      "id": "landing",
+      "title": "Soft landing",
+      "menu": "Move around",
+      "auto": true,
+      "pose": 6,
+      "quip": "nailed it.",
+      "effect": "*",
+      "seconds": 3,
+      "path": "landing",
+      "speed": 160,
+      "clampTarget": true
+    },
+    {
+      "id": "sneak",
+      "title": "Sneak away",
+      "menu": "Move around",
+      "auto": true,
+      "category": "wandering",
+      "poses": [
+        [
+          23,
+          0.55
+        ],
+        [
+          24,
+          0.55
+        ]
+      ],
+      "loop": true,
+      "quip": "you saw nothing.",
+      "effect": "...",
+      "seconds": 8,
+      "speed": 35,
+      "clampTarget": true
+    },
+    {
+      "id": "stretch",
+      "title": "Stretch break",
+      "menu": "Expressions",
+      "auto": true,
+      "pose": 4,
+      "quip": "stretch those pixels.",
+      "effect": "~",
+      "seconds": 5
+    },
+    {
+      "id": "bow",
+      "title": "Dramatic bow",
+      "menu": "Expressions",
+      "auto": true,
+      "pose": 5,
+      "quip": "thank you, thank you.",
+      "effect": "★",
+      "seconds": 4
+    },
+    {
+      "id": "giggle",
+      "title": "Giggle wiggle",
+      "menu": "Expressions",
+      "auto": true,
+      "pose": 1,
+      "quip": "hehehehe.",
+      "effect": "♪",
+      "seconds": 5
+    },
+    {
+      "id": "grumpy",
+      "title": "Grumpy stomp",
+      "menu": "Expressions",
+      "auto": true,
+      "pose": 2,
+      "quip": "who moved my pixels?",
+      "effect": "!",
+      "seconds": 5
+    },
+    {
+      "id": "dizzy",
+      "title": "Dizzy wobble",
+      "menu": "Expressions",
+      "auto": true,
+      "pose": 6,
+      "quip": "okay. too many spins.",
+      "effect": "@ @",
+      "seconds": 5
+    },
+    {
+      "id": "heartbeat",
+      "title": "Happy pulse",
+      "menu": "Expressions",
+      "auto": true,
+      "pose": 1,
+      "quip": "you are alright, choom.",
+      "effect": "♥",
+      "seconds": 5
+    },
+    {
+      "id": "shiver",
+      "title": "Pixel shivers",
+      "menu": "Expressions",
+      "auto": true,
+      "pose": 2,
+      "quip": "who turned on the AC?",
+      "effect": "~ ~",
+      "seconds": 5
+    },
+    {
+      "id": "scan",
+      "title": "Scan the desktop",
+      "menu": "Idle tricks",
+      "auto": true,
+      "pose": 7,
+      "quip": "scanning for snacks...",
+      "effect": "[ - - ]",
+      "seconds": 7,
+      "remark": "mischief"
+    },
+    {
+      "id": "charge",
+      "title": "Charge up",
+      "menu": "Idle tricks",
+      "auto": true,
+      "pose": 5,
+      "quip": "charging chaos...",
+      "effect": "+ + +",
+      "seconds": 5
+    },
+    {
+      "id": "spin",
+      "title": "Tiny pirouette",
+      "menu": "Idle tricks",
+      "auto": true,
+      "pose": 0,
+      "quip": "zero gravity mode.",
+      "effect": "*",
+      "seconds": 5,
+      "tags": [
+        "noFace",
+        "noWobble"
+      ]
+    },
+    {
+      "id": "rain",
+      "title": "Watch digital rain",
+      "menu": "Idle tricks",
+      "auto": true,
+      "pose": 7,
+      "quip": "weather: very binary.",
+      "effect": "1 0 1 0",
+      "seconds": 8
+    },
+    {
+      "id": "celebrate",
+      "title": "Victory party",
+      "menu": "Idle tricks",
+      "auto": true,
+      "pose": 4,
+      "quip": "another flawless operation.",
+      "effect": "★ ♪ ★",
+      "seconds": 7
+    },
+    {
+      "id": "meditate",
+      "title": "Float and meditate",
+      "menu": "Idle tricks",
+      "auto": true,
+      "category": "resting",
+      "pose": 3,
+      "quip": "one peaceful thought... nope.",
+      "effect": "○",
+      "seconds": 9,
+      "tags": [
+        "noRemark",
+        "noFace"
+      ]
+    },
+    {
+      "id": "pendulum",
+      "title": "Pendulum swing",
+      "menu": "Idle tricks",
+      "auto": true,
+      "pose": 0,
+      "quip": "tick. tock.",
+      "effect": "",
+      "seconds": 7
+    },
+    {
+      "id": "jelly",
+      "title": "Jelly wobble",
+      "menu": "Idle tricks",
+      "auto": true,
+      "pose": 1,
+      "quip": "bones? optional.",
+      "effect": "~",
+      "seconds": 5
+    },
+    {
+      "id": "attentionbait",
+      "title": "Attention bait",
+      "menu": "Specials",
+      "auto": true,
+      "pose": 16,
+      "seconds": 7,
+      "next": "sideglance",
+      "tags": [
+        "noCaught"
+      ]
+    },
+    {
+      "id": "baitjudge",
+      "pose": 19,
+      "seconds": 2.5,
+      "tags": [
+        "noCaught"
+      ]
+    },
+    {
+      "id": "scanwindow",
+      "title": "Fake window scan",
+      "menu": "Specials",
+      "auto": true,
+      "pose": 17,
+      "seconds": 6,
+      "next": "smug",
+      "tags": [
+        "blackwall"
+      ],
+      "remark": "mischief"
+    },
+    {
+      "id": "teleport",
+      "title": "Glitch teleport",
+      "menu": "Specials",
+      "rare": true,
+      "pose": 18,
+      "seconds": 2,
+      "tags": [
+        "blackwall"
+      ]
+    },
+    {
+      "id": "upsidedown",
+      "title": "Upside-down peek",
+      "menu": "Specials",
+      "rare": true,
+      "pose": 7,
+      "seconds": 4
+    },
+    {
+      "id": "failedattack",
+      "title": "Failed attack",
+      "menu": "Specials",
+      "rare": true,
+      "pose": 6,
+      "seconds": 3,
+      "next": "rivalglare"
+    }
+  ],
+  "routines": {
+    "Gaming break": [
+      "gaming",
+      "bossfight",
+      "gamerwin",
+      "laughing",
+      "sip"
+    ],
+    "Drink break": [
+      "stretch",
+      "sip",
+      "cheers",
+      "smug"
+    ],
+    "Bedtime": [
+      "yawn",
+      "sleepy",
+      "nap",
+      "yawn",
+      "sip"
+    ],
+    "Comedy break": [
+      "scan",
+      "giggle",
+      "laughing",
+      "bow"
+    ],
+    "Zoomies": [
+      "charge",
+      "rocket",
+      "zigzag",
+      "landing",
+      "dizzy",
+      "smug"
+    ],
+    "Dance show": [
+      "wave",
+      "dance",
+      "spin",
+      "giggle",
+      "celebrate",
+      "bow"
+    ],
+    "Detective": [
+      "scan",
+      "tiptoe",
+      "peek",
+      "patrol",
+      "smug"
+    ],
+    "Recharge": [
+      "stretch",
+      "meditate",
+      "nap",
+      "stretch",
+      "wave"
+    ],
+    "Acrobat": [
+      "hop",
+      "bounce",
+      "figure8",
+      "tumble",
+      "landing",
+      "bow"
+    ],
+    "Sneaky trouble": [
+      "peek",
+      "sneak",
+      "glitch",
+      "dash",
+      "giggle"
+    ]
+  }
+}

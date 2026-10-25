@@ -1,0 +1,39 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+ <Style TargetType="ContextMenu">
+  <Setter Property="Background" Value="#F5091019"/><Setter Property="Foreground" Value="#E1F8FF"/>
+  <Setter Property="FontFamily" Value="Consolas"/><Setter Property="FontSize" Value="13"/>
+  <Setter Property="BorderBrush" Value="#F4E62B"/><Setter Property="BorderThickness" Value="1"/>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ContextMenu">
+   <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" Padding="5">
+    <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" MaxHeight="650"><ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"/></ScrollViewer>
+   </Border>
+  </ControlTemplate></Setter.Value></Setter>
+ </Style>
+ <Style TargetType="MenuItem">
+  <Setter Property="Foreground" Value="#D4F6FA"/><Setter Property="Background" Value="Transparent"/>
+  <Setter Property="FontFamily" Value="Consolas"/><Setter Property="FontSize" Value="13"/>
+  <Setter Property="Padding" Value="6,7"/><Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="MenuItem">
+   <Border x:Name="Row" Background="{TemplateBinding Background}" BorderBrush="Transparent" BorderThickness="2,0,0,0" Padding="{TemplateBinding Padding}">
+    <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="22"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="20"/></Grid.ColumnDefinitions>
+     <TextBlock x:Name="Check" Text="✓" Foreground="#F4E62B" Visibility="Collapsed" VerticalAlignment="Center"/>
+     <ContentPresenter Grid.Column="1" ContentSource="Header" RecognizesAccessKey="True" VerticalAlignment="Center"/>
+     <TextBlock x:Name="Arrow" Grid.Column="2" Text="›" Foreground="#50EFF0" Visibility="Collapsed" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+     <Popup x:Name="PART_Popup" Placement="Right" HorizontalOffset="2" AllowsTransparency="True" Focusable="False" IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" PopupAnimation="None">
+      <Border Background="#FA091019" BorderBrush="#50EFF0" BorderThickness="1" Padding="5">
+       <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" MaxHeight="600"><ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"/></ScrollViewer>
+      </Border>
+     </Popup>
+    </Grid>
+   </Border>
+   <ControlTemplate.Triggers>
+    <Trigger Property="HasItems" Value="True"><Setter TargetName="Arrow" Property="Visibility" Value="Visible"/></Trigger>
+    <Trigger Property="IsChecked" Value="True"><Setter TargetName="Check" Property="Visibility" Value="Visible"/></Trigger>
+    <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="Row" Property="Background" Value="#39202B"/><Setter TargetName="Row" Property="BorderBrush" Value="#FF4262"/><Setter Property="Foreground" Value="#FFF16A"/></Trigger>
+    <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.65"/></Trigger>
+   </ControlTemplate.Triggers>
+  </ControlTemplate></Setter.Value></Setter>
+ </Style>
+ <Style TargetType="Separator"><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Separator"><Border Height="1" Margin="8,5" Background="#405463"/></ControlTemplate></Setter.Value></Setter></Style>
+ <Style TargetType="Slider"><Setter Property="Foreground" Value="#50EFF0"/><Setter Property="Background" Value="#293447"/></Style>
+</ResourceDictionary>

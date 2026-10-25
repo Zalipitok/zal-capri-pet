@@ -1,0 +1,426 @@
+[
+  {
+    "language": "en",
+    "id": "your_turn",
+    "file": "voices/en/audio/your_turn.wav",
+    "events": [
+      "idle",
+      "chase",
+      "click"
+    ],
+    "label": "Your turn",
+    "source": "Capri is a baddie in Cyberpunk Edgerunners 2.mp3",
+    "start": 20.1,
+    "end": 22.65,
+    "subtitle": "Sure did! And now it's your turn!",
+    "duration": 2.7,
+    "speaker_verification": "Retained following user review; five rejected English clips and Japanese pack removed.",
+    "speech_pose": 16,
+    "speech_motion": "beckon",
+    "speech_tempo": 0.8
+  },
+  {
+    "language": "en",
+    "id": "knew_it",
+    "file": "voices/en/audio/knew_it.wav",
+    "events": [
+      "idle",
+      "dance",
+      "click"
+    ],
+    "label": "I knew you could do it",
+    "source": "Capri is a baddie in Cyberpunk Edgerunners 2.mp3",
+    "start": 22.7,
+    "end": 25.4,
+    "subtitle": "I knew it! I knew you could do it!",
+    "duration": 2.85,
+    "speaker_verification": "Retained following user review; five rejected English clips and Japanese pack removed.",
+    "speech_pose": 19,
+    "speech_motion": "tilt",
+    "speech_tempo": 0.88
+  },
+  {
+    "language": "en",
+    "id": "dont_be_shy",
+    "file": "voices/en/audio/dont_be_shy.wav",
+    "events": [
+      "idle",
+      "click"
+    ],
+    "label": "Do not be shy",
+    "source": "Capri is a baddie in Cyberpunk Edgerunners 2.mp3",
+    "start": 34.4,
+    "end": 36.1,
+    "subtitle": "Come on, don't be shy!",
+    "duration": 1.85,
+    "speaker_verification": "Retained following user review; five rejected English clips and Japanese pack removed.",
+    "speech_pose": 16,
+    "speech_motion": "beckon",
+    "speech_tempo": 0.96
+  },
+  {
+    "language": "en",
+    "id": "had_fun",
+    "file": "voices/en/audio/had_fun.wav",
+    "events": [
+      "idle",
+      "dance",
+      "click"
+    ],
+    "label": "Had fun",
+    "source": "Capri is a baddie in Cyberpunk Edgerunners 2.mp3",
+    "start": 82.1,
+    "end": 84.05,
+    "subtitle": "Did you have some fun?",
+    "duration": 2.1,
+    "speaker_verification": "Retained following user review; five rejected English clips and Japanese pack removed.",
+    "speech_pose": 19,
+    "speech_motion": "tilt",
+    "speech_tempo": 1.04
+  },
+  {
+    "language": "en",
+    "id": "spooky",
+    "file": "voices/en/audio/spooky.wav",
+    "events": [
+      "idle",
+      "glitch"
+    ],
+    "label": "Spooky",
+    "source": "Capri is a baddie in Cyberpunk Edgerunners 2.mp3",
+    "start": 143.4,
+    "end": 145.25,
+    "subtitle": "I think I look spooky.",
+    "duration": 2.0,
+    "speaker_verification": "Retained following user review; five rejected English clips and Japanese pack removed.",
+    "speech_pose": 7,
+    "speech_motion": "tilt",
+    "speech_tempo": 1.12
+  },
+  {
+    "language": "en",
+    "id": "dont_worry",
+    "file": "voices/en/audio/dont_worry.wav",
+    "events": [
+      "idle",
+      "click"
+    ],
+    "label": "Do not worry",
+    "source": "Capri is a baddie in Cyberpunk Edgerunners 2.mp3",
+    "start": 210.03,
+    "end": 211.75,
+    "subtitle": "Don't you worry about that.",
+    "duration": 1.87,
+    "speaker_verification": "Retained following user review; five rejected English clips and Japanese pack removed.",
+    "speech_pose": 1,
+    "speech_motion": "nod",
+    "speech_tempo": 1.2
+  },
+  {
+    "language": "en",
+    "id": "laugh",
+    "file": "voices/en/audio/laugh.wav",
+    "events": [
+      "idle",
+      "dance",
+      "glitch"
+    ],
+    "label": "Laugh",
+    "source": "Capri is a baddie in Cyberpunk Edgerunners 2.mp3",
+    "start": 125.5,
+    "end": 126.7,
+    "subtitle": "[Laughs]",
+    "duration": 1.35,
+    "speaker_verification": "Retained following user review; five rejected English clips and Japanese pack removed.",
+    "speech_pose": 10,
+    "speech_motion": "laugh",
+    "speech_tempo": 1.28
+  },
+  {
+    "language": "en",
+    "id": "good_boy",
+    "file": "voices/en/audio/good_boy.wav",
+    "events": [
+      "click",
+      "dance"
+    ],
+    "label": "Good boy.",
+    "subtitle": "Good boy.",
+    "source": "Capri is a baddie in Cyberpunk Edgerunners 2.mp3",
+    "start": 84.97,
+    "end": 86.6,
+    "duration": 1.78,
+    "speaker_verification": "Retained following user review; five rejected English clips and Japanese pack removed.",
+    "speech_pose": 5,
+    "speech_motion": "nod",
+    "speech_tempo": 0.8
+  },
+  {
+    "language": "en",
+    "id": "strong",
+    "file": "voices/en/audio/strong.wav",
+    "events": [
+      "idle",
+      "click"
+    ],
+    "label": "Oh, I can make you strong.",
+    "subtitle": "Oh, I can make you strong.",
+    "source": "Capri is a baddie in Cyberpunk Edgerunners 2.mp3",
+    "start": 208.25,
+    "end": 210.02,
+    "duration": 1.92,
+    "speaker_verification": "Retained following user review; five rejected English clips and Japanese pack removed.",
+    "speech_pose": 1,
+    "speech_motion": "nod",
+    "speech_tempo": 0.88
+  },
+  {
+    "language": "en",
+    "id": "cookie",
+    "file": "voices/en/audio/cookie.wav",
+    "events": [
+      "idle",
+      "click"
+    ],
+    "label": "Well, ain't you a strange cookie?",
+    "subtitle": "Well, ain't you a strange cookie?",
+    "source": "Capri is a baddie in Cyberpunk Edgerunners 2.mp3",
+    "start": 198.52,
+    "end": 200.35,
+    "duration": 1.98,
+    "speaker_verification": "Retained following user review; five rejected English clips and Japanese pack removed.",
+    "speech_pose": 19,
+    "speech_motion": "tilt",
+    "speech_tempo": 0.96
+  },
+  {
+    "language": "en",
+    "id": "problem",
+    "file": "voices/en/audio/problem.wav",
+    "events": [
+      "idle",
+      "glitch",
+      "drag"
+    ],
+    "label": "Now that could be a problem.",
+    "subtitle": "Now that could be a problem.",
+    "source": "Capri is a baddie in Cyberpunk Edgerunners 2.mp3",
+    "start": 235.32,
+    "end": 237.0,
+    "duration": 1.83,
+    "speaker_verification": "Retained following user review; five rejected English clips and Japanese pack removed.",
+    "speech_pose": 2,
+    "speech_motion": "still",
+    "speech_tempo": 1.04
+  },
+  {
+    "language": "en",
+    "id": "okie",
+    "file": "voices/en/audio/okie.wav",
+    "events": [
+      "click",
+      "idle"
+    ],
+    "label": "Okie doke.",
+    "subtitle": "Okie doke.",
+    "source": "Capri is a baddie in Cyberpunk Edgerunners 2.mp3",
+    "start": 256.57,
+    "end": 257.55,
+    "duration": 1.13,
+    "speaker_verification": "Retained following user review; five rejected English clips and Japanese pack removed.",
+    "speech_pose": 12,
+    "speech_motion": "nod",
+    "speech_tempo": 1.12
+  },
+  {
+    "language": "en",
+    "id": "repairs",
+    "file": "voices/en/audio/repairs.wav",
+    "events": [
+      "idle",
+      "glitch"
+    ],
+    "label": "You broke, so I made some repairs.",
+    "subtitle": "You broke, so I made some repairs.",
+    "source": "Capri is a baddie in Cyberpunk Edgerunners 2.mp3",
+    "start": 280.02,
+    "end": 282.45,
+    "duration": 2.58,
+    "speaker_verification": "Retained following user review; five rejected English clips and Japanese pack removed.",
+    "speech_pose": 5,
+    "speech_motion": "tilt",
+    "speech_tempo": 1.2
+  },
+  {
+    "language": "en",
+    "id": "finest",
+    "file": "voices/en/audio/finest.wav",
+    "events": [
+      "idle",
+      "dance"
+    ],
+    "label": "My finest work!",
+    "subtitle": "My finest work!",
+    "source": "Capri is a baddie in Cyberpunk Edgerunners 2.mp3",
+    "start": 285.82,
+    "end": 287.4,
+    "duration": 1.73,
+    "speaker_verification": "Retained following user review; five rejected English clips and Japanese pack removed.",
+    "speech_pose": 1,
+    "speech_motion": "nod",
+    "speech_tempo": 1.28
+  },
+  {
+    "language": "ja",
+    "id": "your_turn",
+    "file": "voices/ja/audio/your_turn.wav",
+    "events": [
+      "idle",
+      "chase",
+      "dance",
+      "click"
+    ],
+    "label": "Your turn!",
+    "subtitle": "Your turn!",
+    "source": "Cyberpunk Edgerunners 2 ENGLISH VS JAPANESE DUB  Part 1.mp3",
+    "start": 370.05,
+    "end": 372.25,
+    "duration": 2.35,
+    "subtitle_note": "Approximate English translation; restored previous Japanese clip at user request.",
+    "speech_pose": 16,
+    "speech_motion": "beckon",
+    "speech_tempo": 0.8
+  },
+  {
+    "language": "ja",
+    "id": "had_fun",
+    "file": "voices/ja/audio/had_fun.wav",
+    "events": [
+      "idle",
+      "click",
+      "dance",
+      "drag",
+      "glitch"
+    ],
+    "label": "Did you have fun?",
+    "subtitle": "Did you have fun?",
+    "source": "Cyberpunk Edgerunners 2 ENGLISH VS JAPANESE DUB  Part 1.mp3",
+    "start": 377.8,
+    "end": 379.25,
+    "duration": 1.6,
+    "subtitle_note": "Approximate English translation; restored previous Japanese clip at user request.",
+    "speech_pose": 19,
+    "speech_motion": "tilt",
+    "speech_tempo": 0.88
+  },
+  {
+    "language": "ja",
+    "id": "part2_trouble",
+    "file": "voices/ja/audio/part2_trouble.wav",
+    "events": [
+      "idle",
+      "click"
+    ],
+    "label": "It would be a problem if you died.",
+    "subtitle": "It would be a problem if you died.",
+    "japanese_transcript": "死んでもらっちゃうと困るんだけどな",
+    "source": "Cyberpunk Edgerunners 2 ENGLISH VS JAPANESE DUB  Part 2.mp3",
+    "start": 67.58,
+    "end": 70.02,
+    "duration": 2.62,
+    "needs_review": true,
+    "speaker_verification": "Unverified candidate; requires user preview and Keep before automatic playback.",
+    "subtitle_note": "Provisional transcription and translation; confirm against recording.",
+    "speech_pose": 19,
+    "speech_motion": "tilt",
+    "speech_tempo": 0.96
+  },
+  {
+    "language": "ja",
+    "id": "part2_souls",
+    "file": "voices/ja/audio/part2_souls.wav",
+    "events": [
+      "idle",
+      "click"
+    ],
+    "label": "Human souls turned into data.",
+    "subtitle": "Human souls turned into data.",
+    "japanese_transcript": "人の魂をデータ化したもの",
+    "source": "Cyberpunk Edgerunners 2 ENGLISH VS JAPANESE DUB  Part 2.mp3",
+    "start": 104.27,
+    "end": 106.92,
+    "duration": 2.83,
+    "needs_review": true,
+    "speaker_verification": "Unverified candidate; requires user preview and Keep before automatic playback.",
+    "subtitle_note": "Provisional transcription and translation; confirm against recording.",
+    "speech_pose": 19,
+    "speech_motion": "tilt",
+    "speech_tempo": 1.04
+  },
+  {
+    "language": "ja",
+    "id": "part2_collection",
+    "file": "voices/ja/audio/part2_collection.wav",
+    "events": [
+      "idle",
+      "click"
+    ],
+    "label": "Collect a whole lot of those into one, and you get me.",
+    "subtitle": "Collect a whole lot of those into one, and you get me.",
+    "japanese_transcript": "それをたくさん集めて一つにしたのが私",
+    "source": "Cyberpunk Edgerunners 2 ENGLISH VS JAPANESE DUB  Part 2.mp3",
+    "start": 106.94,
+    "end": 110.66,
+    "duration": 3.9,
+    "needs_review": true,
+    "speaker_verification": "Unverified candidate; requires user preview and Keep before automatic playback.",
+    "subtitle_note": "Provisional transcription and translation; confirm against recording.",
+    "speech_pose": 16,
+    "speech_motion": "beckon",
+    "speech_tempo": 1.12
+  },
+  {
+    "language": "ja",
+    "id": "part2_different",
+    "file": "voices/ja/audio/part2_different.wav",
+    "events": [
+      "idle",
+      "click"
+    ],
+    "label": "That's a little different.",
+    "subtitle": "That's a little different.",
+    "japanese_transcript": "ちょっと違う",
+    "source": "Cyberpunk Edgerunners 2 ENGLISH VS JAPANESE DUB  Part 2.mp3",
+    "start": 113.06,
+    "end": 114.04,
+    "duration": 1.16,
+    "needs_review": true,
+    "speaker_verification": "Unverified candidate; requires user preview and Keep before automatic playback.",
+    "subtitle_note": "Provisional transcription and translation; confirm against recording.",
+    "speech_pose": 19,
+    "speech_motion": "tilt",
+    "speech_tempo": 1.2
+  },
+  {
+    "language": "ja",
+    "id": "part1_good_kid",
+    "file": "voices/ja/audio/part1_good_kid.wav",
+    "events": [
+      "idle",
+      "click"
+    ],
+    "label": "Good kid.",
+    "subtitle": "Good kid.",
+    "japanese_transcript": "いい子",
+    "source": "Cyberpunk Edgerunners 2 ENGLISH VS JAPANESE DUB  Part 1.mp3",
+    "start": 376.05,
+    "end": 377.55,
+    "duration": 1.68,
+    "needs_review": true,
+    "speaker_verification": "Unverified candidate; requires user preview and Keep before automatic playback.",
+    "subtitle_note": "Provisional transcription and translation; confirm against recording.",
+    "speech_pose": 16,
+    "speech_motion": "nod",
+    "speech_tempo": 1.28
+  }
+]

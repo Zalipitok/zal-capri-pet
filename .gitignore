@@ -1,0 +1,13 @@
+# Personal state
+voice-settings.json
+memory.json
+*.log
+selftest-report.txt
+sprite-cache/
+backup-before-update/
+
+# Build output
+Capri.exe
+
+# Recorded dialogue: not ours to publish
+voices/

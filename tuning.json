@@ -1,0 +1,15 @@
+{
+  "_help": "Numbers Capri uses for feel. Change one, then right-click her > Debug and help > Reload tuning.json.",
+  "throwSpeed": 800,
+  "gravity": 2600,
+  "floorBounce": 0.38,
+  "wallBounce": 0.55,
+  "perchChance": 0.6,
+  "perchSink": 0,
+  "roamChance": 0.2,
+  "crossfadeSeconds": 0.12,
+  "musicBob": 1.0,
+  "songRemarkMinutes": 3,
+  "appRemarkMinutes": 2,
+  "hotkey": "Ctrl+Alt+C"
+}

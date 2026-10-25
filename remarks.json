@@ -1,0 +1,219 @@
+{
+  "hold": [
+    "Oh? What's the plan here?",
+    "You gonna carry me everywhere now?",
+    "Careful. I might get used to this.",
+    "Go on. Take me somewhere interesting.",
+    "Having fun? Thought so.",
+    "You're very pleased with yourself, huh?",
+    "We doing this all day?",
+    "All right, you've got me. Now what?",
+    "You have my attention. Briefly.",
+    "That is an interesting way to ask.",
+    "Higher. I want a better view.",
+    "Taking a hostage? Ambitious.",
+    "You can put me down now.",
+    "I was in the middle of something."
+  ],
+  "release": [
+    "There. Much better.",
+    "Your turn's over.",
+    "That was your big idea?",
+    "Again? Heh. Maybe later.",
+    "I will remember that.",
+    "Finished inspecting me?",
+    "Right. Where were we?",
+    "You picked an odd place."
+  ],
+  "idle": [
+    "Well? What's next?",
+    "Come on. Something interesting has to happen.",
+    "You're awfully quiet.",
+    "Don't tell me you're bored already.",
+    "This could be more fun.",
+    "You always take this long?",
+    "Oh, don't mind me. Keep going.",
+    "Now you've got my attention.",
+    "Still thinking?",
+    "I can wait. For a little while.",
+    "You make that look difficult.",
+    "Go on. I want to see what happens.",
+    "That was a choice.",
+    "Something on your mind?",
+    "I noticed.",
+    "You are getting predictable.",
+    "Try something else.",
+    "No hurry. I am watching.",
+    "Interesting. Keep going.",
+    "You almost had it."
+  ],
+  "stalk": [
+    "Hold still a second.",
+    "Where do you think you're going?",
+    "Oh, this could be fun.",
+    "Keep moving.",
+    "I saw where you went.",
+    "A little closer.",
+    "You made that too easy.",
+    "Go on. Run."
+  ],
+  "caught": [
+    "What?",
+    "Something on my face?",
+    "Oh, now you're watching me.",
+    "Yes?",
+    "Looking for something?",
+    "You saw nothing.",
+    "Can I help you?"
+  ],
+  "gaming": [
+    "One more attempt.",
+    "I saw that coming.",
+    "That timing needs work.",
+    "Now it gets interesting.",
+    "You left an opening.",
+    "Again."
+  ],
+  "drink": [
+    "A moment.",
+    "This can wait.",
+    "I was enjoying that.",
+    "Do you mind?"
+  ],
+  "mischief": [
+    "Nothing to worry about. Yet.",
+    "Curious little thing.",
+    "Let me have a look.",
+    "You noticed that?",
+    "Everything seems fine.",
+    "I wonder what this does."
+  ],
+  "pet": [
+    "Oh? Feeling brave?",
+    "...You get a few seconds.",
+    "Enjoying yourself?",
+    "Fine. Just this once.",
+    "You are getting comfortable.",
+    "Do not look so pleased.",
+    "...I did not say stop.",
+    "That is enough. For now."
+  ],
+  "shaken": [
+    "Enough.",
+    "Put. Me. Down.",
+    "You finished?",
+    "Try that again. See what happens.",
+    "That was your last one.",
+    "Keep your hands steady."
+  ],
+  "thrown": [
+    "Did you just throw me?",
+    "Rude.",
+    "I am keeping score, you know.",
+    "Do that again and I bite.",
+    "...I meant to land like that.",
+    "Ten points. For you, not the landing.",
+    "Wheee. I mean: how dare you."
+  ],
+  "fell": [
+    "Hey. I was sitting there.",
+    "Who moved the furniture?",
+    "Warn me next time.",
+    "That was my seat.",
+    "Rude. That window was mine."
+  ],
+  "returned": [
+    "There you are.",
+    "Took you long enough.",
+    "Back already? I was just getting comfortable.",
+    "I kept an eye on things. Mostly.",
+    "Oh. You're back.",
+    "Missed me? Don't answer that."
+  ],
+  "morning": [
+    "Morning. Coffee first, then chaos.",
+    "You're up early.",
+    "New day. Try not to waste it.",
+    "Morning. I was here first."
+  ],
+  "latenight": [
+    "It's late, you know.",
+    "Still up? Bold.",
+    "The screen will still be here tomorrow.",
+    "Night shift again?",
+    "Sleep is a feature, not a bug."
+  ],
+  "break": [
+    "{0} minutes straight. Stretch.",
+    "You've been at it for {0} minutes. Eyes off the screen for a bit.",
+    "Break time. I'll guard the desktop.",
+    "{0} minutes. Go get some water.",
+    "Up. Walk around. I'll still be here."
+  ],
+  "firstmeet": [
+    "So. You're the one running this desktop.",
+    "Hi. I live here now.",
+    "Nice place. I'm keeping it."
+  ],
+  "longtime": [
+    "{0} days. I counted.",
+    "Oh, you remember me. After {0} days.",
+    "{0} days without me. How did you cope?"
+  ],
+  "anniversary": [
+    "{0} days together. Don't make it weird.",
+    "Day {0}. Still here. Still better than your wallpaper.",
+    "{0} days. I suppose you're tolerable."
+  ],
+  "memorypets": [
+    "{0} head pats today. You're obsessed.",
+    "That's {0} today. I'm counting.",
+    "{0}. Fine. You can have one more."
+  ],
+  "memorythrows": [
+    "That's {0} throws today. I'm filing a complaint.",
+    "{0} today. You need a hobby.",
+    "Throw number {0}. Bold."
+  ],
+  "memoryswats": [
+    "{0} swats. Keep this up and I swat back.",
+    "Swat {0}. I remember every single one."
+  ],
+  "song": [
+    "Oh, {0}. Decent.",
+    "{0}? Your taste is improving.",
+    "Playing {0} again?",
+    "{0}. I'll allow it."
+  ],
+  "musicstop": [
+    "Hey. I was listening to that.",
+    "Silence. Thrilling.",
+    "Put it back on."
+  ],
+  "appgames": [
+    "Gaming? I'll judge your aim.",
+    "Go on. Lose to someone.",
+    "Don't rage-quit. I'm watching."
+  ],
+  "appcode": [
+    "Coding? I'll be quiet. Mostly.",
+    "Missing semicolon. Somewhere. Probably.",
+    "Ship it. What could go wrong?"
+  ],
+  "appvideo": [
+    "What are we watching?",
+    "One more episode, right?",
+    "Turn it up a bit."
+  ],
+  "applate": [
+    "It's very late for this.",
+    "Bedtime was hours ago, you know.",
+    "Okay, last one. Then sleep."
+  ],
+  "scanverdict": [
+    "Threat level {0}. I've seen worse.",
+    "{0} out of 10. Mildly suspicious.",
+    "{0}/10. I'd keep an eye on that one.",
+    "Verdict: {0}. It knows what it did."
+  ]
+}

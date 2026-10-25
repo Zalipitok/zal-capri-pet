@@ -1,0 +1,17 @@
+{
+  "_help": "Used only when 'Notice which app I'm using' is on. Process names without .exe (see Task Manager > Details). Capri reads just the name and title of the window in front, on this PC.",
+  "games": [
+    "League of Legends", "VALORANT-Win64-Shipping", "cs2", "dota2", "Overwatch", "RobloxPlayerBeta", "Minecraft.Windows",
+    "FortniteClient-Win64-Shipping", "GTA5", "eldenring", "ProjectZomboid64", "Darktide", "Bannerlord", "Cyberpunk2077",
+    "RimWorldWin64", "Risk of Rain 2", "helldivers2", "LimbusCompany", "LobotomyCorp", "Skullgirls", "Gw2-64",
+    "Superfighters Deluxe", "Dead Space", "DyingLightGame_x64_rwdi", "Mewgenics", "Vampire", "Darkest", "dontstarve_steam_x64",
+    "Funkin", "bg3", "Terraria", "Hades", "Hades2", "hollow_knight", "Stardew Valley", "Balatro", "Warframe.x64", "destiny2", "r5apex"
+  ],
+  "code": [
+    "Code", "Cursor", "devenv", "rider64", "pycharm64", "idea64", "webstorm64", "clion64", "sublime_text", "notepad++", "zed",
+    "WindowsTerminal", "processing", "powershell_ise"
+  ],
+  "video": ["vlc", "mpc-hc64", "mpv", "PotPlayerMini64", "Netflix", "Video.UI", "wmplayer"],
+  "browsers": ["chrome", "msedge", "firefox", "opera", "brave", "vivaldi", "Arc", "zen"],
+  "videoSites": ["YouTube", "Netflix", "Twitch", "Prime Video", "Disney+", "Crunchyroll", "Kick"]
+}
