@@ -56,16 +56,23 @@ function Show-ChatReply([string]$text){
  $words.Text=$bubbleText; $bubble.Visibility='Visible'
  $script:messageUntil=$clock.Elapsed.TotalSeconds+[Math]::Max(4.0,[Math]::Min(14.0,$text.Length/13.0))
  $script:nextRemark=$clock.Elapsed.TotalSeconds+45; $script:nextYap=[Math]::Max($script:nextYap,$clock.Elapsed.TotalSeconds+20)
+ # Read aloud by a Windows voice (Settings > Fun), rendered in the background.
+ if($script:chatVoice -and $script:ttsAvailable -and -not $script:muted){
+  try{$script:ttsText=$bubbleText; $script:ttsTask=[CapriTts]::Render($text,[string]$script:tuning.chatVoiceName,[string]$script:tuning.chatVoicePitch,[string]$script:tuning.chatVoiceRate)}catch{$script:ttsError=$_.Exception.Message}
+ }
 }
+# A line from her in the chat window, in her bubble, and read aloud.
+function Say-Chat([string]$text){Add-ChatLine 'Capri' $text; Show-ChatReply $text}
+$script:ttsTask=$null; $script:ttsText=''
 # "remind me in 20 minutes to stretch", "remind me to call mum at 18:30". Returns $true when handled.
 function Invoke-ChatReminder([string]$text){
  $m=[regex]::Match($text,'^\s*(?:please\s+)?remind me\s+(?:to\s+(?<what>.+?)\s+(?<when>(?:in|at|tomorrow)\b.+?)|(?<when>(?:in|at|tomorrow)\b.+?)\s+(?:to|that|about)\s+(?<what>.+?))\s*[.!]*\s*$','IgnoreCase')
  if(-not $m.Success){return $false}
  $at=ConvertFrom-WhenText $m.Groups['when'].Value
- if($null -eq $at){Add-ChatLine 'Capri' ('"'+$m.Groups['when'].Value+'"? Give me something like "in 20 minutes" or "at 17:45".'); return $true}
+ if($null -eq $at){Say-Chat ('"'+$m.Groups['when'].Value+'"? Give me something like "in 20 minutes" or "at 17:45".'); return $true}
  [void](Add-Reminder $at $m.Groups['what'].Value)
- $reply=if(Show-Remark 'reminderset' -Force -Value @((Format-ReminderTime $at),$m.Groups['what'].Value)){$words.Text}else{'Fine. '+(Format-ReminderTime $at)+'.'}
- Add-ChatLine 'Capri' $reply
+ $reply=Get-RemarkText 'reminderset' @((Format-ReminderTime $at),$m.Groups['what'].Value)
+ Say-Chat $reply
  return $true
 }
 function Send-ChatMessage([string]$text){
@@ -74,6 +81,8 @@ function Send-ChatMessage([string]$text){
  Add-ChatLine 'You' $text
  if($text -eq '/clear'){$script:chatHistory.Clear(); $script:chatLog.Children.Clear(); Add-ChatLine '' 'Conversation cleared.'; return}
  if(Invoke-ChatReminder $text){return}
+ if(Invoke-ChatCommand $text){return}
+ if(Invoke-ChatGame $text){return}
  if(-not $script:chatEnabled){Add-ChatLine '' 'Her own replies are off. Tick "Let her reply" below (uses your Claude API key). Reminders work either way.'; return}
  $key=Get-ChatKey
  if(-not $key){Add-ChatLine '' 'No API key yet. Paste one below and press Save key.'; return}
@@ -94,6 +103,11 @@ function Send-ChatMessage([string]$text){
  } catch { Add-ChatLine '' ('Could not send: '+$_.Exception.Message); $script:chatHistory.RemoveAt($script:chatHistory.Count-1) }
 }
 function Update-Chat([double]$t){
+ if($null -ne $script:ttsTask -and $script:ttsTask.IsCompleted){
+  $task=$script:ttsTask; $script:ttsTask=$null
+  if($task.IsFaulted){$script:ttsError=$task.Exception.GetBaseException().Message; Add-ChatLine '' ('Voice failed: '+$script:ttsError)}
+  else{[void](Play-SpeechWav $task.Result $script:ttsText)}
+ }
  if($null -ne $script:chatSend -and $script:chatSend.IsCompleted){
   $task=$script:chatSend; $script:chatSend=$null
   if($task.IsFaulted -or $task.IsCanceled){Complete-Chat $null ('No connection: '+$(if($task.Exception){$task.Exception.GetBaseException().Message}else{'timed out'})); return}
@@ -124,8 +138,7 @@ function Complete-Chat($reply,[string]$problem){
  }
  $script:chatError=''
  $script:chatHistory.Add(@{role='assistant'; content=$reply})
- Add-ChatLine 'Capri' $reply
- Show-ChatReply $reply
+ Say-Chat $reply
 }
 
 function Show-ChatWindow {
@@ -171,4 +184,97 @@ function Show-ChatWindow {
  foreach($entry in $script:chatHistory){Add-ChatLine $(if($entry.role -eq 'user'){'You'}else{'Capri'}) $entry.content}
  if($script:chatHistory.Count -eq 0){Add-ChatLine 'Capri' $(if($script:chatEnabled -and (Get-ChatKey)){'Well? Say something.'}else{'I can hold reminders for you: "remind me in 20 minutes to stretch". Want me to actually talk back? Tick the box below.'})}
  [void]$script:chatInput.Focus()
+}
+
+# --- Things she handles herself in chat (no API key needed) ------------------------------------
+# "note: buy milk" leaves a sticky note; "focus 25" starts a focus session.
+function Invoke-ChatCommand([string]$text){
+ $m=[regex]::Match($text,'^\s*(?:/note|note|sticky note|leave a note)\s*[:\-]?\s+(?<what>.+)$','IgnoreCase')
+ if($m.Success){
+  if(New-StickyNote $m.Groups['what'].Value){Say-Chat (Get-RemarkText 'notedone')}
+  else{Say-Chat 'Your screen is full of notes already. Clear a few.'}
+  return $true
+ }
+ $m=[regex]::Match($text,'^\s*(?:/focus|focus|start focus|focus timer)(?:\s+(?:for\s+)?(?<min>\d{1,3}))?\s*(?:min(?:utes?)?)?\s*$','IgnoreCase')
+ if($m.Success){
+  $minutes=if($m.Groups['min'].Success){[int]$m.Groups['min'].Value}else{25}
+  $minutes=[Math]::Max(1,[Math]::Min(180,$minutes))
+  Start-Focus $minutes -Quiet
+  Say-Chat (Get-RemarkText 'focusstart' $minutes)
+  return $true
+ }
+ return $false
+}
+
+# Rock-paper-scissors, guess the number and trivia. One game at a time; anything that isn't a move
+# ends the game and goes to normal chat.
+$script:chatGame=$null
+$script:triviaBank=@()
+try {
+ $gamesPath=Join-Path $script:AppRoot 'games.json'
+ if(Test-Path -LiteralPath $gamesPath){$decodedGames=Get-Content -LiteralPath $gamesPath -Raw -Encoding UTF8 | ConvertFrom-Json; $script:triviaBank=@(foreach($q in $decodedGames.trivia){$q})}
+} catch { $script:gamesError=$_.Exception.Message }
+function Get-GameLine([string]$pool,$value=$null){return Get-RemarkText $pool $value}
+function Ask-Trivia {
+ if($script:triviaBank.Count -eq 0){Say-Chat 'I lost my question list. games.json is missing.'; $script:chatGame=$null; return}
+ $g=$script:chatGame
+ if($g.order.Count -eq 0){$g.order=[Collections.Generic.Queue[int]]::new(); foreach($i in @(0..($script:triviaBank.Count-1) | Sort-Object {$rng.Next()})){$g.order.Enqueue($i)}}
+ $g.current=$script:triviaBank[$g.order.Dequeue()]
+ $letters=@('A','B','C')
+ $choices=@(for($i=0;$i -lt @($g.current.choices).Count;$i++){$letters[$i]+') '+@($g.current.choices)[$i]})
+ Say-Chat ($g.current.q+'  '+($choices -join '   '))
+}
+function Invoke-ChatGame([string]$text){
+ $t=$text.Trim().ToLowerInvariant() -replace '[.!?]+$',''
+ $g=$script:chatGame
+ if($t -in @('play','games','/games','lets play','let''s play','play a game','game')){
+  Say-Chat 'Okie doke. Rock paper scissors, guess the number, or trivia?'
+  return $true
+ }
+ if($null -ne $g -and $t -in @('stop','quit','exit','enough','no','nope')){
+  $script:chatGame=$null; Say-Chat $(if($g.score -gt 0){'Fine. Final score: you '+$g.score+', me '+$g.mine+'.'}else{'Quitter. Cute, though.'}); return $true
+ }
+ if($t -match '^(rps|rock paper scissors|rock,? paper,? scissors|play rps)$'){
+  $script:chatGame=@{type='rps'; score=0; mine=0}; Say-Chat 'Rock, paper or scissors? Choose wisely.'; return $true
+ }
+ if($t -match '^(guess|guess the number|number game|play guess)$'){
+  $script:chatGame=@{type='guess'; number=$rng.Next(1,101); tries=0; score=0; mine=0}; Say-Chat 'I''m thinking of a number from 1 to 100. Go on, guess.'; return $true
+ }
+ if($t -match '^(trivia|quiz|play trivia)$'){
+  $script:chatGame=@{type='trivia'; order=[Collections.Generic.Queue[int]]::new(); current=$null; score=0; mine=0}; Ask-Trivia; return $true
+ }
+ if($null -eq $g){return $false}
+ switch($g.type){
+  'rps' {
+   $moves=@('rock','paper','scissors')
+   if($t -notin $moves){if($t -in @('again','yes','yeah','sure')){Say-Chat 'Rock, paper or scissors?'; return $true}; $script:chatGame=$null; return $false}
+   $mine=$moves[$rng.Next(3)]; $you=[array]::IndexOf($moves,$t); $me=[array]::IndexOf($moves,$mine)
+   $said=$mine.Substring(0,1).ToUpperInvariant()+$mine.Substring(1)
+   $result=($you-$me+3)%3
+   if($result -eq 0){Say-Chat ($said+'. A tie. Again?')}
+   elseif($result -eq 1){$g.score++; Say-Chat ($said+'. '+(Get-GameLine 'gamelose')+' You '+$g.score+', me '+$g.mine+'.')}
+   else{$g.mine++; Say-Chat ($said+'. '+(Get-GameLine 'gamewin')+' You '+$g.score+', me '+$g.mine+'.')}
+   return $true
+  }
+  'guess' {
+   if($t -notmatch '^\d{1,3}$'){$script:chatGame=$null; return $false}
+   $n=[int]$t; $g.tries++
+   if($n -lt $g.number){Say-Chat 'Higher.'}
+   elseif($n -gt $g.number){Say-Chat 'Lower.'}
+   else{Say-Chat ($g.number.ToString()+'! Got it in '+$g.tries+'. '+$(if($g.tries -le 6){'Ain''t you a clever cookie.'}else{'Took you long enough.'})+' Again? Say guess.'); $script:chatGame=$null}
+   return $true
+  }
+  'trivia' {
+   $q=$g.current; if($null -eq $q){$script:chatGame=$null; return $false}
+   $choices=@($q.choices); $pick=-1
+   if($t -match '^[abc]$'){$pick=[int][char]$t-[int][char]'a'}
+   else{for($i=0;$i -lt $choices.Count;$i++){if($t -eq ([string]$choices[$i]).ToLowerInvariant()){$pick=$i}}}
+   if($pick -lt 0){$script:chatGame=$null; return $false}
+   if($pick -eq [int]$q.answer){$g.score++; $lead=Get-GameLine 'triviaright'}else{$g.mine++; $lead=(Get-GameLine 'triviawrong')+' It was '+$choices[[int]$q.answer]+'.'}
+   Add-ChatLine 'Capri' ($lead+' Score: '+$g.score+' right, '+$g.mine+' wrong.')
+   Ask-Trivia
+   return $true
+  }
+ }
+ return $false
 }

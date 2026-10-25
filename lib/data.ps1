@@ -47,6 +47,10 @@ $script:batteryReactions=$true
 $script:dndAware=$true              # quiet corner while Windows Do Not Disturb / Focus is on
 $script:weatherEnabled=$false; $script:weatherCity=''; $script:weatherUnit='C'
 $script:chatEnabled=$false          # opt-in: replies from the Claude API with your key
+$script:chatVoice=$true             # read her chat replies aloud with a Windows voice
+$script:possessWindows=$false       # opt-in: she shakes the window you're using for a moment
+$script:cursorRepairs=$true         # now and then a glitch trail follows your pointer for a minute
+$script:autoUpdate=$true            # check GitHub once a day for a newer Capri
 # Tunable numbers. Edit tuning.json (or Debug and help > Reload tuning.json) instead of the code.
 $script:tuning=[ordered]@{
  throwSpeed=800.0        # release speed (WPF px/s) that counts as a throw
@@ -72,6 +76,11 @@ $script:tuning=[ordered]@{
  weatherMinutes=60.0     # how often the weather is checked (when weather is on)
  chatModel='claude-haiku-5-5'  # Claude model for chatting (when chat is on)
  chatMaxTokens=300.0     # longest reply, in tokens
+ chatVoiceName=''        # Windows voice for chat replies ('' = the first female voice installed)
+ chatVoicePitch='high'   # x-low, low, medium, high, x-high
+ chatVoiceRate='medium'  # x-slow, slow, medium, fast, x-fast
+ powersChance=0.04       # how often she uses her powers when choosing what to do
+ updateRepo='Zalipitok/capri-companion'  # where updates come from (GitHub owner/name)
 }
 $script:tuningPath=Join-Path $script:AppRoot 'tuning.json'
 function Import-Tuning {

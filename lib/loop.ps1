@@ -27,6 +27,13 @@ $script:tickBody={
   elseif($action.StartsWith('routine:')){Prepare-ManualAction; Start-Routine ($action.Substring(8))}
   elseif($action -eq 'random'){Prepare-ManualAction; $script:routine.Clear(); Choose-State}
   elseif($action -eq 'catchgame'){Start-CatchGame}
+  elseif($action -eq 'possess'){[void](Invoke-Possession -Manual)}
+  elseif($action -eq 'repaircursor'){Start-CursorRepair -Manual}
+  elseif($action -eq 'peek'){Prepare-ManualAction; $script:routine.Clear(); Begin-State 'peekbehind'}
+  elseif($action -eq 'note'){Invoke-LeaveNote}
+  elseif($action.StartsWith('focus:')){$m=[int]$action.Substring(6); if($m -le 0){if($script:focus.active){Set-BusyMode $false}}else{Start-Focus $m}}
+  elseif($action -eq 'update-check'){Start-UpdateCheck -Manual; Show-Status 'Checking for updates...'}
+  elseif($action -eq 'update-install'){Start-UpdateInstall}
   elseif($action -eq 'ball'){Set-BallShown (-not $script:ball.shown)}
   elseif($action -eq 'reminders'){Show-ReminderWindow}
   elseif($action -eq 'snooze'){Invoke-SnoozeReminder 10}
@@ -112,6 +119,10 @@ $script:tickBody={
  Update-Friend $t
  Update-Chat $t
  Update-Ball $t $dt
+ Update-Powers $t
+ Update-Focus $t
+ Update-Notes $t
+ Update-Updates $t
  if($script:isHidden){
   $script:lastInteraction=$t
   $script:stateStart+=$elapsedTick; $script:until+=$elapsedTick

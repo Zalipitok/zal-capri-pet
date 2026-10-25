@@ -86,6 +86,10 @@ function Choose-State {
  }
  # The toy ball is out: she plays with it now and then.
  if((Test-BallAvailable) -and $script:activityRates.antics -gt 0 -and $rng.NextDouble() -lt [double]$script:tuning.ballChance){Start-BallChase; return}
+ # Her powers, now and then: possessing a window (opt-in) or upgrading the cursor.
+ $powers=[double]$script:tuning.powersChance
+ if($script:activityRates.antics -gt 0 -and $script:possessWindows -and $rng.NextDouble() -lt $powers){if(Invoke-Possession){return}}
+ if($script:activityRates.antics -gt 0 -and $script:cursorRepairs -and $clock.Elapsed.TotalSeconds -gt $script:trailUntil+600 -and $rng.NextDouble() -lt $powers/2){Start-CursorRepair; return}
  # Music playing: dance a bit more often.
  if($script:musicEnabled -and $script:musicPlaying -and $script:activityRates.antics -gt 0 -and $rng.NextDouble() -lt 0.2){Begin-State 'dance'; return}
  # Time of day: an afternoon drink break once a day, and drowsier antics after midnight.
@@ -410,6 +414,7 @@ $script:pendingAction=''; $script:lastFxError=-60.0
 function Prepare-ManualAction {
  Register-Interaction
  if($script:busyByFullscreen){$script:fullscreenOverride=$true}
+ if($script:focus.active){$script:busyMode=$false; Stop-Focus -GaveUp}
  $script:busyMode=$false; $script:busyByFullscreen=$false; $script:busyByDnd=$false
  $script:paused=$false; $script:mouseDown=$false; $script:hoverLatched=$true
  $script:caughtCooldown=$clock.Elapsed.TotalSeconds+3

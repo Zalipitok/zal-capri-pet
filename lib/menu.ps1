@@ -110,6 +110,13 @@ $interact=New-SubMenu $menu 'Interact'
 [void](New-MenuEntry $interact 'Toy ball (throw it, she fetches)' {$script:pendingAction='ball'} {$script:ball.shown})
 [void](New-MenuEntry $interact 'Chat with her...' {$script:pendingAction='chat'})
 [void](New-MenuEntry $interact 'Reminders...' {$script:pendingAction='reminders'})
+[void](New-MenuEntry $interact 'Leave a sticky note' {$script:pendingAction='note'})
+$focusMenu=New-SubMenu $interact 'Focus timer'
+foreach($minutes in @(25,45,60)){[void](New-MenuEntry $focusMenu ("$minutes minutes") {param($sender,$event) $script:pendingAction='focus:'+[string]$sender.Tag} $null $minutes)}
+$focusStopItem=New-MenuEntry $focusMenu 'Stop focusing' {$script:pendingAction='focus:0'}
+[void](New-MenuEntry $interact 'Possess a window' {$script:pendingAction='possess'})
+[void](New-MenuEntry $interact 'Upgrade my cursor' {$script:pendingAction='repaircursor'})
+[void](New-MenuEntry $interact 'Peek from behind a window' {$script:pendingAction='peek'})
 $snoozeItem=New-MenuEntry $interact 'Snooze last reminder (10 min)' {$script:pendingAction='snooze'}
 $friendItem=New-MenuEntry $interact 'Invite a friend (second Capri)' {if($script:friendPresent){$script:pendingAction='friend-home'}else{$script:pendingAction='friend'}}
 [void](New-MenuEntry $interact 'Cartoon swat (Shift-click)' {$script:pendingAction='swat'})
@@ -194,6 +201,8 @@ $behaviour=New-SubMenu $settings 'Behaviour'
 [void](New-MenuEntry $behaviour 'Throwing physics' {$script:throwPhysics=-not $script:throwPhysics; Save-VoiceSettings} {$script:throwPhysics})
 [void](New-MenuEntry $behaviour 'Time-of-day moods' {$script:timeOfDay=-not $script:timeOfDay; Save-VoiceSettings} {$script:timeOfDay})
 [void](New-MenuEntry $behaviour 'Quiet corner during Do Not Disturb / Focus' {$script:dndAware=-not $script:dndAware; $script:nextDndCheck=0; Save-VoiceSettings} {$script:dndAware})
+[void](New-MenuEntry $behaviour 'Possess windows sometimes (shakes them a little)' {$script:possessWindows=-not $script:possessWindows; Save-VoiceSettings} {$script:possessWindows})
+[void](New-MenuEntry $behaviour 'Glitch trail on the cursor sometimes' {$script:cursorRepairs=-not $script:cursorRepairs; Save-VoiceSettings} {$script:cursorRepairs})
 [void](New-MenuEntry $behaviour 'Battery reactions (laptops)' {$script:batteryReactions=-not $script:batteryReactions; Save-VoiceSettings} {$script:batteryReactions})
 [void](New-MenuEntry $behaviour 'Bob to the real beat (listens to your PC''s sound)' {$script:beatSync=-not $script:beatSync; Save-VoiceSettings} {$script:beatSync})
 [void](New-MenuEntry $behaviour 'React to music' {$script:musicEnabled=-not $script:musicEnabled; Save-VoiceSettings; if($script:musicEnabled -and -not $script:musicAvailable){Show-Status ('Music reactions are not available here: '+$script:musicError)}} {$script:musicEnabled})
@@ -241,6 +250,8 @@ $debugMenu=New-SubMenu $menu 'Debug and help'
  Import-Tuning; Register-SummonHotkey
  if($script:tuningError){Show-Problem ('tuning.json has a problem: '+$script:tuningError); $script:tuningError=''}else{Show-Status 'Tuning reloaded.'}
 })
+[void](New-MenuEntry $debugMenu 'Check for updates' {$script:pendingAction='update-check'})
+$updateItem=New-MenuEntry $debugMenu 'Install update' {$script:pendingAction='update-install'}
 [void](New-MenuEntry $debugMenu 'Weather now' {$script:pendingAction='weather-now'})
 [void](New-MenuEntry $debugMenu 'Wander now' {$script:pendingAction='wander-test'})
 [void](New-MenuEntry $debugMenu 'Test cursor movement (75 px)' {$script:pendingAction='cursor-test'})
@@ -263,6 +274,9 @@ $menu.Add_Opened({
  $hideItem.IsEnabled=($null -ne $script:tray)
  $hotkeyItem.Header=('Summon hotkey ('+$script:tuning.hotkey+')')
  $snoozeItem.IsEnabled=(Test-CanSnooze)
+ $focusStopItem.IsEnabled=$script:focus.active
+ $updateItem.Header=if($null -ne $script:update){'Install update ('+$script:update.version+')'}else{'Install update (none found yet; version '+$script:appVersion+')'}
+ $updateItem.IsEnabled=$null -ne $script:update
  $friendItem.Header=if($script:FriendMode){'(I''m the friend: Quit sends me home)'}elseif($script:friendPresent){'Send her friend home'}else{'Invite a friend (second Capri)'}
  $friendItem.IsEnabled=-not $script:FriendMode
 })
@@ -311,6 +325,8 @@ try {
  [void]$trayMenu.Items.Add([Windows.Forms.ToolStripSeparator]::new())
  $trayRemind=$trayMenu.Items.Add('Remind me...'); $trayRemind.Add_Click({Show-ReminderWindow})
  $trayChat=$trayMenu.Items.Add('Chat with her...'); $trayChat.Add_Click({Show-ChatWindow})
+ $trayFocus=$trayMenu.Items.Add('Focus 25 minutes'); $trayFocus.Add_Click({if($script:focus.active){$script:pendingAction='focus:0'}else{$script:pendingAction='focus:25'}})
+ $trayNote=$trayMenu.Items.Add('Leave a sticky note'); $trayNote.Add_Click({$script:pendingAction='note'})
  $traySettings=$trayMenu.Items.Add('Settings...'); $traySettings.Add_Click({Show-SettingsWindow})
  $trayFull=$trayMenu.Items.Add('Capri menu...'); $trayFull.Add_Click({
   Set-Hidden $false
@@ -320,6 +336,7 @@ try {
  $trayQuit=$trayMenu.Items.Add('Quit'); $trayQuit.Add_Click({$w.Close()})
  $trayMenu.Add_Opening({
   $trayShow.Text=if($script:isHidden){'Show Capri'}else{'Hide Capri'}
+  $trayFocus.Text=if($script:focus.active){'Stop focusing'}else{'Focus 25 minutes'}
   $trayPause.Checked=$script:paused; $trayBusy.Checked=$script:busyMode; $trayMute.Checked=$script:muted
  })
  $tray.ContextMenuStrip=$trayMenu

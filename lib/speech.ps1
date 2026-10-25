@@ -68,6 +68,15 @@ function Show-Remark([string]$kind,[switch]$Force,$Value=$null){
  return $true
 }
 
+# A line from a remark pool as text, without showing it (for the chat window).
+function Get-RemarkText([string]$kind,$Value=$null){
+ $lines=@($remarkPack.$kind | Where-Object {$_})
+ if($lines.Count -eq 0){return ''}
+ $text=[string]$lines[$rng.Next($lines.Count)]
+ if($null -ne $Value){try{$text=[string]::Format($text,$Value)}catch{}}
+ return $text
+}
+
 # ---------------------------------------------------------------------------
 # Local voice packs. Missing audio never falls back to another language.
 $script:language = 'en'; $script:muted = $false; $script:volume = 0.5; $script:liveVolume=$false
@@ -101,7 +110,7 @@ try {
   if($null -ne $saved.rivalWins){$script:rivalWins=[Math]::Max(0.0,[int]$saved.rivalWins)}
   if($null -ne $saved.escapeStreak){$script:escapeStreak=[Math]::Max(0.0,[Math]::Min(5.0,[int]$saved.escapeStreak))}
   if($null -ne $saved.petSize){$script:petSize=[Math]::Max(65.0,[Math]::Min(160.0,[double]$saved.petSize))}
-  foreach($setting in @('facialMotion','chase','blackwallEnabled','sfxEnabled','windowPerch','throwPhysics','timeOfDay','remarksEnabled','subtitles','muted','smoothPoses','musicEnabled','appAware','hotkeyEnabled','talkingMouth','eyesFollow','batteryReactions','shadowEnabled','beatSync','dndAware','weatherEnabled','chatEnabled')){
+  foreach($setting in @('facialMotion','chase','blackwallEnabled','sfxEnabled','windowPerch','throwPhysics','timeOfDay','remarksEnabled','subtitles','muted','smoothPoses','musicEnabled','appAware','hotkeyEnabled','talkingMouth','eyesFollow','batteryReactions','shadowEnabled','beatSync','dndAware','weatherEnabled','chatEnabled','chatVoice','possessWindows','cursorRepairs','autoUpdate')){
    if($saved.$setting -is [bool]){Set-Variable -Name $setting -Scope Script -Value $saved.$setting}
   }
   if($saved.weatherCity -is [string] -and $saved.weatherCity.Length -le 80){$script:weatherCity=$saved.weatherCity}
@@ -120,7 +129,7 @@ try {
 } catch { } # Invalid settings reset to defaults.
 function Save-VoiceSettings {
  if($script:SelfTestMode -or $script:FriendMode){return} # the self-test and the friend never overwrite your settings
- try { @{activityRates=$script:activityRates; rivalEscapes=$script:rivalEscapes; rivalWins=$script:rivalWins; escapeStreak=$script:escapeStreak; facialMotion=$script:facialMotion; chase=$script:chase; blackwallEnabled=$script:blackwallEnabled; sfxEnabled=$script:sfxEnabled; idleSleepAfter=$script:idleSleepAfter; petSize=$script:petSize; language=$script:language; muted=$script:muted; volume=$script:volume; chatter=$script:chatter; subtitles=$script:subtitles; approvedVoices=@($script:approvedVoices); voicePackRevision=3; remarksEnabled=$script:remarksEnabled; fullscreenMode=$script:fullscreenMode; windowPerch=$script:windowPerch; throwPhysics=$script:throwPhysics; timeOfDay=$script:timeOfDay; breakMinutes=$script:breakMinutes; smoothPoses=$script:smoothPoses; musicEnabled=$script:musicEnabled; appAware=$script:appAware; hotkeyEnabled=$script:hotkeyEnabled; talkingMouth=$script:talkingMouth; eyesFollow=$script:eyesFollow; batteryReactions=$script:batteryReactions; shadowEnabled=$script:shadowEnabled; beatSync=$script:beatSync; dndAware=$script:dndAware; weatherEnabled=$script:weatherEnabled; chatEnabled=$script:chatEnabled; weatherCity=$script:weatherCity; weatherUnit=$script:weatherUnit} | ConvertTo-Json | Set-Content -LiteralPath $settingsPath -Encoding UTF8 }
+ try { @{activityRates=$script:activityRates; rivalEscapes=$script:rivalEscapes; rivalWins=$script:rivalWins; escapeStreak=$script:escapeStreak; facialMotion=$script:facialMotion; chase=$script:chase; blackwallEnabled=$script:blackwallEnabled; sfxEnabled=$script:sfxEnabled; idleSleepAfter=$script:idleSleepAfter; petSize=$script:petSize; language=$script:language; muted=$script:muted; volume=$script:volume; chatter=$script:chatter; subtitles=$script:subtitles; approvedVoices=@($script:approvedVoices); voicePackRevision=3; remarksEnabled=$script:remarksEnabled; fullscreenMode=$script:fullscreenMode; windowPerch=$script:windowPerch; throwPhysics=$script:throwPhysics; timeOfDay=$script:timeOfDay; breakMinutes=$script:breakMinutes; smoothPoses=$script:smoothPoses; musicEnabled=$script:musicEnabled; appAware=$script:appAware; hotkeyEnabled=$script:hotkeyEnabled; talkingMouth=$script:talkingMouth; eyesFollow=$script:eyesFollow; batteryReactions=$script:batteryReactions; shadowEnabled=$script:shadowEnabled; beatSync=$script:beatSync; dndAware=$script:dndAware; weatherEnabled=$script:weatherEnabled; chatEnabled=$script:chatEnabled; chatVoice=$script:chatVoice; possessWindows=$script:possessWindows; cursorRepairs=$script:cursorRepairs; autoUpdate=$script:autoUpdate; weatherCity=$script:weatherCity; weatherUnit=$script:weatherUnit} | ConvertTo-Json | Set-Content -LiteralPath $settingsPath -Encoding UTF8 }
  catch { Show-Problem 'Settings could not be saved.' }
 }
 # Volume is applied to Capri's audio session, so changes reach a clip that is already playing.
@@ -238,4 +247,25 @@ function Play-Voice([string]$eventName, [bool]$preview=$false, [string]$clipId='
   $script:voiceLastPlayed[$clip.language+':'+$clip.id]=$now
   Schedule-Yap
  } catch { $detail=$_.Exception.Message; Stop-Voice; Report-AudioError $detail }
+}
+# Plays speech that isn't one of her recorded clips (her chat replies read by a Windows voice),
+# with the same talking mouth and volume handling. The caption always shows: it is the reply.
+function Play-SpeechWav([byte[]]$bytes,[string]$caption){
+ if($script:muted -or $script:isHidden -or $null -eq $bytes -or $bytes.Length -lt 100){return $false}
+ try {
+  Stop-Voice
+  $script:activeCaption=$caption
+  $script:speechRestorePose=$script:poseIndex
+  $script:speechPose=12; $script:speechMotion='nod'; $script:speechTempo=1.0
+  if(-not $script:liveVolume){$bytes=[CapriPcmAudio]::WithVolume($bytes,$script:volume)}
+  $script:speechEnvelope=$null
+  try{$script:speechEnvelope=[CapriPcmAudio]::MouthLevels([CapriPcmAudio]::Envelope($bytes,30.0),[double]$script:tuning.mouthHalf,[double]$script:tuning.mouthWide)}catch{}
+  $script:voiceJob=[CapriVoicePlayback]::new($bytes)
+  $script:voiceBusy=$true
+  $script:speechVisible=$true; $script:speechStarted=$clock.Elapsed.TotalSeconds
+  $words.Text=$caption; $bubble.Visibility='Visible'; $script:subtitleUntil=[double]::PositiveInfinity; $script:messageUntil=[double]::PositiveInfinity
+  $script:voiceJob.Start()
+  $script:voiceNext=$clock.Elapsed.TotalSeconds+8; Schedule-Yap
+  return $true
+ } catch { Stop-Voice; Report-AudioError $_.Exception.Message; return $false }
 }

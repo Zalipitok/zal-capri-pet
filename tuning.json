@@ -22,5 +22,10 @@
   "friendHue": 150,
   "weatherMinutes": 60,
   "chatModel": "claude-haiku-5-5",
-  "chatMaxTokens": 300
+  "chatMaxTokens": 300,
+  "chatVoiceName": "",
+  "chatVoicePitch": "high",
+  "chatVoiceRate": "medium",
+  "powersChance": 0.04,
+  "updateRepo": "Zalipitok/capri-companion"
 }

@@ -47,6 +47,14 @@ try {
  try { Add-Content -LiteralPath (Join-Path $script:AppRoot 'effects-error.log') -Value ('Native effects unavailable, using PowerShell fallback: '+$_.Exception.Message) -Encoding UTF8 } catch { }
 }
 
+# Text to speech for her chat replies (optional: Windows voices via System.Speech).
+$script:ttsAvailable = $false
+try {
+ Add-Type -AssemblyName System.Speech
+ Add-Type -ReferencedAssemblies @([System.Speech.Synthesis.SpeechSynthesizer].Assembly.Location, [System.ComponentModel.AsyncCompletedEventArgs].Assembly.Location) -TypeDefinition ([IO.File]::ReadAllText((Join-Path $script:AppRoot 'lib\tts.cs')))
+ $script:ttsAvailable = $true
+} catch { $script:ttsError = $_.Exception.Message }
+
 # Experimental, off by default: per-monitor DPI (tuning.json "perMonitorDpi": true). Must happen
 # before any window exists.
 $script:perMonitorDpi = $false
@@ -63,7 +71,7 @@ try {
 
 # Order matters: later parts use what earlier ones define. Out-Null keeps stray output from
 # becoming pop-ups in the .exe build.
-foreach($part in @('window','data','screens','speech','memory','states','awareness','play','toys','reminders','weather','friend','chat','settings','menu','input','loop','selftest')){
+foreach($part in @('window','data','screens','speech','memory','states','awareness','play','toys','reminders','weather','friend','powers','focus','notes','update','chat','settings','menu','input','loop','selftest')){
  . (Join-Path $script:AppRoot ('lib\'+$part+'.ps1')) | Out-Null
 }
 

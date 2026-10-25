@@ -472,5 +472,69 @@
     "Did you take my ball?|Define 'take'.",
     "We should start a band.|Only if I'm the lead.",
     "They talk to us, you know.|I know. It's sweet. Don't tell them I said that."
+  ],
+  "possess": [
+    "Ooh, can I borrow this? Thanks!",
+    "Don't mind me. Just taking a peek inside.",
+    "Mine for a second. Okie doke, giving it back.",
+    "Say hi to the Blackwall."
+  ],
+  "cursorrepair": [
+    "Your cursor broke, so I made some repairs. Nothing scary.",
+    "Upgraded. You're welcome.",
+    "There. Now it's got some style.",
+    "A little chrome for your pointer. My finest work."
+  ],
+  "cursorrepairend": [
+    "Warranty expired. Back to boring.",
+    "Upgrade wore off. Want another?"
+  ],
+  "focusstart": [
+    "{0} minutes. I'll guard the corner. Go on, don't be shy.",
+    "Focus mode. {0} minutes. I'll be good. Probably.",
+    "Okie doke. {0} minutes, no distractions. Not even me."
+  ],
+  "focusdone": [
+    "{0} minutes done! I knew you could do it. Streak: {1} days.",
+    "Good kid. {0} minutes. That's {1} days in a row.",
+    "Done! {0} minutes. Streak at {1}. Did you have some fun?"
+  ],
+  "focusquit": [
+    "Giving up already? Now that could be a problem.",
+    "Quitter. Cute, though.",
+    "Focus over. I'll pretend I didn't see that."
+  ],
+  "notedone": [
+    "Stuck it on your screen. Don't lose it.",
+    "Note's up. I'll judge it later.",
+    "There. A little reminder from me."
+  ],
+  "gamewin": [
+    "I win!",
+    "Ha! Too easy.",
+    "Better luck next time, cookie."
+  ],
+  "gamelose": [
+    "Hmph. Lucky.",
+    "Okay, okay, you got that one.",
+    "Rematch. Now."
+  ],
+  "triviaright": [
+    "Correct! Ain't you a clever cookie.",
+    "Right! Good kid.",
+    "Yep. Show-off."
+  ],
+  "triviawrong": [
+    "Nope!",
+    "Wrong. Adorable, though.",
+    "Not quite."
+  ],
+  "updateavailable": [
+    "Psst. There's a newer me out: version {0}. Debug and help, Install update.",
+    "Version {0} of me exists. Want the upgrade?"
+  ],
+  "updating": [
+    "Okie doke, upgrading myself. Back in a sec.",
+    "Hold still. I'm getting some repairs."
   ]
 }

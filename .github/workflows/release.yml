@@ -24,7 +24,7 @@ jobs:
         run: |
           $out = 'Capri-Companion'
           New-Item -ItemType Directory $out | Out-Null
-          foreach($item in @('Capri.exe','capri.ico','Capri.ps1','Capri.vbs','Start-Capri.bat','Run-SelfTest.bat','README.txt','menu-theme.xaml','lib','sprites','sounds','tools')){
+          foreach($item in @('Capri.exe','capri.ico','Capri.ps1','Capri.vbs','Start-Capri.bat','Run-SelfTest.bat','README.txt','VERSION','menu-theme.xaml','lib','sprites','sounds','tools')){
             if(Test-Path $item){ Copy-Item $item $out -Recurse }
           }
           Get-ChildItem *.png, *.json | Copy-Item -Destination $out

@@ -25,7 +25,7 @@ function Invoke-SelfTest {
 
  # --- Files and data
  Test-Step 'Required files' {
-  $missing=@('behaviours.json','remarks.json','voice-pack.json','menu-theme.xaml','tuning.json','app-reactions.json','unlocks.json','sounds\cartoon-swat.wav','sounds\headpat.wav','sounds\ballhit.wav','sounds\reminder.wav','pose-shaken.png',
+  $missing=@('behaviours.json','remarks.json','voice-pack.json','menu-theme.xaml','tuning.json','app-reactions.json','unlocks.json','games.json','VERSION','sounds\cartoon-swat.wav','sounds\headpat.wav','sounds\ballhit.wav','sounds\reminder.wav','pose-shaken.png',
    'poses-clean.png','poses-extra-clean.png','poses-life-clean.png','poses-faces-clean.png','poses-casting-clean.png','poses-motion.png','poses-daily.png','poses-interaction.png') |
    Where-Object {-not (Test-Path -LiteralPath (Join-Path $script:AppRoot $_))}
   if(@($missing).Count -gt 0){'missing: '+(@($missing) -join ', ')}
@@ -67,7 +67,7 @@ function Invoke-SelfTest {
  Test-Step 'Remark pools used by the code' {
   $used=@(Get-ChildItem -LiteralPath (Join-Path $script:AppRoot 'lib') -Filter '*.ps1' | ForEach-Object {
    [regex]::Matches((Get-Content -LiteralPath $_.FullName -Raw),"Show-Remark '([a-z]+)'") | ForEach-Object {$_.Groups[1].Value}
-  }) + @('morning','latenight','returned','firstmeet','longtime','anniversary','appgames','appcode','appvideo','applate','friendtalk','friendhello','friendarrive') + @(foreach($k in $script:weatherReaction.Keys){'weather'+$k}) | Select-Object -Unique
+  }) + @('morning','latenight','returned','firstmeet','longtime','anniversary','appgames','appcode','appvideo','applate','friendtalk','friendhello','friendarrive','notedone','focusstart','reminderset','gamewin','gamelose','triviaright','triviawrong') + @(foreach($k in $script:weatherReaction.Keys){'weather'+$k}) | Select-Object -Unique
   $missing=@($used | Where-Object {@($remarkPack.$_ | Where-Object {$_}).Count -eq 0})
   if($missing.Count -gt 0){'empty or missing in remarks.json: '+($missing -join ', ')}
  }
@@ -160,6 +160,49 @@ function Invoke-SelfTest {
   if($script:weatherEnabled -and -not $script:weatherCity){return 'WARN: weather is on but no city is set (Settings > Fun)'}
   if($script:weatherError){'WARN: last check failed: '+$script:weatherError}
  }
+ Test-Step 'Possession' {
+  # Without moving anything: just the checks and the overlay.
+  [void][CapriWindows]::Rect([long]$script:petHandle); [void][CapriWindows]::Maximized([long]$script:petHandle)
+  $script:selfTestErrors.Clear(); Begin-State 'possess'; & $script:tickBody; Stop-Possession
+  if($script:selfTestErrors.Count -gt 0){$script:selfTestErrors -join '; '}
+ }
+ Test-Step 'Cursor trail' {
+  $script:selfTestErrors.Clear(); Start-CursorRepair; & $script:tickBody; & $script:tickBody
+  $script:trailUntil=0; & $script:tickBody
+  if($script:selfTestErrors.Count -gt 0){$script:selfTestErrors -join '; '}
+ }
+ Test-Step 'Peeking from behind a window' {
+  $script:selfTestErrors.Clear(); Begin-State 'peekbehind'; for($i=0;$i -lt 3;$i++){& $script:tickBody}
+  Begin-State 'float'; & $script:tickBody
+  if($script:behindWindow){return 'she stayed behind the window'}
+  if($script:selfTestErrors.Count -gt 0){$script:selfTestErrors -join '; '}
+ }
+ Test-Step 'Focus timer' {
+  $script:selfTestErrors.Clear(); Start-Focus 1 -Quiet; & $script:tickBody
+  if(-not $script:busyMode){return 'focus did not start'}
+  $script:focus.ends=(Get-Date).AddSeconds(-1); $script:nextFocusTick=0; & $script:tickBody
+  if($script:focus.active){return 'focus did not finish'}
+  if($script:selfTestErrors.Count -gt 0){$script:selfTestErrors -join '; '}
+ }
+ Test-Step 'Sticky notes' {
+  if($script:notesError){return 'notes.json: '+$script:notesError}
+  if(-not (New-StickyNote 'self-test' 0 0 -Restore)){return 'could not make a note'}
+  $id=@($script:notes.Keys)[-1]; Remove-StickyNote $id
+ }
+ Test-Step 'Chat games' {
+  if($script:triviaBank.Count -eq 0){return 'games.json missing or empty'+$(if($script:gamesError){': '+$script:gamesError}else{''})}
+  $bad=@(foreach($q in $script:triviaBank){if(@($q.choices).Count -ne 3 -or [int]$q.answer -lt 0 -or [int]$q.answer -gt 2){$q.q}})
+  if($bad.Count -gt 0){'bad trivia: '+($bad -join '; ')}
+ }
+ Test-Step 'Chat voice' {
+  if(-not $script:ttsAvailable){return 'WARN: Windows speech is unavailable ('+$script:ttsError+'); chat replies stay silent'}
+  $voices=@([CapriTts]::Voices()); if($voices.Count -eq 0){return 'WARN: no Windows voices installed'}
+  $task=[CapriTts]::Render('Okie doke.',[string]$script:tuning.chatVoiceName,[string]$script:tuning.chatVoicePitch,[string]$script:tuning.chatVoiceRate)
+  if(-not $task.Wait(15000)){return 'WARN: speech took too long'}
+  if($task.Result.Length -lt 1000){return 'speech came out empty'}
+  if([CapriPcmAudio]::Envelope($task.Result,30.0).Length -eq 0){'no mouth data from the speech'}
+ }
+ Test-Step 'Version' {if($script:appVersion -eq [version]'0.0.0'){'WARN: VERSION file missing, so updates cannot compare versions'}}
  Test-Step 'Do Not Disturb check' {[void][CapriQuiet]::State()}
  Test-Step 'Two Capris link' {if(-not $script:linkOk){'WARN: shared memory unavailable ('+$script:linkError+'); a friend could not see her'}}
  Test-Step 'File drop scan' {Start-FileScan 'C:\example\test file.txt'; & $script:tickBody; if($script:state -ne 'filescan'){'scan did not start'}}

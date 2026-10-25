@@ -97,6 +97,26 @@ EVEN NEWER
                     time, the song playing, the weather and your history with her, is sent to
                     Anthropic to write her reply. chatModel in tuning.json picks the model.
 
+LATEST
+  Her powers        Interact > Possess a window: a red flicker and a little shake over the window you're
+                    using, then it goes back exactly where it was (turn on "Possess windows sometimes"
+                    in Settings > Behaviour to let her do it on her own). Interact > Upgrade my cursor:
+                    a glitch trail follows your pointer for a minute (only a picture; your cursor isn't
+                    changed).
+  Peeking           she hides behind the window you're using and peeks over its top edge.
+  Chat voice        her chat replies are read aloud by a Windows voice, with her talking mouth.
+                    chatVoiceName / chatVoicePitch / chatVoiceRate in tuning.json change it.
+  Chat games        type "play" in the chat: rock paper scissors, guess the number, or trivia
+                    (questions in games.json, add your own). "stop" ends a game.
+                    Also in chat: "note: buy milk" and "focus 25".
+  Focus timer       Interact > Focus timer (or the tray): she waits in her corner with a countdown,
+                    cheers when you finish and keeps your streak. Turning Busy off gives up.
+  Sticky notes      Interact > Leave a sticky note. Type into it, drag it by the yellow bar, x removes
+                    it. Notes come back after a restart (notes.json).
+  Updates           once a day she checks GitHub for a newer Capri (Settings > General).
+                    Debug and help > Install update keeps your settings, memory, notes, reminders,
+                    voices and tuning.json, and backs up every file it replaces.
+
 FILES YOU CAN EDIT
   behaviours.json      every state: pose, timing, movement, what comes next, routines
   remarks.json         her text lines, by situation ({0} is filled in with a number or name)
@@ -105,8 +125,9 @@ FILES YOU CAN EDIT
                        After editing: Debug and help > Reload tuning.json.
   app-reactions.json   which programs count as games, code, video, browsers
   unlocks.json         what can be unlocked and what it takes
+  games.json           trivia questions for the chat games
 Saved automatically: voice-settings.json (preferences), memory.json (history), reminders.json,
-chat-key.dat (only if you save an API key).
+notes.json, chat-key.dat (only if you save an API key).
 sprite-cache\ is rebuilt from the sprite sheets when they change; safe to delete.
 
 SELF-TEST
@@ -145,7 +166,8 @@ LOGS (in this folder, only when something goes wrong)
   startup-error.log  runtime-error.log  audio-error.log  effects-error.log  cursor-error.log
 Problems also appear in her speech bubble and as a tray notification.
 There is no telemetry. Nothing leaves this PC unless you turn on weather (city name to open-meteo.com)
-or chat replies (your messages to Anthropic, with your own key).
+or chat replies (your messages to Anthropic, with your own key). The daily update check asks GitHub
+for the latest version number only.
 
 CODE LAYOUT
   Capri.ps1          starts everything (loads lib\ in order)
@@ -163,7 +185,12 @@ CODE LAYOUT
   lib\reminders.ps1  reminders
   lib\weather.ps1    weather
   lib\friend.ps1     the second Capri
-  lib\chat.ps1       the chat window
+  lib\chat.ps1       the chat window, chat games
+  lib\powers.ps1     possession, cursor trail, peeking
+  lib\focus.ps1      focus timer
+  lib\notes.ps1      sticky notes
+  lib\update.ps1     updates from GitHub
+  lib\tts.cs         Windows voice for chat replies
   lib\settings.ps1   the settings window
   lib\menu.ps1       voice library, menu, tray icon
   lib\input.ps1      mouse

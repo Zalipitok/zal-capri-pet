@@ -1,0 +1,275 @@
+{
+  "_help": "Trivia for the chat games: question, three choices, and the index (0-2) of the right one. Add your own.",
+  "trivia": [
+    {
+      "q": "What does CPU stand for?",
+      "choices": [
+        "Central Processing Unit",
+        "Computer Power Unit",
+        "Core Program Utility"
+      ],
+      "answer": 0
+    },
+    {
+      "q": "Which planet is closest to the Sun?",
+      "choices": [
+        "Venus",
+        "Mercury",
+        "Mars"
+      ],
+      "answer": 1
+    },
+    {
+      "q": "How many bits are in a byte?",
+      "choices": [
+        "4",
+        "8",
+        "16"
+      ],
+      "answer": 1
+    },
+    {
+      "q": "What is the chemical symbol for gold?",
+      "choices": [
+        "Au",
+        "Ag",
+        "Gd"
+      ],
+      "answer": 0
+    },
+    {
+      "q": "Which language is mostly used to style web pages?",
+      "choices": [
+        "HTML",
+        "CSS",
+        "SQL"
+      ],
+      "answer": 1
+    },
+    {
+      "q": "What is the largest ocean on Earth?",
+      "choices": [
+        "Atlantic",
+        "Indian",
+        "Pacific"
+      ],
+      "answer": 2
+    },
+    {
+      "q": "How many sides does a hexagon have?",
+      "choices": [
+        "5",
+        "6",
+        "8"
+      ],
+      "answer": 1
+    },
+    {
+      "q": "Who wrote the novel Neuromancer?",
+      "choices": [
+        "William Gibson",
+        "Philip K. Dick",
+        "Isaac Asimov"
+      ],
+      "answer": 0
+    },
+    {
+      "q": "What is 2 to the power of 10?",
+      "choices": [
+        "512",
+        "1024",
+        "2048"
+      ],
+      "answer": 1
+    },
+    {
+      "q": "Which gas do plants mostly take in from the air?",
+      "choices": [
+        "Oxygen",
+        "Nitrogen",
+        "Carbon dioxide"
+      ],
+      "answer": 2
+    },
+    {
+      "q": "What does RAM stand for?",
+      "choices": [
+        "Random Access Memory",
+        "Read And Modify",
+        "Rapid Array Module"
+      ],
+      "answer": 0
+    },
+    {
+      "q": "What is the capital of Japan?",
+      "choices": [
+        "Osaka",
+        "Kyoto",
+        "Tokyo"
+      ],
+      "answer": 2
+    },
+    {
+      "q": "Which element has the atomic number 1?",
+      "choices": [
+        "Helium",
+        "Hydrogen",
+        "Lithium"
+      ],
+      "answer": 1
+    },
+    {
+      "q": "In binary, what is 101?",
+      "choices": [
+        "3",
+        "5",
+        "6"
+      ],
+      "answer": 1
+    },
+    {
+      "q": "Which company made the first iPhone?",
+      "choices": [
+        "Apple",
+        "Samsung",
+        "Nokia"
+      ],
+      "answer": 0
+    },
+    {
+      "q": "What is the hardest natural material?",
+      "choices": [
+        "Quartz",
+        "Iron",
+        "Diamond"
+      ],
+      "answer": 2
+    },
+    {
+      "q": "How many continents are there?",
+      "choices": [
+        "5",
+        "6",
+        "7"
+      ],
+      "answer": 2
+    },
+    {
+      "q": "What does Wi-Fi use to send data?",
+      "choices": [
+        "Radio waves",
+        "Sound waves",
+        "Light pulses through cables"
+      ],
+      "answer": 0
+    },
+    {
+      "q": "Which is the longest river in Africa?",
+      "choices": [
+        "Congo",
+        "Nile",
+        "Niger"
+      ],
+      "answer": 1
+    },
+    {
+      "q": "What year did the first Moon landing happen?",
+      "choices": [
+        "1965",
+        "1969",
+        "1972"
+      ],
+      "answer": 1
+    },
+    {
+      "q": "What does URL stand for?",
+      "choices": [
+        "Uniform Resource Locator",
+        "Universal Remote Link",
+        "User Route Line"
+      ],
+      "answer": 0
+    },
+    {
+      "q": "Which animal is known for changing its skin colour to blend in?",
+      "choices": [
+        "Chameleon",
+        "Gecko",
+        "Iguana"
+      ],
+      "answer": 0
+    },
+    {
+      "q": "How many minutes are in a day?",
+      "choices": [
+        "1,240",
+        "1,440",
+        "1,640"
+      ],
+      "answer": 1
+    },
+    {
+      "q": "Which city is split between Europe and Asia?",
+      "choices": [
+        "Istanbul",
+        "Athens",
+        "Cairo"
+      ],
+      "answer": 0
+    },
+    {
+      "q": "What is the freezing point of water in Fahrenheit?",
+      "choices": [
+        "0",
+        "32",
+        "100"
+      ],
+      "answer": 1
+    },
+    {
+      "q": "Which of these is a prime number?",
+      "choices": [
+        "21",
+        "27",
+        "29"
+      ],
+      "answer": 2
+    },
+    {
+      "q": "What does GPU stand for?",
+      "choices": [
+        "Graphics Processing Unit",
+        "General Power Unit",
+        "Grid Program Utility"
+      ],
+      "answer": 0
+    },
+    {
+      "q": "What is the main language of Brazil?",
+      "choices": [
+        "Spanish",
+        "Portuguese",
+        "French"
+      ],
+      "answer": 1
+    },
+    {
+      "q": "Which planet has the most famous rings?",
+      "choices": [
+        "Jupiter",
+        "Saturn",
+        "Neptune"
+      ],
+      "answer": 1
+    },
+    {
+      "q": "Which key combination usually undoes something on Windows?",
+      "choices": [
+        "Ctrl+Z",
+        "Ctrl+Y",
+        "Ctrl+U"
+      ],
+      "answer": 0
+    }
+  ]
+}

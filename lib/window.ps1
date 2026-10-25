@@ -19,6 +19,9 @@
   <Border Name="SabotagePanel" Grid.Row="1" VerticalAlignment="Top" Background="#E510070C" BorderBrush="#D02246" BorderThickness="1" Padding="8" Visibility="Collapsed" IsHitTestVisible="False">
    <TextBlock Name="SabotageText" Foreground="#FF4564" FontFamily="Consolas" FontSize="11" TextWrapping="Wrap" Text="SIGNAL LOST"/>
   </Border>
+  <Border Name="FocusBadge" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Background="#E5070A12" BorderBrush="#FCEE0A" BorderThickness="1" Padding="6,1" Margin="0,0,0,2" Visibility="Collapsed" IsHitTestVisible="False">
+   <TextBlock Name="FocusText" Foreground="#FCEE0A" FontFamily="Consolas" FontSize="12" FontWeight="Bold"/>
+  </Border>
   <TextBlock Name="Effect" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,10,0,0" Foreground="#FF75D6" FontFamily="Segoe UI Symbol" FontSize="24" IsHitTestVisible="False"/>
   <Border Grid.Row="0" Name="Bubble" VerticalAlignment="Bottom" HorizontalAlignment="Center" MaxWidth="{Binding ActualWidth, ElementName=Scene}" Margin="6,0,6,8" IsHitTestVisible="False"
    Background="#F2070A12" BorderBrush="#00E5FF" BorderThickness="1" CornerRadius="0" Visibility="Collapsed">
@@ -44,6 +47,7 @@ $w = [Windows.Markup.XamlReader]::Load([System.Xml.XmlNodeReader]::new($xaml))
 $effect = $w.FindName('Effect'); $effect.Visibility='Collapsed'
 $sprite = $w.FindName('Sprite'); $bubble = $w.FindName('Bubble'); $words = $w.FindName('Words')
 $scene = $w.FindName('Scene'); $shadow = $w.FindName('Shadow')
+$focusBadge = $w.FindName('FocusBadge'); $focusText = $w.FindName('FocusText')
 
 # ---------------------------------------------------------------------------
 # Effects layers

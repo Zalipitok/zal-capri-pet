@@ -1228,6 +1228,66 @@
         "noYap",
         "noRemark"
       ]
+    },
+    {
+      "id": "possess",
+      "title": "Possess a window",
+      "pose": 17,
+      "seconds": 2.5,
+      "next": "smug",
+      "tags": [
+        "blackwall",
+        "strong",
+        "noCaught",
+        "noYap",
+        "noRemark",
+        "noSleep",
+        "noSpeechPose"
+      ]
+    },
+    {
+      "id": "repaircursor",
+      "title": "Upgrade your cursor",
+      "poses": [
+        [
+          17,
+          1.2
+        ],
+        [
+          31,
+          1.0
+        ],
+        [
+          5
+        ]
+      ],
+      "seconds": 3.5,
+      "next": "smug",
+      "tags": [
+        "blackwall",
+        "noCaught",
+        "noYap",
+        "noRemark"
+      ]
+    },
+    {
+      "id": "peekbehind",
+      "title": "Peek from behind a window",
+      "menu": "Idle tricks",
+      "auto": true,
+      "pose": 7,
+      "seconds": [
+        8,
+        12
+      ],
+      "path": "peekbehind",
+      "speed": 320,
+      "tags": [
+        "noCaught",
+        "noYap",
+        "noRemark",
+        "noSleep"
+      ]
     }
   ],
   "routines": {

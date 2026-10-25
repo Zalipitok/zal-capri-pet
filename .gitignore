@@ -14,3 +14,6 @@ voices/
 reminders.json
 chat-key.dat
 __pycache__/
+notes.json
+backup-before-*/
+Capri.exe.old

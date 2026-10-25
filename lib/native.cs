@@ -551,3 +551,21 @@ public static class CapriTint {
   }
  }
 }
+
+// Window moves for the opt-in "possession" antic and for peeking from behind a window.
+public static class CapriWindows {
+ [DllImport("user32.dll")] static extern bool GetWindowRect(IntPtr h, out CapriDesktop.RECT r);
+ [DllImport("user32.dll")] static extern bool SetWindowPos(IntPtr h, IntPtr after, int x, int y, int cx, int cy, uint flags);
+ [DllImport("user32.dll")] static extern bool IsZoomed(IntPtr h);
+ [DllImport("user32.dll")] static extern bool IsWindow(IntPtr h);
+ public static int[] Rect(long handle) {
+  CapriDesktop.RECT r; IntPtr h = new IntPtr(handle);
+  if (!IsWindow(h) || !GetWindowRect(h, out r)) return null;
+  return new int[] { r.Left, r.Top, r.Right, r.Bottom };
+ }
+ public static bool Maximized(long handle) { return IsZoomed(new IntPtr(handle)); }
+ // Moves without resizing, activating or changing the stacking order.
+ public static bool MoveTo(long handle, int x, int y) { return SetWindowPos(new IntPtr(handle), IntPtr.Zero, x, y, 0, 0, 0x0001 | 0x0004 | 0x0010); }
+ // Puts "self" directly behind "target" in the stacking order.
+ public static bool PlaceBehind(IntPtr self, long target) { return SetWindowPos(self, new IntPtr(target), 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010); }
+}

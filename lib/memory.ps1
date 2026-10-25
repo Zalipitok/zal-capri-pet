@@ -4,6 +4,7 @@ $script:memory=[ordered]@{
  firstMet=''; lastSeen=''; lastDay=''; days=0; sessions=0
  pets=0; throws=0; shakes=0; swats=0; returns=0; scans=0; games=0; bestCatch=0; unlocked=''
  todayDate=''; todayPets=0; todayThrows=0; todaySwats=0
+ focusSessions=0; focusMinutes=0; focusStreak=0; lastFocusDay=''; lastUpdateCheck=''
 }
 $script:memoryDirty=$false; $script:nextMemorySave=0.0; $script:greeting=$null
 try {
@@ -63,7 +64,7 @@ function Start-MemorySession {
 }
 function Get-MemorySummary {
  $m=$script:memory
- return "First met: $($m.firstMet)`nDays together: $($m.days)`nSessions: $($m.sessions)`n`nHead pats: $($m.pets) ($($m.todayPets) today)`nThrows: $($m.throws) ($($m.todayThrows) today)`nShakes: $($m.shakes)`nSwats: $($m.swats)`nCursor catches: $($script:rivalWins) / escapes: $($script:rivalEscapes)`nWelcome-backs: $($m.returns)`nFiles scanned: $($m.scans)"
+ return "First met: $($m.firstMet)`nDays together: $($m.days)`nSessions: $($m.sessions)`n`nHead pats: $($m.pets) ($($m.todayPets) today)`nThrows: $($m.throws) ($($m.todayThrows) today)`nShakes: $($m.shakes)`nSwats: $($m.swats)`nCursor catches: $($script:rivalWins) / escapes: $($script:rivalEscapes)`nWelcome-backs: $($m.returns)`nFiles scanned: $($m.scans)`nFocus sessions: $($m.focusSessions) ($($m.focusMinutes) minutes, streak $($m.focusStreak) days)"
 }
 # A milestone remark replaces the usual one when a daily count hits one of these.
 function Test-Milestone([int]$count,[int[]]$marks){return $marks -contains $count}
