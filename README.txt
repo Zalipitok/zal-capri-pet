@@ -122,6 +122,11 @@ Installs the ps2exe module for your user (once), makes capri.ico from her hover 
 around it (lib\, images, voices, json files). Windows SmartScreen may warn the first time
 because the exe is not signed.
 
+SHARING WITH FRIENDS
+On GitHub, every push to the 'release' branch builds Capri.exe on a Windows machine and publishes
+Capri-Companion.zip under Releases, named after the VERSION file. The zip has no voices folder
+(recorded dialogue isn't ours to share); she works fine without it, just with text instead of voice.
+
 SPRITES
 Capri draws from sprites\frame-00..32.png. They are made from the sprite sheets by
 tools\normalize_sprites.py, which separates each figure on the full sheet (so hair that crossed

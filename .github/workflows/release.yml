@@ -1,9 +1,11 @@
-# Push a tag like v2.1.0 to build Capri.exe on Windows and publish a ready-to-run zip as a release.
+# Push to the 'release' branch to build Capri.exe on Windows and publish a ready-to-run zip as a
+# release named after the VERSION file (bump it for each new release).
 # The zip has no voices folder (recorded dialogue is not ours to share); Capri runs without it.
 name: Release
 on:
   push:
-    tags: ['v*']
+    branches: [release]
+  workflow_dispatch:
 permissions:
   contents: write
 jobs:
@@ -31,4 +33,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
-        run: gh release create "$GITHUB_REF_NAME" Capri-Companion.zip --title "Capri $GITHUB_REF_NAME" --notes "Unzip anywhere and run Capri.exe (or Capri.vbs). Windows may show a SmartScreen warning the first time because the exe is not signed. Voices are not included."
+        run: |
+          version="v$(tr -d '[:space:]' < VERSION)"
+          gh release create "$version" Capri-Companion.zip --target "$GITHUB_SHA" --title "Capri $version" --notes "Unzip anywhere and run Capri.exe (or Capri.vbs). Windows may show a SmartScreen warning the first time because the exe is not signed. Voices are not included."
