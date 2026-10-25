@@ -80,7 +80,7 @@ $script:tuning=[ordered]@{
  chatVoicePitch='high'   # x-low, low, medium, high, x-high
  chatVoiceRate='medium'  # x-slow, slow, medium, fast, x-fast
  powersChance=0.04       # how often she uses her powers when choosing what to do
- updateRepo='Zalipitok/capri-companion'  # where updates come from (GitHub owner/name)
+ updateRepo='Zalipitok/zal-capri-pet'  # where updates come from (GitHub owner/name)
 }
 $script:tuningPath=Join-Path $script:AppRoot 'tuning.json'
 function Import-Tuning {

@@ -6,7 +6,7 @@ A little Capri from *Cyberpunk: Edgerunners 2* who lives on your Windows desktop
 
 ## Download
 
-**[⬇ Download Capri-Companion.zip](https://github.com/Zalipitok/capri-companion/releases/latest/download/Capri-Companion.zip)** (latest release)
+**[⬇ Download Capri-Companion.zip](https://github.com/Zalipitok/zal-capri-pet/releases/latest/download/Capri-Companion.zip)** (latest release)
 
 1. Unzip it anywhere, for example your Desktop.
 2. Run **Capri.exe**. If Windows SmartScreen warns you, click *More info → Run anyway* (the exe isn't code-signed).
