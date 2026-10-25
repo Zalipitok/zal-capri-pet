@@ -86,7 +86,7 @@ $voicePack = @(foreach($entry in $decodedPack) {
  $entry
 })
 $script:approvedVoices=@($voicePack | Where-Object {-not $_.needs_review} | ForEach-Object {$_.language+':'+$_.id})
-$settingsPath = Join-Path $PSScriptRoot 'voice-settings.json'
+$settingsPath = Join-Path $script:AppRoot 'voice-settings.json'
 try {
  if(Test-Path -LiteralPath $settingsPath){
   $saved = Get-Content -LiteralPath $settingsPath -Raw | ConvertFrom-Json

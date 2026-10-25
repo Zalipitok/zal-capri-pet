@@ -172,19 +172,36 @@ function Get-CleanFrames([string]$sheetName){
  } catch { } # Read-only folder: keep working without a cache.
  return $frames
 }
+# Preferred: sprites\frame-00..32.png made by tools\normalize_sprites.py from the sheets. Every frame
+# shares one canvas, one scale and one head position, with no clipped hair. frames.json says where
+# her feet are in each frame. Without that folder, frames are cut from the sheets as before.
 $poses = @()
-foreach($sheetName in @('poses-clean.png','poses-extra-clean.png','poses-life-clean.png','poses-faces-clean.png','poses-casting-clean.png')) {
- $poses += Get-CleanFrames $sheetName
-}
-$angryFrame=[Windows.Media.Imaging.BitmapImage]::new([Uri](Join-Path $PSScriptRoot 'pose-shaken.png'))
-$angryFrame.Freeze(); $poses += $angryFrame
-foreach($name in @('poses-motion.png','poses-daily.png','poses-interaction.png')){
- $sheet=[Windows.Media.Imaging.BitmapImage]::new([Uri](Join-Path $PSScriptRoot $name))
- $cw=[int]($sheet.PixelWidth/2); $split=[int]($sheet.PixelHeight/2)
- foreach($i in 0..3){
-  $cy=if($i -lt 2){0}else{$split}; $ch=if($i -lt 2){$split}else{$sheet.PixelHeight-$split}
-  $rect=[Windows.Int32Rect]::new(($i%2)*$cw,$cy,$cw,$ch)
-  $frame=[Windows.Media.Imaging.CroppedBitmap]::new($sheet,$rect); $frame.Freeze(); $poses+=$frame
+$script:spriteFeet = $null
+$script:spriteScale = 1.0
+$spriteDir = Join-Path $script:AppRoot 'sprites'
+$spriteMeta = Join-Path $spriteDir 'frames.json'
+$framePaths = @(foreach($n in 0..32){Join-Path $spriteDir ('frame-{0:D2}.png' -f $n)})
+if((Test-Path -LiteralPath $spriteMeta) -and @($framePaths | Where-Object {-not (Test-Path -LiteralPath $_)}).Count -eq 0){
+ $meta = Get-Content -LiteralPath $spriteMeta -Raw | ConvertFrom-Json
+ foreach($path in $framePaths){$poses += Read-Png $path}
+ $script:spriteFeet = @($meta.feet | ForEach-Object {[double]$_})
+ # The shared canvas has more room around her than the old 768 px cells; grow the window to match
+ # so she stays the same size on screen.
+ $script:spriteScale = [double]$meta.height / 768.0
+}else{
+ foreach($sheetName in @('poses-clean.png','poses-extra-clean.png','poses-life-clean.png','poses-faces-clean.png','poses-casting-clean.png')) {
+  $poses += Get-CleanFrames $sheetName
+ }
+ $angryFrame=[Windows.Media.Imaging.BitmapImage]::new([Uri](Join-Path $script:AppRoot 'pose-shaken.png'))
+ $angryFrame.Freeze(); $poses += $angryFrame
+ foreach($name in @('poses-motion.png','poses-daily.png','poses-interaction.png')){
+  $sheet=[Windows.Media.Imaging.BitmapImage]::new([Uri](Join-Path $script:AppRoot $name))
+  $cw=[int]($sheet.PixelWidth/2); $split=[int]($sheet.PixelHeight/2)
+  foreach($i in 0..3){
+   $cy=if($i -lt 2){0}else{$split}; $ch=if($i -lt 2){$split}else{$sheet.PixelHeight-$split}
+   $rect=[Windows.Int32Rect]::new(($i%2)*$cw,$cy,$cw,$ch)
+   $frame=[Windows.Media.Imaging.CroppedBitmap]::new($sheet,$rect); $frame.Freeze(); $poses+=$frame
+  }
  }
 }
 

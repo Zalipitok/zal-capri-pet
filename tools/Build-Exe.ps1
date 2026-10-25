@@ -16,8 +16,16 @@ Import-Module ps2exe
 $icon = Join-Path $root 'capri.ico'
 if(-not (Test-Path -LiteralPath $icon)){
  Write-Host 'Making capri.ico from her hover pose...'
- $sheet = [Windows.Media.Imaging.BitmapImage]::new([Uri](Join-Path $root 'poses-faces-clean.png'))
- $cell = [Windows.Media.Imaging.CroppedBitmap]::new($sheet, [Windows.Int32Rect]::new(0, 0, [int]($sheet.PixelWidth/2), [int]($sheet.PixelHeight/2)))
+ $frame = Join-Path $root 'sprites\frame-12.png'
+ if(Test-Path -LiteralPath $frame){
+  # Head close-up from the normalised hover frame.
+  $image = [Windows.Media.Imaging.BitmapImage]::new([Uri]$frame)
+  $side = [int]($image.PixelWidth*0.42); $top = [int][Math]::Max(0.0, $image.PixelHeight*0.41-$side*0.55)
+  $cell = [Windows.Media.Imaging.CroppedBitmap]::new($image, [Windows.Int32Rect]::new([int](($image.PixelWidth-$side)/2), $top, $side, $side))
+ }else{
+  $sheet = [Windows.Media.Imaging.BitmapImage]::new([Uri](Join-Path $root 'poses-faces-clean.png'))
+  $cell = [Windows.Media.Imaging.CroppedBitmap]::new($sheet, [Windows.Int32Rect]::new(0, 0, [int]($sheet.PixelWidth/2), [int]($sheet.PixelHeight/2)))
+ }
  $size = 256.0
  $ratio = [Math]::Min($size/$cell.PixelWidth, $size/$cell.PixelHeight)
  $dw = $cell.PixelWidth*$ratio; $dh = $cell.PixelHeight*$ratio

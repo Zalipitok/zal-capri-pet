@@ -270,6 +270,11 @@ function New-TrayIconImage {
  if(Test-Path -LiteralPath $custom){return [Drawing.Icon]::new($custom)}
  try {
   $size=32; $source=$poses[12]
+  if($null -ne $script:spriteFeet){
+   # Head and hair only: the whole figure is too small to read at tray size.
+   $side=[int]($source.PixelWidth*0.42); $left=[int](($source.PixelWidth-$side)/2); $top=[int]([Math]::Max(0.0,$source.PixelHeight*0.41-$side*0.55))
+   $source=[Windows.Media.Imaging.CroppedBitmap]::new($source,[Windows.Int32Rect]::new($left,$top,$side,[Math]::Min($side,$source.PixelHeight-$top)))
+  }
   $ratio=[Math]::Min($size/$source.Width,$size/$source.Height); $dw=$source.Width*$ratio; $dh=$source.Height*$ratio
   $visual=[Windows.Media.DrawingVisual]::new(); $context=$visual.RenderOpen()
   $context.DrawImage($source,[Windows.Rect]::new(($size-$dw)/2,($size-$dh)/2,$dw,$dh)); $context.Close()

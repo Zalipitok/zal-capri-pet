@@ -491,7 +491,7 @@ function Set-PetSize([double]$percent){
  $script:petSize=[Math]::Max(65.0,[Math]::Min(160.0,$percent))
  $factor=$script:petSize/100
  $oldBottom=$w.Top+$w.Height; $oldCenter=$w.Left+$w.Width/2
- $w.Width=260*$factor; $w.Height=130+300*$factor
+ $w.Width=260*$factor*$script:spriteScale; $w.Height=130+300*$factor*$script:spriteScale
  if(-not [double]::IsNaN($oldBottom)){$w.Top=$oldBottom-$w.Height}
  if(-not [double]::IsNaN($oldCenter)){$w.Left=$oldCenter-$w.Width/2}
  Clamp-Pet

@@ -30,11 +30,13 @@ function Clamp-Pet {
  $w.Top = [Math]::Max($a.Top, [Math]::Min($w.Top, [Math]::Max($a.Top,$a.Bottom-$w.Height)))
 }
 # Distance from the window's bottom edge to the bottom of the drawn sprite, in WPF units.
-function Get-SpriteFoot {
+# With the normalised sprites this is where her feet are drawn in the given pose (default: hover, 12).
+function Get-SpriteFoot([int]$pose=12) {
  try {
   $origin=$scene.TransformToAncestor($w).Transform([Windows.Point]::new(0,0))
   $offset=[Windows.Media.VisualTreeHelper]::GetOffset($sprite)
-  return [Math]::Max(0.0,$w.Height-($origin.Y+$offset.Y+$sprite.ActualHeight))
+  $feet=if($null -ne $script:spriteFeet -and $pose -lt $script:spriteFeet.Count){$script:spriteFeet[$pose]}else{1.0}
+  return [Math]::Max(0.0,$w.Height-($origin.Y+$offset.Y+$sprite.ActualHeight*$feet))
  } catch { return 18.0 }
 }
 function Get-WindowRectDip([long]$handle){

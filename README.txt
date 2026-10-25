@@ -78,6 +78,17 @@ Installs the ps2exe module for your user (once), makes capri.ico from her hover 
 around it (lib\, images, voices, json files). Windows SmartScreen may warn the first time
 because the exe is not signed.
 
+SPRITES
+Capri draws from sprites\frame-00..32.png. They are made from the sprite sheets by
+tools\normalize_sprites.py, which separates each figure on the full sheet (so hair that crossed
+into the next cell is no longer cut off), scales all sheets to the same size, and lines every
+frame up on her visor so she no longer jumps or changes size between poses.
+sprites\frames.json records where her feet are in each frame, which is how she sits on windows.
+After editing a sheet, rebuild the frames (needs Python):
+  pip install pillow numpy scipy scikit-image
+  python tools\normalize_sprites.py
+Without the sprites folder she falls back to cutting the sheets as before.
+
 LOGS (in this folder, only when something goes wrong)
   startup-error.log  runtime-error.log  audio-error.log  effects-error.log  cursor-error.log
 Problems also appear in her speech bubble and as a tray notification.
