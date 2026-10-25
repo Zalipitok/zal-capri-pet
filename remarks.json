@@ -23,7 +23,9 @@
     "I will remember that.",
     "Finished inspecting me?",
     "Right. Where were we?",
-    "You picked an odd place."
+    "You picked an odd place.",
+    "Did you have some fun?",
+    "Okie doke. Put me down wherever."
   ],
   "idle": [
     "Well? What's next?",
@@ -45,7 +47,12 @@
     "Try something else.",
     "No hurry. I am watching.",
     "Interesting. Keep going.",
-    "You almost had it."
+    "You almost had it.",
+    "So many souls in here, and not one of them is bored like I am.",
+    "Hey. Want to get stronger? I'm just asking.",
+    "I could fix you up, you know. Few upgrades. Nothing scary.",
+    "Okie doke, what are we breaking today?",
+    "Ain't you a strange cookie, staring at that screen all day."
   ],
   "stalk": [
     "Hold still a second.",
@@ -64,7 +71,9 @@
     "Yes?",
     "Looking for something?",
     "You saw nothing.",
-    "Can I help you?"
+    "Can I help you?",
+    "Peekaboo.",
+    "Don't be shy, come closer."
   ],
   "gaming": [
     "One more attempt.",
@@ -96,7 +105,10 @@
     "You are getting comfortable.",
     "Do not look so pleased.",
     "...I did not say stop.",
-    "That is enough. For now."
+    "That is enough. For now.",
+    "Good kid.",
+    "Ooh, again. I like that.",
+    "See? We get along great."
   ],
   "shaken": [
     "Enough.",
@@ -113,7 +125,9 @@
     "Do that again and I bite.",
     "...I meant to land like that.",
     "Ten points. For you, not the landing.",
-    "Wheee. I mean: how dare you."
+    "Wheee. I mean: how dare you.",
+    "Wheee! Again! No, wait, rude.",
+    "You broke the throw. I'd repair it, but it was kinda fun."
   ],
   "fell": [
     "Hey. I was sitting there.",
@@ -128,7 +142,10 @@
     "Back already? I was just getting comfortable.",
     "I kept an eye on things. Mostly.",
     "Oh. You're back.",
-    "Missed me? Don't answer that."
+    "Missed me? Don't answer that.",
+    "There's my favourite project.",
+    "Missed me? Of course you did.",
+    "Welcome back. I kept the lights on. Mostly."
   ],
   "morning": [
     "Morning. Coffee first, then chaos.",
@@ -153,7 +170,9 @@
   "firstmeet": [
     "So. You're the one running this desktop.",
     "Hi. I live here now.",
-    "Nice place. I'm keeping it."
+    "Nice place. I'm keeping it.",
+    "Well, hello. You plugged me in. No take-backs.",
+    "Oh, a new host. Ain't you a strange cookie."
   ],
   "longtime": [
     "{0} days. I counted.",
@@ -331,7 +350,9 @@
     "Hey. You told me to tell you: {0}",
     "Reminder, since you asked: {0}",
     "Time's up. {0}",
-    "You wanted me to nag you: {0}"
+    "You wanted me to nag you: {0}",
+    "Psst. You wanted this: {0}",
+    "Don't you worry, I remembered: {0}"
   ],
   "reminderlate": [
     "I was offline, but you wanted this at {1}: {0}",
