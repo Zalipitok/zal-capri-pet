@@ -227,6 +227,10 @@ $script:tickBody={
  if($moodPose -and $null -eq $spec.timeline){
   if($script:mood -eq 'smug'){$pose=5}elseif($script:mood -eq 'irritated'){$pose=2}
  }
+ $script:musicFrameActive=$false
+ if($script:musicPoseStart -ge 0 -and ($pose -eq 12 -or $pose -eq 13) -and (Test-MusicGroove)){
+  $pose=Get-MusicPose $t; $script:musicFrameActive=$true
+ }
  if($null -ne $pose){Set-Pose $pose}
  $scale.ScaleX=$script:direction; $scale.ScaleY=1; $rotation.Angle=0
  $shift.X=0; $shift.Y=[Math]::Sin($t*2)*5; $sprite.Opacity=1

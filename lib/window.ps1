@@ -177,6 +177,7 @@ function Get-CleanFrames([string]$sheetName){
 # her feet are in each frame. Without that folder, frames are cut from the sheets as before.
 $poses = @()
 $script:spriteFeet = $null
+$script:musicPoseStart = -1
 $script:spriteScale = 1.0
 $spriteDir = Join-Path $script:AppRoot 'sprites'
 $spriteMeta = Join-Path $spriteDir 'frames.json'
@@ -185,6 +186,13 @@ if((Test-Path -LiteralPath $spriteMeta) -and @($framePaths | Where-Object {-not 
  $meta = Get-Content -LiteralPath $spriteMeta -Raw | ConvertFrom-Json
  foreach($path in $framePaths){$poses += Read-Png $path}
  $script:spriteFeet = @($meta.feet | ForEach-Object {[double]$_})
+ # Music frames (headphones, head bobbing), made by tools\make_music_frames.py. They follow the
+ # 33 regular frames, so they are poses 33-36.
+ $musicPaths = @(foreach($n in 0..3){Join-Path $spriteDir ('music-{0}.png' -f $n)})
+ if($null -ne $meta.music -and @($musicPaths | Where-Object {-not (Test-Path -LiteralPath $_)}).Count -eq 0){
+  $script:musicPoseStart = $poses.Count
+  foreach($path in $musicPaths){$poses += Read-Png $path; $script:spriteFeet += [double]$meta.music.feet}
+ }
  # The shared canvas has more room around her than the old 768 px cells; grow the window to match
  # so she stays the same size on screen.
  $script:spriteScale = [double]$meta.height / 768.0

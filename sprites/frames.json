@@ -41,5 +41,10 @@
   0.8896,
   0.9287
  ],
- "note": "feet = bottom of the drawn figure as a fraction of canvas height"
+ "note": "feet = bottom of the drawn figure as a fraction of canvas height",
+ "music": {
+  "frames": 4,
+  "base": 12,
+  "feet": 0.8473
+ }
 }

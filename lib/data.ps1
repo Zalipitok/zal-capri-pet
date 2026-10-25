@@ -51,7 +51,8 @@ $script:tuning=[ordered]@{
  perchSink=0.0           # px to lower her onto a title bar (raise if she floats above it)
  roamChance=0.2          # chance a wander goes to another monitor
  crossfadeSeconds=0.12   # pose-change fade; 0 = off
- musicBob=1.0            # strength of her bobbing to music
+ musicBob=1.0            # strength of her swaying to music (poses without music frames)
+ musicBpm=108.0          # head-bob tempo with headphones on (Windows does not report a song's tempo)
  songRemarkMinutes=3.0   # at least this long between comments on songs
  appRemarkMinutes=2.0    # at least this long between comments on apps
  hotkey='Ctrl+Alt+C'     # summon / hide shortcut

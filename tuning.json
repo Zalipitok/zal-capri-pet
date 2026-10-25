@@ -9,6 +9,7 @@
   "roamChance": 0.2,
   "crossfadeSeconds": 0.12,
   "musicBob": 1.0,
+  "musicBpm": 108,
   "songRemarkMinutes": 3,
   "appRemarkMinutes": 2,
   "hotkey": "Ctrl+Alt+C"

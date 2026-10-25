@@ -60,8 +60,16 @@ function Update-Music([double]$t){
  }
 }
 # Bob along while something plays and she's just hanging around.
+function Test-MusicGroove {
+ return $script:musicEnabled -and $script:musicPlaying -and -not $script:voiceBusy -and $script:spec.tags.Contains('calm')
+}
+# With headphones on: the hover pose becomes the four head-bob frames, one per half beat.
+function Get-MusicPose([double]$t){
+ $step=[int][Math]::Floor($t*[Math]::Max(30.0,[double]$script:tuning.musicBpm)/30.0)%4
+ return $script:musicPoseStart+$step
+}
 function Apply-MusicGroove([double]$t){
- if(-not $script:musicEnabled -or -not $script:musicPlaying -or $script:voiceBusy -or -not $script:spec.tags.Contains('calm')){return}
+ if($script:musicFrameActive -or -not (Test-MusicGroove)){return}
  $k=[double]$script:tuning.musicBob
  $shift.Y+=[Math]::Sin($t*11.3)*3.0*$k
  $rotation.Angle+=[Math]::Sin($t*5.65)*2.5*$k

@@ -30,7 +30,8 @@ function Invoke-SelfTest {
    Where-Object {-not (Test-Path -LiteralPath (Join-Path $script:AppRoot $_))}
   if(@($missing).Count -gt 0){'missing: '+(@($missing) -join ', ')}
  }
- Test-Step 'Sprite frames' {if($poses.Count -ne 33){'expected 33 frames, found '+$poses.Count}}
+ Test-Step 'Sprite frames' {if($poses.Count -lt 33){'expected at least 33 frames, found '+$poses.Count}}
+ Test-Step 'Music frames' {if($script:musicPoseStart -lt 0){'WARN: no headphone frames (sprites\music-0..3.png); she sways to music instead'}}
  Test-Step 'Normalised sprites' {
   if($null -eq $script:spriteFeet){return 'WARN: sprites\ folder missing, so frames are cut from the sheets (clipped hair, size jumps)'}
   $sizes=@($poses | ForEach-Object {''+$_.PixelWidth+'x'+$_.PixelHeight} | Select-Object -Unique)
