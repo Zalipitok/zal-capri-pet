@@ -101,6 +101,7 @@ function Enable-Unlock($unlock){
  if($unlock.remarks -and $script:unlockPools -notcontains [string]$unlock.remarks){$script:unlockPools+=@([string]$unlock.remarks)}
 }
 function Test-Unlocks {
+ if($script:FriendMode){return}
  $have=@(Get-UnlockedIds)
  foreach($unlock in $script:unlocks){
   if($have -contains [string]$unlock.id -or -not (Test-UnlockMet $unlock)){continue}

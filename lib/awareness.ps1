@@ -65,7 +65,7 @@ function Test-MusicGroove {
 }
 # With headphones on: the hover pose becomes the four head-bob frames (tilt, up, other tilt, up).
 # With beat sync, each tilt lands on a real beat; otherwise she bobs at musicBpm from tuning.json.
-$script:beatSync=$true; $script:nextBeatCheck=0.0
+$script:nextBeatCheck=0.0
 function Get-BeatPhase {
  if(-not $script:beatSync){return -1.0}
  try{return [CapriBeat]::Phase()}catch{return -1.0}
@@ -107,7 +107,6 @@ function Apply-MusicGroove([double]$t){
 
 # --- Battery ---------------------------------------------------------------
 # Laptops only: she reacts to unplugging, plugging in, a low and a nearly empty battery, and a full charge.
-$script:batteryReactions=$true
 $script:batteryState=@{known=$false; online=$false; percent=-1; low=$false; critical=$false; full=$false}
 $script:nextBatteryPoll=5.0
 # True when she can drop what she's doing for a reaction.
@@ -147,6 +146,27 @@ function Update-Battery([double]$t){
   $b.full=$true; [void](Show-Remark 'batteryfull')
  }
  $b.online=$online; $b.percent=$percent
+}
+
+# --- Do Not Disturb / Focus ------------------------------------------------
+# When Windows' Do Not Disturb, Focus or presentation mode turns on, she goes to her quiet corner
+# (Busy mode) and comes back out when it ends. Turning Busy off by hand keeps her out until next time.
+$script:busyByDnd=$false; $script:dndOn=$false; $script:nextDndCheck=2.0
+function Update-QuietMode([double]$t){
+ if($t -lt $script:nextDndCheck){return}
+ $script:nextDndCheck=$t+3
+ $on=$false; if($script:dndAware){try{$on=[CapriQuiet]::State() -gt 0}catch{}}
+ if($on -eq $script:dndOn){return}
+ $script:dndOn=$on
+ if($on){
+  if(-not $script:busyMode){
+   $script:busyByDnd=$true; Set-BusyMode $true -Auto
+   Show-Status 'Do Not Disturb. Got it, I''ll be quiet over here.' 4
+  }
+ }elseif($script:busyByDnd){
+  $script:busyByDnd=$false
+  if($script:busyMode){Set-BusyMode $false -Auto; [void](Show-Remark 'dndover')}
+ }
 }
 
 # --- Apps (opt-in) ---------------------------------------------------------
@@ -239,7 +259,7 @@ function Register-SummonHotkey {
  $script:hotkeyOk=$false; $script:hotkeyError=''
  if(-not $script:fxNative -or $script:petHandle -eq [IntPtr]::Zero){$script:hotkeyError='unavailable'; return}
  try{[CapriHotkey]::Unregister($script:petHandle)}catch{}
- if(-not $script:hotkeyEnabled){return}
+ if(-not $script:hotkeyEnabled -or $script:FriendMode){return}
  $parsed=ConvertFrom-HotkeyText ([string]$script:tuning.hotkey)
  if($null -eq $parsed){$script:hotkeyError='could not read "'+$script:tuning.hotkey+'" in tuning.json'; return}
  try{$script:hotkeyOk=[CapriHotkey]::Register($script:petHandle,[uint32]$parsed[0],[uint32]$parsed[1])}catch{$script:hotkeyError=$_.Exception.Message}

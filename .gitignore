@@ -11,3 +11,6 @@ Capri.exe
 
 # Recorded dialogue: not ours to publish
 voices/
+reminders.json
+chat-key.dat
+__pycache__/

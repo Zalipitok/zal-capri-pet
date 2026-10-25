@@ -84,6 +84,8 @@ function Choose-State {
   $rare=@($script:specs.Values | Where-Object {$_.rare} | ForEach-Object {$_.id})
   if($rare.Count -gt 0){Begin-State $rare[$rng.Next($rare.Count)]; return}
  }
+ # The toy ball is out: she plays with it now and then.
+ if((Test-BallAvailable) -and $script:activityRates.antics -gt 0 -and $rng.NextDouble() -lt [double]$script:tuning.ballChance){Start-BallChase; return}
  # Music playing: dance a bit more often.
  if($script:musicEnabled -and $script:musicPlaying -and $script:activityRates.antics -gt 0 -and $rng.NextDouble() -lt 0.2){Begin-State 'dance'; return}
  # Time of day: an afternoon drink break once a day, and drowsier antics after midnight.
@@ -394,7 +396,7 @@ function Set-BusyMode([bool]$on,[switch]$Auto){
   $script:busyUntil=0.0; $script:busyBag.Clear()
   $script:activeSince=$clock.Elapsed.TotalSeconds # a focus session starts the break timer
   Begin-State 'taskbar'
- }else{$script:busyByFullscreen=$false; Schedule-Yap; Begin-State 'stretch'}
+ }else{$script:busyByFullscreen=$false; $script:busyByDnd=$false; Schedule-Yap; Begin-State 'stretch'}
 }
 function Set-Paused([bool]$on){
  $script:paused=$on
@@ -408,7 +410,7 @@ $script:pendingAction=''; $script:lastFxError=-60.0
 function Prepare-ManualAction {
  Register-Interaction
  if($script:busyByFullscreen){$script:fullscreenOverride=$true}
- $script:busyMode=$false; $script:busyByFullscreen=$false
+ $script:busyMode=$false; $script:busyByFullscreen=$false; $script:busyByDnd=$false
  $script:paused=$false; $script:mouseDown=$false; $script:hoverLatched=$true
  $script:caughtCooldown=$clock.Elapsed.TotalSeconds+3
  $script:nextRetry=[double]::PositiveInfinity
@@ -499,8 +501,9 @@ function Set-PetSize([double]$percent){
  Clamp-Pet
 }
 # Sound effects (swat, head pat, catch) share one player; they follow mute and the sound-effects setting.
-function Play-Sfx([string]$file,[double]$gain=1.0){
- if(-not $script:sfxEnabled -or $script:muted -or $script:busyMode -or $script:isHidden){return}
+# -Important (reminders): plays in Busy mode, when hidden and with sound effects off; only Mute stops it.
+function Play-Sfx([string]$file,[double]$gain=1.0,[switch]$Important){
+ if($script:muted -or (-not $Important -and (-not $script:sfxEnabled -or $script:busyMode -or $script:isHidden))){return}
  $path=Join-Path $script:AppRoot ('sounds\'+$file)
  if(-not (Test-Path -LiteralPath $path)){return}
  try{

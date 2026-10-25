@@ -10,6 +10,9 @@ function New-ChoiceSetting([string]$tab,[string]$label,[object[]]$options,[scrip
 function New-SliderSetting([string]$tab,[string]$label,[double]$min,[double]$max,[double]$step,[scriptblock]$get,[scriptblock]$set,[string]$unit='%'){
  return @{tab=$tab; type='slider'; label=$label; min=$min; max=$max; step=$step; get=$get; set=$set; unit=$unit}
 }
+function New-TextSetting([string]$tab,[string]$label,[scriptblock]$get,[scriptblock]$set,[string]$hint=''){
+ return @{tab=$tab; type='text'; label=$label; get=$get; set=$set; hint=$hint}
+}
 function New-ButtonSetting([string]$tab,[string]$label,[scriptblock]$click){
  return @{tab=$tab; type='button'; label=$label; click=$click}
 }
@@ -19,6 +22,7 @@ $script:settingDefs=@(
  (New-BoolSetting 'General' 'Start with Windows' {Test-Path -LiteralPath $script:startupLink} {param($v) Set-StartWithWindows $v})
  (New-ChoiceSetting 'General' 'When a fullscreen app is open' @(@('Hide until it closes','hide'),@('Sit quietly in the corner','busy'),@('Stay on top','ignore')) {$script:fullscreenMode} {param($v) Set-FullscreenMode $v})
  (New-BoolSetting 'General' ('Summon hotkey ('+$script:tuning.hotkey+')') {$script:hotkeyEnabled} {param($v) $script:hotkeyEnabled=$v; Register-SummonHotkey} 'Calls her to the pointer; press again next to her to hide her.')
+ (New-BoolSetting 'General' 'Quiet corner during Do Not Disturb / Focus' {$script:dndAware} {param($v) $script:dndAware=$v; $script:nextDndCheck=0} 'When Windows Do Not Disturb, Focus or presentation mode is on, she sits quietly in the corner.')
  (New-ChoiceSetting 'General' 'Sleep after inactivity' @(@('2 minutes',120.0),@('5 minutes',300.0),@('10 minutes',600.0),@('Never',0.0)) {$script:idleSleepAfter} {param($v) $script:idleSleepAfter=[double]$v})
  (New-ChoiceSetting 'General' 'Break reminders' @(@('Off',0),@('Every 25 minutes',25),@('Every 50 minutes',50),@('Every 90 minutes',90)) {$script:breakMinutes} {param($v) $script:breakMinutes=[int]$v; $script:activeSince=$clock.Elapsed.TotalSeconds})
  # Voice
@@ -56,6 +60,15 @@ $script:settingDefs=@(
  (New-BoolSetting 'Music and apps' 'Notice which app I''m using' {$script:appAware} {param($v) $script:appAware=$v; $script:appCategory=''; $script:appAnnounced=''} 'Reads only the name and title of the window in front. Nothing leaves this PC.')
  # Fun
  (New-ButtonSetting 'Fun' 'Play catch me (30 s)' {$script:pendingAction='catchgame'})
+ (New-ButtonSetting 'Fun' 'Toy ball (show / put away)' {$script:pendingAction='ball'})
+ (New-ButtonSetting 'Fun' 'Invite a friend (second Capri)' {$script:pendingAction='friend'})
+ (New-ButtonSetting 'Fun' 'Reminders...' {$script:pendingAction='reminders'})
+ (New-ButtonSetting 'Fun' 'Chat with her...' {$script:pendingAction='chat'})
+ (New-BoolSetting 'Fun' 'Let her reply in chat (Claude API)' {$script:chatEnabled} {param($v) $script:chatEnabled=$v} 'Uses your own Claude API key (set it in the chat window). What you type, plus the time, the song playing, the weather and your history with her, goes to Anthropic to write her reply.')
+ (New-BoolSetting 'Fun' 'Weather reactions' {$script:weatherEnabled} {param($v) $script:weatherEnabled=$v; Reset-Weather} 'Checks open-meteo.com about once an hour. Only the city name and its coordinates are sent.')
+ (New-TextSetting 'Fun' 'City for the weather' {$script:weatherCity} {param($v) $script:weatherCity=$v.Trim(); Reset-Weather} 'For example: Istanbul, or Paris, France')
+ (New-ChoiceSetting 'Fun' 'Temperature' @(@('Celsius','C'),@('Fahrenheit','F')) {$script:weatherUnit} {param($v) $script:weatherUnit=[string]$v; Reset-Weather})
+ (New-ButtonSetting 'Fun' 'Weather now' {$script:pendingAction='weather-now'})
  (New-ButtonSetting 'Fun' 'Our history and unlocks...' {[void][Windows.MessageBox]::Show((Get-MemorySummary)+"`n`nBest catch-me score: "+$script:memory.bestCatch+"`n`n"+(Get-UnlockSummary),'What Capri remembers')})
  (New-ButtonSetting 'Fun' 'Run self-test' {$script:pendingAction='selftest'})
 )
@@ -103,6 +116,15 @@ function Show-SettingsWindow {
     $slider.Add_ValueChanged({param($sender,$event) $d=$script:settingDefs[[int]$sender.Tag]; & $d.set ([double]$sender.Value); $sender.Parent.Children[0].Text=$d.label+': '+[int]$sender.Value+$d.unit})
     $slider.Add_LostMouseCapture({Save-VoiceSettings})
     [void]$row.Children.Add($slider)
+   }
+   'text' {
+    $label=[Windows.Controls.TextBlock]::new(); $label.Text=$def.label; [void]$row.Children.Add($label)
+    $line=[Windows.Controls.DockPanel]::new(); $line.Margin=[Windows.Thickness]::new(0,4,0,0); $line.MaxWidth=320; $line.HorizontalAlignment='Left'; $line.Width=320
+    $apply=[Windows.Controls.Button]::new(); $apply.Content='Apply'; $apply.Tag=$i; $apply.Padding=[Windows.Thickness]::new(10,2,10,2); $apply.Margin=[Windows.Thickness]::new(6,0,0,0)
+    [Windows.Controls.DockPanel]::SetDock($apply,'Right'); [void]$line.Children.Add($apply)
+    $box=[Windows.Controls.TextBox]::new(); $box.Text=[string](& $def.get); $box.Padding=[Windows.Thickness]::new(3); [void]$line.Children.Add($box)
+    $apply.Add_Click({param($sender,$event) $d=$script:settingDefs[[int]$sender.Tag]; & $d.set ([string]$sender.Parent.Children[1].Text); Save-VoiceSettings; Show-Status 'Saved.' 2})
+    [void]$row.Children.Add($line)
    }
    'button' {
     $button=[Windows.Controls.Button]::new(); $button.Content=$def.label; $button.Tag=$i; $button.HorizontalAlignment='Left'; $button.Padding=[Windows.Thickness]::new(12,5,12,5)

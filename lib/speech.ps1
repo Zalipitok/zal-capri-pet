@@ -85,6 +85,10 @@ $voicePack = @(foreach($entry in $decodedPack) {
  if($entry.file -isnot [string]) { throw 'Invalid voice pack: file must be a single path.' }
  $entry
 })
+# Clips whose file is not there (for example a copy shared without the voices folder) are left out,
+# so she simply talks less instead of reporting audio problems.
+$script:voicesMissing=@($voicePack | Where-Object {-not (Test-Path -LiteralPath (Join-Path $script:AppRoot ([string]$_.file)) -PathType Leaf)}).Count
+if($script:voicesMissing -gt 0){$voicePack=@($voicePack | Where-Object {Test-Path -LiteralPath (Join-Path $script:AppRoot ([string]$_.file)) -PathType Leaf})}
 $script:approvedVoices=@($voicePack | Where-Object {-not $_.needs_review} | ForEach-Object {$_.language+':'+$_.id})
 $settingsPath = Join-Path $script:AppRoot 'voice-settings.json'
 try {
@@ -97,9 +101,11 @@ try {
   if($null -ne $saved.rivalWins){$script:rivalWins=[Math]::Max(0.0,[int]$saved.rivalWins)}
   if($null -ne $saved.escapeStreak){$script:escapeStreak=[Math]::Max(0.0,[Math]::Min(5.0,[int]$saved.escapeStreak))}
   if($null -ne $saved.petSize){$script:petSize=[Math]::Max(65.0,[Math]::Min(160.0,[double]$saved.petSize))}
-  foreach($setting in @('facialMotion','chase','blackwallEnabled','sfxEnabled','windowPerch','throwPhysics','timeOfDay','remarksEnabled','subtitles','muted','smoothPoses','musicEnabled','appAware','hotkeyEnabled','talkingMouth','eyesFollow','batteryReactions','shadowEnabled','beatSync')){
+  foreach($setting in @('facialMotion','chase','blackwallEnabled','sfxEnabled','windowPerch','throwPhysics','timeOfDay','remarksEnabled','subtitles','muted','smoothPoses','musicEnabled','appAware','hotkeyEnabled','talkingMouth','eyesFollow','batteryReactions','shadowEnabled','beatSync','dndAware','weatherEnabled','chatEnabled')){
    if($saved.$setting -is [bool]){Set-Variable -Name $setting -Scope Script -Value $saved.$setting}
   }
+  if($saved.weatherCity -is [string] -and $saved.weatherCity.Length -le 80){$script:weatherCity=$saved.weatherCity}
+  if($saved.weatherUnit -in @('C','F')){$script:weatherUnit=[string]$saved.weatherUnit}
   if($saved.idleSleepAfter -in @(0,120,300,600)){$script:idleSleepAfter=[double]$saved.idleSleepAfter}
   if($saved.language -in @('en','ja')){$script:language=$saved.language}
   if($saved.chatter -in @('off','quiet','normal','chatty')){$script:chatter=$saved.chatter}
@@ -113,8 +119,8 @@ try {
  }
 } catch { } # Invalid settings reset to defaults.
 function Save-VoiceSettings {
- if($script:SelfTestMode){return} # the self-test never overwrites your settings
- try { @{activityRates=$script:activityRates; rivalEscapes=$script:rivalEscapes; rivalWins=$script:rivalWins; escapeStreak=$script:escapeStreak; facialMotion=$script:facialMotion; chase=$script:chase; blackwallEnabled=$script:blackwallEnabled; sfxEnabled=$script:sfxEnabled; idleSleepAfter=$script:idleSleepAfter; petSize=$script:petSize; language=$script:language; muted=$script:muted; volume=$script:volume; chatter=$script:chatter; subtitles=$script:subtitles; approvedVoices=@($script:approvedVoices); voicePackRevision=3; remarksEnabled=$script:remarksEnabled; fullscreenMode=$script:fullscreenMode; windowPerch=$script:windowPerch; throwPhysics=$script:throwPhysics; timeOfDay=$script:timeOfDay; breakMinutes=$script:breakMinutes; smoothPoses=$script:smoothPoses; musicEnabled=$script:musicEnabled; appAware=$script:appAware; hotkeyEnabled=$script:hotkeyEnabled; talkingMouth=$script:talkingMouth; eyesFollow=$script:eyesFollow; batteryReactions=$script:batteryReactions; shadowEnabled=$script:shadowEnabled; beatSync=$script:beatSync} | ConvertTo-Json | Set-Content -LiteralPath $settingsPath -Encoding UTF8 }
+ if($script:SelfTestMode -or $script:FriendMode){return} # the self-test and the friend never overwrite your settings
+ try { @{activityRates=$script:activityRates; rivalEscapes=$script:rivalEscapes; rivalWins=$script:rivalWins; escapeStreak=$script:escapeStreak; facialMotion=$script:facialMotion; chase=$script:chase; blackwallEnabled=$script:blackwallEnabled; sfxEnabled=$script:sfxEnabled; idleSleepAfter=$script:idleSleepAfter; petSize=$script:petSize; language=$script:language; muted=$script:muted; volume=$script:volume; chatter=$script:chatter; subtitles=$script:subtitles; approvedVoices=@($script:approvedVoices); voicePackRevision=3; remarksEnabled=$script:remarksEnabled; fullscreenMode=$script:fullscreenMode; windowPerch=$script:windowPerch; throwPhysics=$script:throwPhysics; timeOfDay=$script:timeOfDay; breakMinutes=$script:breakMinutes; smoothPoses=$script:smoothPoses; musicEnabled=$script:musicEnabled; appAware=$script:appAware; hotkeyEnabled=$script:hotkeyEnabled; talkingMouth=$script:talkingMouth; eyesFollow=$script:eyesFollow; batteryReactions=$script:batteryReactions; shadowEnabled=$script:shadowEnabled; beatSync=$script:beatSync; dndAware=$script:dndAware; weatherEnabled=$script:weatherEnabled; chatEnabled=$script:chatEnabled; weatherCity=$script:weatherCity; weatherUnit=$script:weatherUnit} | ConvertTo-Json | Set-Content -LiteralPath $settingsPath -Encoding UTF8 }
  catch { Show-Problem 'Settings could not be saved.' }
 }
 # Volume is applied to Capri's audio session, so changes reach a clip that is already playing.

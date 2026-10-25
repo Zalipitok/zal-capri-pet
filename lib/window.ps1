@@ -39,6 +39,7 @@
  </Grid>
 </Window>
 '@
+if($script:FriendMode){foreach($node in $xaml.SelectNodes('//*[@Text="CAPRI // LIVE"]')){$node.SetAttribute('Text','CAPRI // ECHO')}}
 $w = [Windows.Markup.XamlReader]::Load([System.Xml.XmlNodeReader]::new($xaml))
 $effect = $w.FindName('Effect'); $effect.Visibility='Collapsed'
 $sprite = $w.FindName('Sprite'); $bubble = $w.FindName('Bubble'); $words = $w.FindName('Words')
@@ -136,6 +137,16 @@ function Read-Png([string]$path){
  $image.BeginInit(); $image.CacheOption=[Windows.Media.Imaging.BitmapCacheOption]::OnLoad
  if($script:decodeHeight -gt 0){$image.DecodePixelHeight=$script:decodeHeight}
  $image.UriSource=[Uri]::new($path); $image.EndInit(); $image.Freeze()
+ if($script:FriendMode){
+  # Her friend has different colours (tuning.json friendHue, in degrees).
+  try {
+   $bgra=[Windows.Media.Imaging.FormatConvertedBitmap]::new($image,[Windows.Media.PixelFormats]::Bgra32,$null,0)
+   $stride=$bgra.PixelWidth*4; $pixels=[byte[]]::new($stride*$bgra.PixelHeight); $bgra.CopyPixels($pixels,$stride,0)
+   [CapriTint]::HueShift($pixels,[double]$script:friendHue)
+   $tinted=[Windows.Media.Imaging.BitmapSource]::Create($bgra.PixelWidth,$bgra.PixelHeight,$image.DpiX,$image.DpiY,[Windows.Media.PixelFormats]::Bgra32,$null,$pixels,$stride)
+   $tinted.Freeze(); return $tinted
+  } catch { }
+ }
  return $image
 }
 function Get-CleanFrames([string]$sheetName){

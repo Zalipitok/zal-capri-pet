@@ -25,7 +25,7 @@ function Invoke-SelfTest {
 
  # --- Files and data
  Test-Step 'Required files' {
-  $missing=@('behaviours.json','remarks.json','voice-pack.json','menu-theme.xaml','tuning.json','app-reactions.json','unlocks.json','sounds\cartoon-swat.wav','sounds\headpat.wav','pose-shaken.png',
+  $missing=@('behaviours.json','remarks.json','voice-pack.json','menu-theme.xaml','tuning.json','app-reactions.json','unlocks.json','sounds\cartoon-swat.wav','sounds\headpat.wav','sounds\ballhit.wav','sounds\reminder.wav','pose-shaken.png',
    'poses-clean.png','poses-extra-clean.png','poses-life-clean.png','poses-faces-clean.png','poses-casting-clean.png','poses-motion.png','poses-daily.png','poses-interaction.png') |
    Where-Object {-not (Test-Path -LiteralPath (Join-Path $script:AppRoot $_))}
   if(@($missing).Count -gt 0){'missing: '+(@($missing) -join ', ')}
@@ -67,7 +67,7 @@ function Invoke-SelfTest {
  Test-Step 'Remark pools used by the code' {
   $used=@(Get-ChildItem -LiteralPath (Join-Path $script:AppRoot 'lib') -Filter '*.ps1' | ForEach-Object {
    [regex]::Matches((Get-Content -LiteralPath $_.FullName -Raw),"Show-Remark '([a-z]+)'") | ForEach-Object {$_.Groups[1].Value}
-  }) + @('morning','latenight','returned','firstmeet','longtime','anniversary','appgames','appcode','appvideo','applate') | Select-Object -Unique
+  }) + @('morning','latenight','returned','firstmeet','longtime','anniversary','appgames','appcode','appvideo','applate','friendtalk','friendhello','friendarrive') + @(foreach($k in $script:weatherReaction.Keys){'weather'+$k}) | Select-Object -Unique
   $missing=@($used | Where-Object {@($remarkPack.$_ | Where-Object {$_}).Count -eq 0})
   if($missing.Count -gt 0){'empty or missing in remarks.json: '+($missing -join ', ')}
  }
@@ -125,6 +125,43 @@ function Invoke-SelfTest {
   if($problem){'WARN: cannot listen to the PC''s sound ('+$problem+'); she bobs at a fixed tempo instead'}
  }
  Test-Step 'Routines start' {foreach($name in @($script:routines.Keys)){Start-Routine $name}; $script:routine.Clear()}
+ Test-Step 'Toy ball' {
+  $script:selfTestErrors.Clear()
+  Set-BallShown $true; for($i=0;$i -lt 4;$i++){& $script:tickBody; Start-Sleep -Milliseconds 15}
+  Start-BallChase; for($i=0;$i -lt 4;$i++){& $script:tickBody; Start-Sleep -Milliseconds 15}
+  $script:ball.x=$w.Left+$w.Width/2-22; [void](Hit-Ball); & $script:tickBody
+  Set-BallShown $false; & $script:tickBody
+  if($script:selfTestErrors.Count -gt 0){$script:selfTestErrors -join '; '}
+ }
+ Test-Step 'Reminder times' {
+  $base=[DateTime]::new(2026,5,4,10,0,0)
+  $cases=@(@('20',$base.AddMinutes(20)),@('in 1h30',$base.AddMinutes(90)),@('45 min',$base.AddMinutes(45)),@('1 hour and 15 minutes',$base.AddMinutes(75)),
+   @('half an hour',$base.AddMinutes(30)),@('17:45',$base.Date.AddHours(17.75)),@('5pm',$base.Date.AddHours(17)),@('9:00',$base.Date.AddDays(1).AddHours(9)),@('tomorrow 8am',$base.Date.AddDays(1).AddHours(8)))
+  $bad=@(foreach($c in $cases){$got=ConvertFrom-WhenText $c[0] $base; if($got -ne $c[1]){'"'+$c[0]+'" gave '+$got}})
+  foreach($nonsense in @('banana','','25:99')){if($null -ne (ConvertFrom-WhenText $nonsense $base)){$bad+='"'+$nonsense+'" should not be understood'}}
+  if($script:remindersError){$bad+='reminders.json: '+$script:remindersError}
+  if($bad.Count -gt 0){$bad -join '; '}
+ }
+ Test-Step 'Reminder delivery' {
+  $script:selfTestErrors.Clear()
+  Send-Reminder ([pscustomobject]@{at=(Get-Date); text='self-test'}) 0; & $script:tickBody
+  if($script:state -ne 'remind'){return 'she did not come over (state '+$script:state+')'}
+  if($script:selfTestErrors.Count -gt 0){$script:selfTestErrors -join '; '}
+ }
+ Test-Step 'Chat' {
+  $prompt=Get-ChatSystemPrompt; if($prompt.Length -lt 200){return 'system prompt is missing'}
+  $m=[regex]::Match('remind me in 20 minutes to stretch','^\s*(?:please\s+)?remind me\s+(?:to\s+(?<what>.+?)\s+(?<when>(?:in|at|tomorrow)\b.+?)|(?<when>(?:in|at|tomorrow)\b.+?)\s+(?:to|that|about)\s+(?<what>.+?))\s*[.!]*\s*$','IgnoreCase')
+  if(-not $m.Success -or $m.Groups['what'].Value -ne 'stretch'){return 'chat reminders are not understood'}
+  if($script:chatEnabled -and -not (Get-ChatKey)){'WARN: replies are on but no API key is saved (chat window > Save key)'}
+ }
+ Test-Step 'Weather' {
+  $bad=@(foreach($c in @(@(0,20,'clear'),@(3,15,'cloudy'),@(63,12,'rain'),@(73,-2,'snow'),@(95,25,'storm'),@(1,34,'hot'),@(2,-4,'cold'))){$k=Get-WeatherKind $c[0] $c[1]; if($k -ne $c[2]){'code '+$c[0]+' at '+$c[1]+' gave '+$k}})
+  if($bad.Count -gt 0){return $bad -join '; '}
+  if($script:weatherEnabled -and -not $script:weatherCity){return 'WARN: weather is on but no city is set (Settings > Fun)'}
+  if($script:weatherError){'WARN: last check failed: '+$script:weatherError}
+ }
+ Test-Step 'Do Not Disturb check' {[void][CapriQuiet]::State()}
+ Test-Step 'Two Capris link' {if(-not $script:linkOk){'WARN: shared memory unavailable ('+$script:linkError+'); a friend could not see her'}}
  Test-Step 'File drop scan' {Start-FileScan 'C:\example\test file.txt'; & $script:tickBody; if($script:state -ne 'filescan'){'scan did not start'}}
 
  # --- Sound

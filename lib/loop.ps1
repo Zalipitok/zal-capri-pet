@@ -27,6 +27,16 @@ $script:tickBody={
   elseif($action.StartsWith('routine:')){Prepare-ManualAction; Start-Routine ($action.Substring(8))}
   elseif($action -eq 'random'){Prepare-ManualAction; $script:routine.Clear(); Choose-State}
   elseif($action -eq 'catchgame'){Start-CatchGame}
+  elseif($action -eq 'ball'){Set-BallShown (-not $script:ball.shown)}
+  elseif($action -eq 'reminders'){Show-ReminderWindow}
+  elseif($action -eq 'snooze'){Invoke-SnoozeReminder 10}
+  elseif($action -eq 'chat'){Show-ChatWindow}
+  elseif($action -eq 'friend'){Start-FriendCapri}
+  elseif($action -eq 'friend-home'){Stop-FriendCapri}
+  elseif($action -eq 'weather-now'){
+   if($script:weatherEnabled -and $script:weatherCity){$script:nextWeather=0; if($null -ne $script:weather.fetched){$script:weather.pendingReport=$true}}
+   [void][Windows.MessageBox]::Show((Get-WeatherSummary),'Capri - weather')
+  }
   elseif($action -eq 'settings'){Show-SettingsWindow}
   elseif($action -eq 'selftest'){Start-SelfTestRun}
   elseif($action -eq 'speak'){Prepare-ManualAction; $script:voiceNext=0; Play-Voice 'random' $true}
@@ -96,6 +106,12 @@ $script:tickBody={
  Update-BeatSync $t
  Update-Battery $t
  Update-AppAwareness $t
+ Update-QuietMode $t
+ Update-Reminders $t
+ Update-Weather $t
+ Update-Friend $t
+ Update-Chat $t
+ Update-Ball $t $dt
  if($script:isHidden){
   $script:lastInteraction=$t
   $script:stateStart+=$elapsedTick; $script:until+=$elapsedTick
@@ -313,6 +329,7 @@ $w.Add_Closing({param($sender,$event)
 })
 $w.Add_Closed({
  $timer.Stop(); Save-VoiceSettings; Save-Memory; Stop-Voice; $sfxPlayer.Close(); $cursorFx.Close()
+ try{if(-not $script:FriendMode){Stop-FriendCapri}; $ballWin.Close()}catch{}
  try{if($script:fxNative){[CapriHotkey]::Unregister($script:petHandle)}}catch{}
  try{[CapriBeat]::Stop()}catch{}
  if($null -ne $script:tray){$script:tray.Visible=$false; $script:tray.Dispose()}

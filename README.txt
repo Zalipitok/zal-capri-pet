@@ -72,6 +72,31 @@ NEWER FEATURES
   Mixed-scale monitors (experimental): set "perMonitorDpi": true in tuning.json and restart for
                     sharp rendering on monitors with different scale settings.
 
+EVEN NEWER
+  Toy ball          Interact > Toy ball. Drag and flick it: it bounces around and she fetches it,
+                    bats it back, and sometimes steals it and guards it in a corner (click the
+                    ball to take it back). Right-click the ball to put it away.
+  Reminders         Interact > Reminders... (or the tray): "20" means in 20 minutes; 1h30, 45 min,
+                    17:45, 5pm and tomorrow 9:00 work too. She flies over and tells you, with a chime
+                    and a Windows notification. They survive a restart (reminders.json).
+                    Snooze the last one from Interact > Snooze last reminder.
+  Do Not Disturb    while Windows Do Not Disturb, Focus or presentation mode is on, she waits in her
+                    quiet corner and comes back out afterwards (Settings > General to turn off).
+  Weather           Settings > Fun: turn on Weather reactions and type your city. She checks
+                    open-meteo.com about once an hour (free, no account; only the city name and its
+                    coordinates are sent), gives a morning report and reacts to rain, snow, storms,
+                    heat and cold. Debug and help > Weather now shows the latest.
+  A friend          Interact > Invite a friend starts a second Capri in different colours. They wave,
+                    meet up to chat, play tag and dance when music plays. The friend saves nothing and
+                    leaves when Capri quits (or Interact > Send her friend home).
+                    friendHue in tuning.json changes the friend's colours.
+  Chat              Interact > Chat with her... Reminders typed there ("remind me in 20 minutes to
+                    stretch") always work. For real replies, tick "Let her reply" and paste a Claude
+                    API key from console.anthropic.com (usage is billed to that account). The key is
+                    stored encrypted for your Windows account in chat-key.dat. What you type, plus the
+                    time, the song playing, the weather and your history with her, is sent to
+                    Anthropic to write her reply. chatModel in tuning.json picks the model.
+
 FILES YOU CAN EDIT
   behaviours.json      every state: pose, timing, movement, what comes next, routines
   remarks.json         her text lines, by situation ({0} is filled in with a number or name)
@@ -80,7 +105,8 @@ FILES YOU CAN EDIT
                        After editing: Debug and help > Reload tuning.json.
   app-reactions.json   which programs count as games, code, video, browsers
   unlocks.json         what can be unlocked and what it takes
-Saved automatically: voice-settings.json (preferences), memory.json (history).
+Saved automatically: voice-settings.json (preferences), memory.json (history), reminders.json,
+chat-key.dat (only if you save an API key).
 sprite-cache\ is rebuilt from the sprite sheets when they change; safe to delete.
 
 SELF-TEST
@@ -113,7 +139,8 @@ Without the sprites folder she falls back to cutting the sheets as before.
 LOGS (in this folder, only when something goes wrong)
   startup-error.log  runtime-error.log  audio-error.log  effects-error.log  cursor-error.log
 Problems also appear in her speech bubble and as a tray notification.
-There is no telemetry and nothing is uploaded.
+There is no telemetry. Nothing leaves this PC unless you turn on weather (city name to open-meteo.com)
+or chat replies (your messages to Anthropic, with your own key).
 
 CODE LAYOUT
   Capri.ps1          starts everything (loads lib\ in order)
@@ -125,8 +152,13 @@ CODE LAYOUT
   lib\speech.ps1     bubble, remarks, settings, voice playback
   lib\memory.ps1     memory.json
   lib\states.ps1     state machine, paths, animations, throws, hiding, modes
-  lib\awareness.ps1  music, beat sync, battery, app awareness, file drops, hotkey
+  lib\awareness.ps1  music, beat sync, battery, Do Not Disturb, app awareness, file drops, hotkey
   lib\play.ps1       catch-me game and unlocks
+  lib\toys.ps1       the toy ball
+  lib\reminders.ps1  reminders
+  lib\weather.ps1    weather
+  lib\friend.ps1     the second Capri
+  lib\chat.ps1       the chat window
   lib\settings.ps1   the settings window
   lib\menu.ps1       voice library, menu, tray icon
   lib\input.ps1      mouse

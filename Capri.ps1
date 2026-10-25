@@ -3,14 +3,16 @@
 #   Start-Capri.bat    start with a console (shows errors)
 #   Run-SelfTest.bat   check everything and write selftest-report.txt
 #   tools\Build-Exe.ps1  build Capri.exe
-# The code lives in lib\: window, data, screens, speech, memory, states, awareness, menu, input, loop, selftest.
-param([switch]$SelfTest)
+# The code lives in lib\ (see README.txt > CODE LAYOUT).
+param([switch]$SelfTest,[switch]$Friend)
 $ErrorActionPreference = 'Stop'
 # The script's folder, or the .exe's folder when built with tools\Build-Exe.ps1.
 $hostExe = [Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
 $script:IsExe = [IO.Path]::GetFileNameWithoutExtension($hostExe) -notin @('powershell','pwsh','powershell_ise')
 $script:AppRoot = if($script:IsExe -or -not $PSScriptRoot){Split-Path -Parent $hostExe}else{$PSScriptRoot}
 $script:SelfTestMode = [bool]$SelfTest
+# -Friend: a second Capri that visits the first one (Interact > Invite a friend). She saves nothing.
+$script:FriendMode = [bool]$Friend -and -not $script:SelfTestMode
 $script:LaunchPath = if($script:IsExe){$hostExe}else{$PSCommandPath}
 
 # Startup failures used to vanish with a hidden console: show and log them instead.
@@ -26,10 +28,10 @@ Add-Type -AssemblyName @('PresentationFramework', 'PresentationCore', 'WindowsBa
 # One Capri at a time (the startup shortcut plus a manual launch would otherwise make two).
 # The self-test runs alongside a normal Capri.
 $script:instanceIsNew = $false
-$mutexName = if($script:SelfTestMode){'Local\CapriSelfTest'}else{'Local\CapriDesktopCompanion'}
+$mutexName = if($script:SelfTestMode){'Local\CapriSelfTest'}elseif($script:FriendMode){'Local\CapriFriend'}else{'Local\CapriDesktopCompanion'}
 $script:instanceMutex = [Threading.Mutex]::new($true, $mutexName, [ref]$script:instanceIsNew)
 if(-not $script:instanceIsNew){
- [void][Windows.MessageBox]::Show('Capri is already running. Look for her icon in the system tray.','Capri')
+ if(-not $script:FriendMode){[void][Windows.MessageBox]::Show('Capri is already running. Look for her icon in the system tray.','Capri')}
  exit 0
 }
 
@@ -48,9 +50,12 @@ try {
 # Experimental, off by default: per-monitor DPI (tuning.json "perMonitorDpi": true). Must happen
 # before any window exists.
 $script:perMonitorDpi = $false
+$script:friendHue = 150.0
 try {
  $tuningFile = Join-Path $script:AppRoot 'tuning.json'
- if((Test-Path -LiteralPath $tuningFile) -and [bool](Get-Content -LiteralPath $tuningFile -Raw | ConvertFrom-Json).perMonitorDpi){
+ $earlyTuning = if(Test-Path -LiteralPath $tuningFile){Get-Content -LiteralPath $tuningFile -Raw | ConvertFrom-Json}else{$null}
+ if($null -ne $earlyTuning -and $null -ne $earlyTuning.friendHue){$script:friendHue = [double]$earlyTuning.friendHue}
+ if($null -ne $earlyTuning -and [bool]$earlyTuning.perMonitorDpi){
   [AppContext]::SetSwitch('Switch.System.Windows.DoNotScaleForDpiChanges', $false)
   $script:perMonitorDpi = [CapriDesktop]::EnablePerMonitorDpi()
  }
@@ -58,7 +63,7 @@ try {
 
 # Order matters: later parts use what earlier ones define. Out-Null keeps stray output from
 # becoming pop-ups in the .exe build.
-foreach($part in @('window','data','screens','speech','memory','states','awareness','play','settings','menu','input','loop','selftest')){
+foreach($part in @('window','data','screens','speech','memory','states','awareness','play','toys','reminders','weather','friend','chat','settings','menu','input','loop','selftest')){
  . (Join-Path $script:AppRoot ('lib\'+$part+'.ps1')) | Out-Null
 }
 

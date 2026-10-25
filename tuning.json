@@ -16,5 +16,11 @@
   "songRemarkMinutes": 3,
   "appRemarkMinutes": 2,
   "hotkey": "Ctrl+Alt+C",
-  "perMonitorDpi": false
+  "perMonitorDpi": false,
+  "ballBounce": 0.62,
+  "ballChance": 0.3,
+  "friendHue": 150,
+  "weatherMinutes": 60,
+  "chatModel": "claude-haiku-5-5",
+  "chatMaxTokens": 300
 }

@@ -1053,6 +1053,181 @@
       "pose": 6,
       "seconds": 3,
       "next": "rivalglare"
+    },
+    {
+      "id": "chaseball",
+      "title": "Chase the ball",
+      "pose": 6,
+      "seconds": 9,
+      "path": "chaseball",
+      "speed": 560,
+      "next": "smug",
+      "tags": [
+        "noCaught",
+        "noFace",
+        "noSleep",
+        "noYap",
+        "noRemark"
+      ]
+    },
+    {
+      "id": "ballbat",
+      "pose": 32,
+      "seconds": 0.6,
+      "motion": "swat",
+      "next": "chaseball",
+      "tags": [
+        "noCaught",
+        "noFace",
+        "noSleep",
+        "noYap",
+        "noSpeechPose"
+      ]
+    },
+    {
+      "id": "ballsteal",
+      "pose": 5,
+      "seconds": 8,
+      "path": "ballsteal",
+      "speed": 320,
+      "next": "smug",
+      "tags": [
+        "noCaught",
+        "noFace",
+        "noSleep",
+        "noYap"
+      ]
+    },
+    {
+      "id": "ballguard",
+      "pose": 5,
+      "seconds": 6,
+      "tags": [
+        "noCaught",
+        "blink"
+      ]
+    },
+    {
+      "id": "remind",
+      "pose": 4,
+      "seconds": 7,
+      "target": "cursor",
+      "speed": 650,
+      "clampTarget": true,
+      "next": "smug",
+      "tags": [
+        "noCaught",
+        "noSleep",
+        "noYap",
+        "noRemark"
+      ]
+    },
+    {
+      "id": "weather",
+      "pose": 19,
+      "seconds": 3.5,
+      "tags": [
+        "noCaught",
+        "noYap",
+        "noRemark"
+      ]
+    },
+    {
+      "id": "wilt",
+      "title": "Wilt in the heat",
+      "menu": "Expressions",
+      "pose": 28,
+      "seconds": 6,
+      "tags": [
+        "noYap"
+      ]
+    },
+    {
+      "id": "friendmeet",
+      "pose": 12,
+      "seconds": 6,
+      "path": "friendmeet",
+      "speed": 260,
+      "next": "friendtalk",
+      "tags": [
+        "noCaught",
+        "noFace",
+        "noSleep",
+        "noYap",
+        "noRemark",
+        "blink"
+      ]
+    },
+    {
+      "id": "friendtalk",
+      "pose": 12,
+      "seconds": 7,
+      "path": "friendface",
+      "next": "giggle",
+      "tags": [
+        "noCaught",
+        "noFace",
+        "noSleep",
+        "noYap",
+        "noRemark",
+        "blink"
+      ]
+    },
+    {
+      "id": "friendchase",
+      "pose": 6,
+      "seconds": 7,
+      "path": "friendchase",
+      "speed": 330,
+      "motion": "chaseball",
+      "next": "laughing",
+      "tags": [
+        "noCaught",
+        "noFace",
+        "noSleep",
+        "noYap",
+        "noRemark"
+      ]
+    },
+    {
+      "id": "friendflee",
+      "pose": 7,
+      "seconds": 7,
+      "path": "friendflee",
+      "speed": 300,
+      "motion": "dash",
+      "next": "giggle",
+      "tags": [
+        "noCaught",
+        "noFace",
+        "noSleep",
+        "noYap",
+        "noRemark"
+      ]
+    },
+    {
+      "id": "friendwave",
+      "pose": 4,
+      "seconds": 3,
+      "path": "friendface",
+      "motion": "wave",
+      "tags": [
+        "noCaught",
+        "noFace",
+        "noYap",
+        "noRemark"
+      ]
+    },
+    {
+      "id": "chatreply",
+      "pose": 12,
+      "seconds": 5,
+      "tags": [
+        "blink",
+        "noCaught",
+        "noYap",
+        "noRemark"
+      ]
     }
   ],
   "routines": {

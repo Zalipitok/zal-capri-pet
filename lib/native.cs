@@ -474,3 +474,80 @@ public static class CapriSpritePixels {
   }
  }
 }
+
+// Do Not Disturb / Focus: Windows has no single public API for it, so three sources are combined.
+public static class CapriQuiet {
+ [DllImport("ntdll.dll")] static extern int NtQueryWnfStateData(ref ulong stateName, IntPtr typeId, IntPtr explicitScope, out uint changeStamp, byte[] buffer, ref uint bufferSize);
+ [DllImport("shell32.dll")] static extern int SHQueryUserNotificationState(out int state);
+ public static string Source = "";
+ // 0 = off; otherwise Focus / Do Not Disturb / presentation is on (Source says which).
+ public static int State() {
+  Source = "";
+  try {
+   ulong name = 0x0d83063ea3bf1c75UL; // WNF_SHEL_QUIETHOURS_ACTIVE_PROFILE_CHANGED
+   byte[] buffer = new byte[4]; uint size = 4; uint stamp;
+   if (NtQueryWnfStateData(ref name, IntPtr.Zero, IntPtr.Zero, out stamp, buffer, ref size) == 0 && size >= 4) {
+    int profile = BitConverter.ToInt32(buffer, 0);
+    if (profile > 0) { Source = "focus"; return 1; }
+   }
+  } catch { }
+  try {
+   object toasts = Microsoft.Win32.Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings", "NOC_GLOBAL_SETTING_TOASTS_ENABLED", null);
+   if (toasts is int && (int)toasts == 0) { Source = "dnd"; return 2; }
+  } catch { }
+  try {
+   int s; if (SHQueryUserNotificationState(out s) == 0) {
+    if (s == 6) { Source = "quiet hours"; return 3; }
+    if (s == 4) { Source = "presentation"; return 4; }
+   }
+  } catch { }
+  return 0;
+ }
+}
+
+// Shared memory between two Capris (slot 0 = the first, slot 1 = her friend). 16 doubles per slot.
+public static class CapriLink {
+ [DllImport("kernel32.dll", SetLastError=true, CharSet=CharSet.Unicode)] static extern IntPtr CreateFileMapping(IntPtr file, IntPtr attributes, uint protect, uint maxHigh, uint maxLow, string name);
+ [DllImport("kernel32.dll", SetLastError=true)] static extern IntPtr MapViewOfFile(IntPtr mapping, uint access, uint offsetHigh, uint offsetLow, UIntPtr bytes);
+ static IntPtr mapping = IntPtr.Zero, view = IntPtr.Zero;
+ public static bool Open() {
+  if (view != IntPtr.Zero) return true;
+  mapping = CreateFileMapping(new IntPtr(-1), IntPtr.Zero, 0x04, 0, 512, "Local\\CapriLink");
+  if (mapping == IntPtr.Zero) return false;
+  view = MapViewOfFile(mapping, 0x0006, 0, 0, new UIntPtr(512));
+  return view != IntPtr.Zero;
+ }
+ public static void Write(int slot, double[] values) {
+  if (view == IntPtr.Zero || slot < 0 || slot > 1) return;
+  Marshal.Copy(values, 0, IntPtr.Add(view, slot * 128), Math.Min(16, values.Length));
+ }
+ public static double[] Read(int slot) {
+  double[] values = new double[16];
+  if (view != IntPtr.Zero && slot >= 0 && slot <= 1) Marshal.Copy(IntPtr.Add(view, slot * 128), values, 0, 16);
+  return values;
+ }
+ public static double Clock() { return DateTime.UtcNow.Ticks / 1e7; }
+}
+
+// Recolours a frame (BGRA): rotates the hue of coloured pixels, leaving greys, skin and outlines alone.
+public static class CapriTint {
+ public static void HueShift(byte[] p, double degrees) {
+  for (int i = 0; i + 3 < p.Length; i += 4) {
+   if (p[i + 3] == 0) continue;
+   double b = p[i] / 255.0, g = p[i + 1] / 255.0, r = p[i + 2] / 255.0;
+   double max = Math.Max(r, Math.Max(g, b)), min = Math.Min(r, Math.Min(g, b)), d = max - min;
+   if (d < 0.12 || max < 0.15) continue;
+   double h;
+   if (max == r) h = 60 * (((g - b) / d) % 6); else if (max == g) h = 60 * ((b - r) / d + 2); else h = 60 * ((r - g) / d + 4);
+   if (h < 0) h += 360;
+   if (h >= 10 && h <= 45 && d < 0.45) continue; // skin tones stay as they are
+   double s = d / max;
+   h = (h + degrees) % 360; if (h < 0) h += 360;
+   double c = max * s, x = c * (1 - Math.Abs((h / 60) % 2 - 1)), m = max - c;
+   double r2, g2, b2;
+   if (h < 60) { r2 = c; g2 = x; b2 = 0; } else if (h < 120) { r2 = x; g2 = c; b2 = 0; } else if (h < 180) { r2 = 0; g2 = c; b2 = x; }
+   else if (h < 240) { r2 = 0; g2 = x; b2 = c; } else if (h < 300) { r2 = x; g2 = 0; b2 = c; } else { r2 = c; g2 = 0; b2 = x; }
+   p[i] = (byte)Math.Round((b2 + m) * 255); p[i + 1] = (byte)Math.Round((g2 + m) * 255); p[i + 2] = (byte)Math.Round((r2 + m) * 255);
+  }
+ }
+}

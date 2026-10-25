@@ -17,7 +17,7 @@ try {
 } catch { } # A damaged memory file starts fresh.
 
 function Save-Memory {
- if($script:SelfTestMode -or -not $script:memoryDirty){return}
+ if($script:SelfTestMode -or $script:FriendMode -or -not $script:memoryDirty){return}
  try {
   $script:memory.lastSeen=(Get-Date).ToString('o')
   $script:memory | ConvertTo-Json | Set-Content -LiteralPath $script:memoryPath -Encoding UTF8

@@ -41,6 +41,12 @@ $script:musicEnabled=$true          # react to whatever is playing
 $script:appAware=$false             # opt-in: react to the app in front
 $script:hotkeyEnabled=$true         # global summon hotkey
 $script:scanName=''; $script:scanScore=0
+# Defaults for settings defined in later parts (they must exist before voice-settings.json is read).
+$script:beatSync=$true              # nod on the real beat
+$script:batteryReactions=$true
+$script:dndAware=$true              # quiet corner while Windows Do Not Disturb / Focus is on
+$script:weatherEnabled=$false; $script:weatherCity=''; $script:weatherUnit='C'
+$script:chatEnabled=$false          # opt-in: replies from the Claude API with your key
 # Tunable numbers. Edit tuning.json (or Debug and help > Reload tuning.json) instead of the code.
 $script:tuning=[ordered]@{
  throwSpeed=800.0        # release speed (WPF px/s) that counts as a throw
@@ -60,6 +66,12 @@ $script:tuning=[ordered]@{
  appRemarkMinutes=2.0    # at least this long between comments on apps
  hotkey='Ctrl+Alt+C'     # summon / hide shortcut
  perMonitorDpi=0.0       # experimental: 1 = sharp on mixed-scale monitors (applies at next start)
+ ballBounce=0.62         # share of speed the toy ball keeps when it bounces
+ ballChance=0.3          # chance she goes after the ball when choosing something to do
+ friendHue=150.0         # how different her friend's colours are (degrees around the colour wheel)
+ weatherMinutes=60.0     # how often the weather is checked (when weather is on)
+ chatModel='claude-haiku-5-5'  # Claude model for chatting (when chat is on)
+ chatMaxTokens=300.0     # longest reply, in tokens
 }
 $script:tuningPath=Join-Path $script:AppRoot 'tuning.json'
 function Import-Tuning {

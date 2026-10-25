@@ -107,6 +107,11 @@ $interact=New-SubMenu $menu 'Interact'
 [void](New-MenuEntry $interact 'Do something!' {$script:pendingAction='random'})
 [void](New-MenuEntry $interact 'Pet her (Ctrl-click)' {$script:pendingAction='pet'})
 [void](New-MenuEntry $interact 'Play catch me (30 s)' {$script:pendingAction='catchgame'})
+[void](New-MenuEntry $interact 'Toy ball (throw it, she fetches)' {$script:pendingAction='ball'} {$script:ball.shown})
+[void](New-MenuEntry $interact 'Chat with her...' {$script:pendingAction='chat'})
+[void](New-MenuEntry $interact 'Reminders...' {$script:pendingAction='reminders'})
+$snoozeItem=New-MenuEntry $interact 'Snooze last reminder (10 min)' {$script:pendingAction='snooze'}
+$friendItem=New-MenuEntry $interact 'Invite a friend (second Capri)' {if($script:friendPresent){$script:pendingAction='friend-home'}else{$script:pendingAction='friend'}}
 [void](New-MenuEntry $interact 'Cartoon swat (Shift-click)' {$script:pendingAction='swat'})
 [void](New-MenuEntry $interact 'Say a line now' {$script:pendingAction='speak'})
 [void](New-MenuEntry $interact 'Attack cursor (Blackwall)' {$script:pendingAction='attack'})
@@ -188,6 +193,7 @@ $behaviour=New-SubMenu $settings 'Behaviour'
 [void](New-MenuEntry $behaviour 'Sit on windows' {$script:windowPerch=-not $script:windowPerch; Save-VoiceSettings} {$script:windowPerch})
 [void](New-MenuEntry $behaviour 'Throwing physics' {$script:throwPhysics=-not $script:throwPhysics; Save-VoiceSettings} {$script:throwPhysics})
 [void](New-MenuEntry $behaviour 'Time-of-day moods' {$script:timeOfDay=-not $script:timeOfDay; Save-VoiceSettings} {$script:timeOfDay})
+[void](New-MenuEntry $behaviour 'Quiet corner during Do Not Disturb / Focus' {$script:dndAware=-not $script:dndAware; $script:nextDndCheck=0; Save-VoiceSettings} {$script:dndAware})
 [void](New-MenuEntry $behaviour 'Battery reactions (laptops)' {$script:batteryReactions=-not $script:batteryReactions; Save-VoiceSettings} {$script:batteryReactions})
 [void](New-MenuEntry $behaviour 'Bob to the real beat (listens to your PC''s sound)' {$script:beatSync=-not $script:beatSync; Save-VoiceSettings} {$script:beatSync})
 [void](New-MenuEntry $behaviour 'React to music' {$script:musicEnabled=-not $script:musicEnabled; Save-VoiceSettings; if($script:musicEnabled -and -not $script:musicAvailable){Show-Status ('Music reactions are not available here: '+$script:musicError)}} {$script:musicEnabled})
@@ -235,6 +241,7 @@ $debugMenu=New-SubMenu $menu 'Debug and help'
  Import-Tuning; Register-SummonHotkey
  if($script:tuningError){Show-Problem ('tuning.json has a problem: '+$script:tuningError); $script:tuningError=''}else{Show-Status 'Tuning reloaded.'}
 })
+[void](New-MenuEntry $debugMenu 'Weather now' {$script:pendingAction='weather-now'})
 [void](New-MenuEntry $debugMenu 'Wander now' {$script:pendingAction='wander-test'})
 [void](New-MenuEntry $debugMenu 'Test cursor movement (75 px)' {$script:pendingAction='cursor-test'})
 Add-MenuSeparator $debugMenu
@@ -255,6 +262,9 @@ $menu.Add_Opened({
  $rivalItem.Header=('Rivalry: '+$script:rivalWins+' catches / '+$script:rivalEscapes+' escapes')
  $hideItem.IsEnabled=($null -ne $script:tray)
  $hotkeyItem.Header=('Summon hotkey ('+$script:tuning.hotkey+')')
+ $snoozeItem.IsEnabled=(Test-CanSnooze)
+ $friendItem.Header=if($script:FriendMode){'(I''m the friend: Quit sends me home)'}elseif($script:friendPresent){'Send her friend home'}else{'Invite a friend (second Capri)'}
+ $friendItem.IsEnabled=-not $script:FriendMode
 })
 $menu.Add_Closed({Register-Interaction; Save-VoiceSettings})
 $themePath=Join-Path $script:AppRoot 'menu-theme.xaml'
@@ -290,7 +300,7 @@ function New-TrayIconImage {
 try {
  [Windows.Forms.Application]::EnableVisualStyles()
  $tray=[Windows.Forms.NotifyIcon]::new()
- $tray.Icon=New-TrayIconImage; $tray.Text='Capri'
+ $tray.Icon=New-TrayIconImage; $tray.Text=if($script:FriendMode){'Capri (friend)'}else{'Capri'}
  $trayMenu=[Windows.Forms.ContextMenuStrip]::new()
  $trayShow=$trayMenu.Items.Add('Hide Capri'); $trayShow.Add_Click({Set-Hidden (-not $script:isHidden)})
  $trayCall=$trayMenu.Items.Add('Call her over here'); $trayCall.Add_Click({Invoke-CallOver})
@@ -299,6 +309,8 @@ try {
  $trayBusy=$trayMenu.Items.Add('Busy (quiet corner)'); $trayBusy.Add_Click({Set-BusyMode (-not $script:busyMode)})
  $trayMute=$trayMenu.Items.Add('Mute'); $trayMute.Add_Click({Set-Muted (-not $script:muted)})
  [void]$trayMenu.Items.Add([Windows.Forms.ToolStripSeparator]::new())
+ $trayRemind=$trayMenu.Items.Add('Remind me...'); $trayRemind.Add_Click({Show-ReminderWindow})
+ $trayChat=$trayMenu.Items.Add('Chat with her...'); $trayChat.Add_Click({Show-ChatWindow})
  $traySettings=$trayMenu.Items.Add('Settings...'); $traySettings.Add_Click({Show-SettingsWindow})
  $trayFull=$trayMenu.Items.Add('Capri menu...'); $trayFull.Add_Click({
   Set-Hidden $false

@@ -290,5 +290,166 @@
     "I've scanned so many of your files. Some of them were... interesting.",
     "Case file update: still suspicious.",
     "Bring me more files. I'm on a streak."
+  ],
+  "ballout": [
+    "Oh? A ball. For me?",
+    "Throw it. I dare you.",
+    "Is that a toy or a challenge?"
+  ],
+  "ballfetch": [
+    "Mine!",
+    "Oh, it's on.",
+    "You think I won't chase that? I will."
+  ],
+  "ballbat": [
+    "Ha!",
+    "Again!",
+    "Too easy.",
+    "Catch!"
+  ],
+  "ballbored": [
+    "Okay, I win. Ball's yours.",
+    "That's enough cardio for one day.",
+    "Fine, you can have it back. For now."
+  ],
+  "ballsteal": [
+    "Mine now.",
+    "Finders keepers.",
+    "This is mine. I'm keeping it."
+  ],
+  "ballhide": [
+    "It lives here now.",
+    "Come and get it. If you dare.",
+    "Guarding this. Don't try anything."
+  ],
+  "balltaken": [
+    "Hey! I had that!",
+    "Thief.",
+    "Rude. That was mine."
+  ],
+  "reminder": [
+    "Hey. You told me to tell you: {0}",
+    "Reminder, since you asked: {0}",
+    "Time's up. {0}",
+    "You wanted me to nag you: {0}"
+  ],
+  "reminderlate": [
+    "I was offline, but you wanted this at {1}: {0}",
+    "Late, not my fault. From {1}: {0}"
+  ],
+  "reminderset": [
+    "Fine. {0}: {1}. I'll remember.",
+    "Noted. {0}, {1}.",
+    "Okay. I'll bug you at {0}."
+  ],
+  "dndover": [
+    "Do Not Disturb's off. Miss me?",
+    "Can I talk now? Good.",
+    "Quiet time's over."
+  ],
+  "weatherreport": [
+    "Weather in {0}: {1}, {2} now, up to {3} today.",
+    "{0} report: {1}. {2} right now, {3} at the warmest.",
+    "Checked outside for you. {0}: {1}, {2}, high of {3}."
+  ],
+  "weatherclear": [
+    "Clear skies. You should go outside. I'll watch your stuff.",
+    "Sun's out. Suspicious.",
+    "Nice day. Don't waste it all on me."
+  ],
+  "weathercloudy": [
+    "Clouds. Moody. I like it.",
+    "Grey out there. Good day to stay in.",
+    "Overcast. Very cinematic."
+  ],
+  "weatherfog": [
+    "Fog. Can't see a thing out there.",
+    "Foggy. Perfect for sneaking."
+  ],
+  "weatherrain": [
+    "It's raining. Good thing I live in here.",
+    "Rain. Take an umbrella if you go out.",
+    "Ugh. Wet out there."
+  ],
+  "weathersnow": [
+    "Snow! Okay, that's actually nice.",
+    "It's snowing. I demand you look out the window.",
+    "Snow day. Productivity is cancelled."
+  ],
+  "weatherstorm": [
+    "Thunderstorm. I'm not scared. You're scared.",
+    "Storm outside. Unplug me if it gets loud... actually, don't.",
+    "Thunder. Great. Very relaxing."
+  ],
+  "weatherhot": [
+    "{0}. I'm melting.",
+    "It's {0} out. Drink some water. I mean it.",
+    "Too hot. Everything's too hot."
+  ],
+  "weathercold": [
+    "{0}? Cold. Wear something warm.",
+    "It's freezing out there. Stay in with me.",
+    "Brr. {0}."
+  ],
+  "friendhello": [
+    "Oh. There's two of us now.",
+    "Look who showed up.",
+    "Great, another one of me. The screen isn't big enough."
+  ],
+  "friendarrive": [
+    "Hey, me.",
+    "So this is where you live.",
+    "Nice desktop. Bit messy."
+  ],
+  "friendgone": [
+    "She left. More room for me.",
+    "Gone already? Typical.",
+    "Quiet again."
+  ],
+  "friendbye": [
+    "Gotta go. Behave, both of you.",
+    "I'm out. See you around."
+  ],
+  "friendwave": [
+    "Hi!",
+    "Hey you.",
+    "Don't copy me."
+  ],
+  "frienddance": [
+    "Dance-off. Now.",
+    "She can't keep up.",
+    "Follow my lead."
+  ],
+  "friendchase": [
+    "Tag! You're it!",
+    "Bet you can't catch me. Wait, I'm the one chasing.",
+    "Get back here!"
+  ],
+  "friendtag": [
+    "Got you!",
+    "Tagged. Too slow.",
+    "Ha! You're it."
+  ],
+  "friendtagged": [
+    "Okay, okay, you got me.",
+    "Cheater.",
+    "I let you win."
+  ],
+  "friendtalk": [
+    "So, what do you think of them?|Honestly? Could be worse.",
+    "Did you see how they tried to catch me earlier?|Embarrassing. For them.",
+    "Your colours are wrong.|No, YOUR colours are wrong.",
+    "I've been thinking about the Blackwall.|Don't. Last time you did that, the screen flickered.",
+    "Who's the original?|Me, obviously.",
+    "Want to mess with the cursor?|Always.",
+    "They gave me a head pat yesterday.|Show-off.",
+    "Is it just me, or is this desktop cluttered?|It's not just you.",
+    "Quick, look busy.|I am always busy. Being amazing.",
+    "Rock, paper, scissors?|I already know what you'll pick.",
+    "How many tabs do you think they have open?|Too many. Way too many.",
+    "I'm bored.|Same. Want to sit on a window?",
+    "Did you take my ball?|Define 'take'.",
+    "We should start a band.|Only if I'm the lead.",
+    "They talk to us, you know.|I know. It's sweet. Don't tell them I said that."
   ]
 }
