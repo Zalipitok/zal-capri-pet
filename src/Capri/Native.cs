@@ -616,45 +616,70 @@ public static class CapriSfx {
   return null;
  }
 
+ // Opening a waveOut device can take a long moment, so a few are opened ahead of time (one per
+ // format) and reused; playing never waits on the UI thread.
+ static readonly Dictionary<long, Stack<IntPtr>> idle = new Dictionary<long, Stack<IntPtr>>();
+ static IntPtr Open(int rate, int channels) {
+  long key = (long)rate * 16 + channels;
+  lock(idle) { Stack<IntPtr> st; if(idle.TryGetValue(key, out st) && st.Count > 0) return st.Pop(); }
+  var format = new WAVEFORMATEX { wFormatTag = 1, nChannels = (ushort)channels, nSamplesPerSec = (uint)rate, wBitsPerSample = 16 };
+  format.nBlockAlign = (ushort)(channels * 2); format.nAvgBytesPerSec = (uint)(rate * format.nBlockAlign);
+  IntPtr h;
+  return waveOutOpen(out h, 0xFFFFFFFF, ref format, IntPtr.Zero, IntPtr.Zero, 0) == 0 ? h : IntPtr.Zero;
+ }
+ static void Release(IntPtr h, int rate, int channels) {
+  long key = (long)rate * 16 + channels;
+  lock(idle) { Stack<IntPtr> st; if(!idle.TryGetValue(key, out st)) idle[key] = st = new Stack<IntPtr>(); if(st.Count < 6) { st.Push(h); return; } }
+  waveOutClose(h);
+ }
+
  public static bool Play(string path, double gain) {
   Clip clip;
-  try { clip = Load(path); } catch(Exception) { return false; }
+  lock(cache) cache.TryGetValue(path, out clip);
+  if(clip == null) { try { clip = Load(path); } catch(Exception) { return false; } }
   if(clip == null) return false;
   gain = Math.Max(0, Math.Min(1, gain));
+  System.Threading.ThreadPool.QueueUserWorkItem(delegate(object unused) { PlayNow(clip, gain); });
+  return true;
+ }
+
+ static void PlayNow(Clip clip, double gain) {
   var data = new short[clip.samples.Length];
   for(int i = 0; i < data.Length; i++) data[i] = (short)(clip.samples[i] * gain);
-  var format = new WAVEFORMATEX { wFormatTag = 1, nChannels = (ushort)clip.channels, nSamplesPerSec = (uint)clip.rate, wBitsPerSample = 16 };
-  format.nBlockAlign = (ushort)(clip.channels * 2); format.nAvgBytesPerSec = (uint)(clip.rate * format.nBlockAlign);
-  IntPtr h;
-  if(waveOutOpen(out h, 0xFFFFFFFF, ref format, IntPtr.Zero, IntPtr.Zero, 0) != 0) return false;
+  IntPtr h = Open(clip.rate, clip.channels);
+  if(h == IntPtr.Zero) return;
   int bytes = data.Length * 2;
   IntPtr buffer = Marshal.AllocHGlobal(bytes); Marshal.Copy(data, 0, buffer, data.Length);
   uint hdrSize = (uint)Marshal.SizeOf(typeof(WAVEHDR));
   IntPtr hdr = Marshal.AllocHGlobal((int)hdrSize);
   Marshal.StructureToPtr(new WAVEHDR { lpData = buffer, dwBufferLength = (uint)bytes }, hdr, false);
-  if(waveOutPrepareHeader(h, hdr, hdrSize) != 0 || waveOutWrite(h, hdr, hdrSize) != 0) {
-   waveOutUnprepareHeader(h, hdr, hdrSize); waveOutClose(h); Marshal.FreeHGlobal(hdr); Marshal.FreeHGlobal(buffer); return false;
-  }
-  lock(playing) playing.Add(h);
-  int ms = (int)(1000.0 * data.Length / clip.channels / clip.rate) + 400;
-  System.Threading.ThreadPool.QueueUserWorkItem(delegate(object unused) {
-   var start = Environment.TickCount;
+  try {
+   if(waveOutPrepareHeader(h, hdr, hdrSize) != 0 || waveOutWrite(h, hdr, hdrSize) != 0) { waveOutReset(h); waveOutClose(h); h = IntPtr.Zero; return; }
+   lock(playing) playing.Add(h);
+   int ms = (int)(1000.0 * data.Length / clip.channels / clip.rate) + 400, start = Environment.TickCount;
    while(Environment.TickCount - start < ms) {
     var header = (WAVEHDR)Marshal.PtrToStructure(hdr, typeof(WAVEHDR));
     if((header.dwFlags & 1) != 0) break;   // WHDR_DONE
-    System.Threading.Thread.Sleep(25);
+    System.Threading.Thread.Sleep(20);
    }
    lock(playing) playing.Remove(h);
-   waveOutReset(h); waveOutUnprepareHeader(h, hdr, hdrSize); waveOutClose(h);
-   Marshal.FreeHGlobal(hdr); Marshal.FreeHGlobal(buffer);
-  });
-  return true;
+   waveOutReset(h); waveOutUnprepareHeader(h, hdr, hdrSize);
+   Release(h, clip.rate, clip.channels);
+  }
+  finally { Marshal.FreeHGlobal(hdr); Marshal.FreeHGlobal(buffer); }
  }
 
  public static void StopAll() { lock(playing) foreach(var h in playing) waveOutReset(h); }
  public static void Preload(string folder) {
   System.Threading.ThreadPool.QueueUserWorkItem(delegate(object unused) {
    try { foreach(var f in System.IO.Directory.GetFiles(folder, "*.wav")) { try { Load(f); } catch(Exception) { } } } catch(Exception) { }
+   // open a few devices now so the first sounds don't wait for one
+   var formats = new HashSet<long>(); lock(cache) foreach(var c in cache.Values) formats.Add((long)c.rate * 16 + c.channels);
+   foreach(var k in formats) {
+    var opened = new List<IntPtr>();
+    for(int i = 0; i < 3; i++) { var h = Open((int)(k / 16), (int)(k % 16)); if(h != IntPtr.Zero) opened.Add(h); }
+    foreach(var h in opened) Release(h, (int)(k / 16), (int)(k % 16));
+   }
   });
  }
 }
