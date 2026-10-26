@@ -193,7 +193,7 @@ namespace Capri
             var s = spec;
             phase = t - stateStart;
             int? pose = s.PoseAt(phase);
-            int animPose; curAnimPose = -1;
+            int animPose = -1; curAnimPose = -1;
             if (newSprites && animPoses.TryGetValue(state, out animPose)) { pose = animPose; curAnimPose = animPose; }
             bool moodPose = s.Has("mood") && !voiceBusy;
             if (moodPose && curAnimPose >= 0) { if (mood == "smug") pose = curAnimPose = AnimPose("smug", animPose); else if (mood == "irritated") pose = curAnimPose = AnimPose("rivalglare", animPose); }
