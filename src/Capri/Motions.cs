@@ -41,8 +41,8 @@ namespace Capri
             paths["windowperch"] = () =>
             {
                 var r = WindowRectDip(perchHandle);
-                if (r == null || r.Value.Top - (w.Height - SpriteFoot()) < area.Top - 2) { StartThrow(0, 0, "fell"); return; }
-                targetX = r.Value.Left + perchOffsetX; targetY = r.Value.Top - w.Height + SpriteFoot() + tuning.perchSink;
+                if (r == null || CapriWindows.Maximized(perchHandle) || r.Value.Top - PerchRoom() < area.Top - 2) { StartThrow(0, 0, "fell"); return; }
+                targetX = r.Value.Left + perchOffsetX; targetY = r.Value.Top - w.Height + SpriteFoot(PerchPose) + tuning.perchSink;
                 if (!perchArrived && Abs(targetX - w.Left) + Abs(targetY - w.Top) <= 4) perchArrived = true;
                 if (perchArrived) { w.Left = targetX; w.Top = targetY; }
             };

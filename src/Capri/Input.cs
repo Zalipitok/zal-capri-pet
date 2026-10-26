@@ -61,6 +61,7 @@ namespace Capri
                 {
                     ClampPet();
                     if (shakeAngry) { shakeAngry = false; BeginState("shaken"); caughtCooldown = until + 1; }
+                    else if (TryDropPerch()) { }
                     else { BeginState("smug"); ShowRemark("release"); }
                 }
             };

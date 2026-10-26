@@ -73,8 +73,9 @@ namespace Capri
                     if (perch != null)
                     {
                         perchHandle = perch.Value.Key; var r = perch.Value.Value; perchArrived = false;
-                        perchOffsetX = (r.Width - w.Width) * (0.1 + 0.8 * rng.NextDouble());
-                        targetX = r.Left + perchOffsetX; targetY = r.Top - w.Height + SpriteFoot() + tuning.perchSink;
+                        perchOffsetX = !double.IsNaN(perchDropX) ? Math.Max(-w.Width * 0.3, Math.Min(r.Width - w.Width * 0.7, perchDropX)) : (r.Width - w.Width) * (0.1 + 0.8 * rng.NextDouble());
+                        perchDropX = double.NaN;
+                        targetX = r.Left + perchOffsetX; targetY = r.Top - w.Height + SpriteFoot(PerchPose) + tuning.perchSink;
                     }
                     break;
             }

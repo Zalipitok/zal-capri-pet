@@ -69,6 +69,26 @@ namespace Capri
 
         public Pet() { Current = this; }
 
+        // The speech bubble sits in a row above the sprite frame, but her drawing starts well below
+        // the top of the frame, so it is slid down to just above her head (and kept on screen).
+        TranslateTransform bubbleShift = new TranslateTransform(); bool bubbleSettled;
+        void PlaceBubble(double dt)
+        {
+            if (bubble.Visibility != Visibility.Visible || sprite.ActualHeight <= 0) { bubbleSettled = false; return; }
+            try
+            {
+                double bottom = bubble.TranslatePoint(new Point(0, bubble.ActualHeight), scene).Y - bubbleShift.Y;
+                double head = sprite.TranslatePoint(new Point(sprite.ActualWidth / 2, ArtTop(poseIndex) * sprite.ActualHeight), scene).Y;
+                double target = Math.Max(0.0, head + 4 - bottom);
+                double sceneTop = scene.TransformToAncestor(w).Transform(new Point(0, 0)).Y;
+                double screenTop = w.Top + sceneTop + bottom - bubble.ActualHeight;
+                target = Math.Max(target, WorkArea().Top + 2 - screenTop);
+                if (!bubbleSettled) { bubbleShift.Y = target; bubbleSettled = true; }
+                else bubbleShift.Y += (target - bubbleShift.Y) * Math.Min(1.0, dt * 6);
+            }
+            catch { }
+        }
+
         static T LoadXaml<T>(string name) where T : class
         {
             using (var stream = typeof(Pet).Assembly.GetManifestResourceStream(name))
@@ -123,7 +143,7 @@ namespace Capri
                 foreach (var tb in FindAll<TextBlock>(w)) if (tb.Text == "CAPRI:") tb.Text = "ECHO:";
             }
             effect = (TextBlock)w.FindName("Effect"); effect.Visibility = Visibility.Collapsed;
-            sprite = (Image)w.FindName("Sprite"); bubble = (Border)w.FindName("Bubble");
+            sprite = (Image)w.FindName("Sprite"); bubble = (Border)w.FindName("Bubble"); bubble.RenderTransform = bubbleShift;
             // The bubble's cut-corner frame is sized in code: a stretched path would make it as big as its drawing.
             var bubbleFrame = (System.Windows.Shapes.Path)w.FindName("BubbleFrame");
             var bubbleGrid = (Grid)bubble.Child;

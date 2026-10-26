@@ -23,7 +23,8 @@ CONTROLS
 
 MENU
   Pause / Busy (quiet corner) / Mute / Hide
-  Interact      do something, pet, swat, say a line, cursor attack, sit on the active window,
+  Interact      do something, pet, swat, say a line, cursor attack, sit on a window (or drop
+                her on a title bar),
                 perch at taskbar, fake sabotage
   Animations    every pose and antic by group, little routines, stop routine
   Settings

@@ -250,6 +250,7 @@ namespace Capri
             if (state == "pounce" && phase > 0.12 && CursorContact()) { attackContact = true; until = t; }
             ApplySpeechPose();
             ClampPet();
+            PlaceBubble(dt);
             UpdateShadow(spec.Has("grounded") && (state != "windowperch" || perchArrived), state == "windowperch");
             if (!spec.Has("noFace"))
             {

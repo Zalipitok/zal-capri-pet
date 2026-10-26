@@ -99,6 +99,14 @@ public static class CapriDesktop {
   if(IsShell(ClassOf(h))) return false;
   return (GetWindowLong(h,-20)&0x80)==0; // skip tool windows
  }
+ delegate bool EnumWinProc(IntPtr h,IntPtr l);
+ [DllImport("user32.dll")] static extern bool EnumWindows(EnumWinProc proc,IntPtr l);
+ // Visible app windows, front to back.
+ public static long[] AppWindows() {
+  List<long> list=new List<long>();
+  EnumWindows((h,l)=>{ if(Usable(h)) list.Add(h.ToInt64()); return true; },IntPtr.Zero);
+  return list.ToArray();
+ }
  // Foreground app window as {hwnd,left,top,right,bottom} in pixels, or null.
  public static long[] ForegroundWindow() {
   IntPtr h=GetForegroundWindow(); RECT r;

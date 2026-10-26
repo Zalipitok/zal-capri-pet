@@ -18,7 +18,7 @@ Needs Windows 10 (1809 or newer) or Windows 11. Nothing to install: she's a smal
 
 ## What she does
 
-- **Lives on your screen** — wanders, perches on the taskbar and on window title bars, rides along when you move a window, works across multiple monitors and hides for fullscreen games.
+- **Lives on your screen** — wanders, perches on the taskbar and on window title bars, rides along when you move a window (drag and drop her onto a title bar to make her sit there), works across multiple monitors and hides for fullscreen games.
 - **Plays with you** — drag her around, throw her (she bounces), pat her (Ctrl-click), swat her (Shift-click), play *catch me*, throw her a toy ball to fetch, and call her over with **Ctrl+Alt+C**.
 - **Notices things** — headphones and head-bobbing on the real beat of whatever is playing, battery reactions on laptops, optional weather reactions, quiet corner during Do Not Disturb / Focus, and (opt-in) which kind of app you're using.
 - **Helps a bit** — reminders, a focus timer with streaks, sticky notes, break reminders.

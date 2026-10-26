@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Media.Imaging;
 using System.Windows;
 using System.Windows.Media;
 
@@ -60,8 +62,47 @@ namespace Capri
             if (spec.Has("noClamp")) return;
             var a = WorkArea();
             w.Left = Math.Max(a.Left, Math.Min(w.Left, Math.Max(a.Left, a.Right - w.Width)));
-            w.Top = Math.Max(a.Top, Math.Min(w.Top, Math.Max(a.Top, a.Bottom - w.Height)));
+            // the transparent space above her head may go off the top of the screen
+            double above = Math.Max(0.0, EmptyAbove(poseIndex) - 4);
+            w.Top = Math.Max(a.Top - above, Math.Min(w.Top, Math.Max(a.Top - above, a.Bottom - w.Height)));
         }
+
+        // Where the drawing starts in each frame (fraction of the frame height from the top).
+        Dictionary<int, double> artTops = new Dictionary<int, double>();
+        public double ArtTop(int pose)
+        {
+            double v;
+            if (artTops.TryGetValue(pose, out v)) return v;
+            v = 0.0;
+            try
+            {
+                var bmp = new FormatConvertedBitmap(Frame(pose), PixelFormats.Bgra32, null, 0);
+                int wd = bmp.PixelWidth, ht = bmp.PixelHeight, stride = wd * 4;
+                var px = new byte[stride * ht]; bmp.CopyPixels(px, stride, 0);
+                for (int y = 0; y < ht && v == 0.0; y++)
+                {
+                    int solid = 0;
+                    for (int x = 0; x < wd; x++) if (px[y * stride + x * 4 + 3] > 60 && ++solid >= 3) { v = (double)y / ht; break; }
+                }
+            }
+            catch { v = 0.25; }
+            artTops[pose] = v; return v;
+        }
+        // Transparent space between the top of her window and the top of the drawing.
+        public double EmptyAbove(int pose)
+        {
+            try
+            {
+                if (sprite.ActualHeight <= 0 || pose < 0 || pose >= poses.Count) return 0.0;
+                var origin = scene.TransformToAncestor(w).Transform(new Point(0, 0));
+                var offset = VisualTreeHelper.GetOffset(sprite);
+                return origin.Y + offset.Y + ArtTop(pose) * sprite.ActualHeight;
+            }
+            catch { return 0.0; }
+        }
+        public int PerchPose { get { return AnimPose("windowperch", 12); } }
+        // How much room she needs above a window's top edge to sit on it (just her drawn height).
+        public double PerchRoom() { return w.Height - SpriteFoot(PerchPose) - EmptyAbove(PerchPose) + 4; }
 
         // Distance from the window's bottom edge to her feet in the given pose (default hover, 12).
         public double SpriteFoot(int pose = 12)
@@ -92,7 +133,7 @@ namespace Capri
         {
             if (!shadowEnabled || !grounded || isHidden) { if (shadow.Visibility != Visibility.Collapsed) shadow.Visibility = Visibility.Collapsed; return; }
             double foot = SpriteFoot(poseIndex);
-            double surface = onWindow ? SpriteFoot(12) : 8.0;
+            double surface = onWindow ? SpriteFoot(PerchPose) : 8.0;
             double height = Math.Max(0.0, foot - surface);
             double width = Math.Max(20.0, sprite.ActualWidth * 0.42 * (1.0 - Math.Min(0.5, height / 400.0)));
             shadow.Width = width; shadow.Height = width * 0.16;
@@ -133,23 +174,70 @@ namespace Capri
             return FromDeviceRect(r, m.Value);
         }
 
-        // A window with room above its title bar for Capri to sit on.
+        // A window with room above its title bar for Capri to sit on: the one she was dropped on,
+        // the active one, the last one used, then any other visible window whose top edge isn't covered.
+        public long preferPerch;
         public KeyValuePair<long, Rect>? FindPerchWindow()
         {
-            var candidates = new List<long>();
-            try { var fg = CapriDesktop.ForegroundWindow(); if (fg != null) candidates.Add(fg[0]); } catch { }
-            if (lastAppWindow != 0) candidates.Add(lastAppWindow);
             var m = DeviceScale(); if (m == null) return null;
-            foreach (var handle in candidates)
+            Func<long, Rect?> fits = PerchFits;
+            if (preferPerch != 0) { long p = preferPerch; preferPerch = 0; var r = fits(p); if (r != null) return new KeyValuePair<long, Rect>(p, r.Value); }
+            var first = new List<long>();
+            try { var fg = CapriDesktop.ForegroundWindow(); if (fg != null) first.Add(fg[0]); } catch { }
+            if (lastAppWindow != 0) first.Add(lastAppWindow);
+            foreach (var h in first) { var r = fits(h); if (r != null) return new KeyValuePair<long, Rect>(h, r.Value); }
+            long[] all = new long[0]; try { all = CapriDesktop.AppWindows(); } catch { }
+            var above = new List<Rect>(); var ok = new List<KeyValuePair<long, Rect>>();
+            foreach (var h in all)
             {
-                var r = WindowRectDip(handle);
-                if (r == null || r.Value.Width < 300 || r.Value.Height < 150) continue;
-                var area = WorkAreaAtDip(r.Value.Left + r.Value.Width / 2, r.Value.Top + 5);
-                if (area == null) continue;
-                if (r.Value.Top - (w.Height - SpriteFoot()) < area.Value.Top) continue;
-                return new KeyValuePair<long, Rect>(handle, r.Value);
+                var rr = WindowRectDip(h); if (rr == null) continue;
+                var r = fits(h);
+                if (r != null)
+                {
+                    // skip it if a window in front covers the middle of its top edge
+                    var mid = new Point(r.Value.Left + r.Value.Width / 2, r.Value.Top + 2);
+                    if (!above.Any(o => o.Contains(mid))) ok.Add(new KeyValuePair<long, Rect>(h, r.Value));
+                }
+                above.Add(rr.Value);
+                if (ok.Count >= 4) break;
             }
-            return null;
+            if (ok.Count == 0) return null;
+            return ok[rng.Next(ok.Count)];
         }
+
+        public Rect? PerchFits(long handle)
+        {
+            if (handle == 0 || CapriWindows.Maximized(handle)) return null;
+            var r = WindowRectDip(handle);
+            if (r == null || r.Value.Width < 260 || r.Value.Height < 120) return null;
+            var area = WorkAreaAtDip(r.Value.Left + r.Value.Width / 2, r.Value.Top + 5);
+            if (area == null || r.Value.Top - PerchRoom() < area.Value.Top || r.Value.Top > area.Value.Bottom - 40) return null;
+            return r;
+        }
+
+        // Dropped near the top edge of a window: sit on it there.
+        public bool TryDropPerch()
+        {
+            try
+            {
+                double feet = w.Top + w.Height - SpriteFoot(poseIndex), cx = w.Left + w.Width / 2;
+                foreach (var h in CapriDesktop.AppWindows())
+                {
+                    var r = WindowRectDip(h); if (r == null) continue;
+                    bool overX = cx > r.Value.Left + 10 && cx < r.Value.Right - 10;
+                    if (!overX) continue;
+                    if (feet > r.Value.Top - 70 && feet < r.Value.Top + 45)
+                    {
+                        if (PerchFits(h) == null) { ShowStatus("No room above that window for her to sit.", 3); return false; }
+                        preferPerch = h; perchDropX = cx - w.Width / 2 - r.Value.Left;
+                        BeginState("windowperch"); return true;
+                    }
+                    if (r.Value.Contains(new Point(cx, feet))) return false;   // dropped onto the middle of a window
+                }
+            }
+            catch { }
+            return false;
+        }
+        public double perchDropX = double.NaN;
     }
 }
