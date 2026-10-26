@@ -49,7 +49,17 @@
       "title": "Tumble",
       "menu": "Basic",
       "auto": true,
-      "pose": 6,
+      "poses": [
+        [
+          6,
+          0.35
+        ],
+        [
+          0,
+          0.35
+        ]
+      ],
+      "loop": true,
       "seconds": 3.6,
       "tags": [
         "noFace",
@@ -61,7 +71,17 @@
       "title": "Peek",
       "menu": "Basic",
       "auto": true,
-      "pose": 7,
+      "poses": [
+        [
+          7,
+          1.0
+        ],
+        [
+          19,
+          0.8
+        ]
+      ],
+      "loop": true,
       "target": "edge",
       "speed": 65
     },
@@ -71,7 +91,7 @@
       "menu": "Basic",
       "auto": true,
       "category": "wandering",
-      "pose": 6,
+      "pose": 0,
       "seconds": 3,
       "speed": 360
     },
@@ -81,7 +101,17 @@
       "menu": "Basic",
       "auto": true,
       "category": "attacks",
-      "pose": 6,
+      "poses": [
+        [
+          16,
+          0.6
+        ],
+        [
+          0,
+          0.6
+        ]
+      ],
+      "loop": true,
       "seconds": 7,
       "target": "cursorAnchor",
       "path": "orbit",
@@ -131,7 +161,21 @@
       "title": "Glitch",
       "menu": "Basic",
       "auto": true,
-      "pose": 0,
+      "poses": [
+        [
+          14,
+          0.15
+        ],
+        [
+          18,
+          0.1
+        ],
+        [
+          12,
+          0.25
+        ]
+      ],
+      "loop": true,
       "remark": "mischief"
     },
     {
@@ -168,7 +212,17 @@
       "title": "Chase the cursor",
       "auto": true,
       "category": "attacks",
-      "pose": 7,
+      "poses": [
+        [
+          16,
+          0.5
+        ],
+        [
+          7,
+          0.5
+        ]
+      ],
+      "loop": true,
       "path": "chase",
       "speed": 100,
       "tags": [
@@ -484,7 +538,17 @@
     },
     {
       "id": "welcomeback",
-      "pose": 4,
+      "poses": [
+        [
+          4,
+          0.8
+        ],
+        [
+          1,
+          0.8
+        ]
+      ],
+      "loop": true,
       "seconds": 2.5,
       "motion": "wave",
       "tags": [
@@ -495,12 +559,12 @@
       "id": "breaktime",
       "poses": [
         [
-          16,
-          1.35
+          11,
+          1.0
         ],
         [
-          19,
-          0.65
+          4,
+          0.8
         ]
       ],
       "loop": true,
@@ -646,7 +710,16 @@
       "menu": "New poses",
       "auto": true,
       "category": "resting",
-      "pose": 11,
+      "poses": [
+        [
+          11,
+          1.6
+        ],
+        [
+          30,
+          5
+        ]
+      ],
       "quip": "five more minutes...",
       "effect": "z z",
       "seconds": 6
@@ -656,7 +729,16 @@
       "title": "Cheers!",
       "menu": "New poses",
       "auto": true,
-      "pose": 27,
+      "poses": [
+        [
+          27,
+          1.2
+        ],
+        [
+          21,
+          5
+        ]
+      ],
       "quip": "to excellent bad decisions.",
       "effect": "CHEERS",
       "seconds": 6,
@@ -667,7 +749,17 @@
       "title": "Boss fight",
       "menu": "New poses",
       "auto": true,
-      "pose": 25,
+      "poses": [
+        [
+          25,
+          1.2
+        ],
+        [
+          20,
+          0.5
+        ]
+      ],
+      "loop": true,
       "quip": "oh, it is ON.",
       "effect": "BOSS!",
       "seconds": 10,
@@ -679,7 +771,17 @@
       "menu": "New poses",
       "auto": true,
       "category": "resting",
-      "pose": 28,
+      "poses": [
+        [
+          30,
+          1.5
+        ],
+        [
+          28,
+          1.0
+        ]
+      ],
+      "loop": true,
       "quip": "totally awake.",
       "effect": "z",
       "seconds": 9,
@@ -705,7 +807,17 @@
       "title": "Bunny hops",
       "menu": "Move around",
       "auto": true,
-      "pose": 1,
+      "poses": [
+        [
+          1,
+          0.35
+        ],
+        [
+          6,
+          0.25
+        ]
+      ],
+      "loop": true,
       "quip": "boing. boing.",
       "effect": "",
       "seconds": 5,
@@ -723,7 +835,17 @@
       "seconds": 7,
       "speed": 35,
       "clampTarget": true,
-      "pose": 7
+      "poses": [
+        [
+          22,
+          0.45
+        ],
+        [
+          7,
+          0.45
+        ]
+      ],
+      "loop": true
     },
     {
       "id": "patrol",
@@ -737,7 +859,17 @@
       "path": "patrol",
       "speed": 160,
       "clampTarget": true,
-      "pose": 5
+      "poses": [
+        [
+          23,
+          0.35
+        ],
+        [
+          24,
+          0.35
+        ]
+      ],
+      "loop": true
     },
     {
       "id": "zigzag",
@@ -745,7 +877,17 @@
       "menu": "Move around",
       "auto": true,
       "category": "wandering",
-      "pose": 1,
+      "poses": [
+        [
+          0,
+          0.25
+        ],
+        [
+          1,
+          0.25
+        ]
+      ],
+      "loop": true,
       "quip": "the shortest route is boring.",
       "effect": ">>",
       "seconds": 7,
@@ -759,7 +901,17 @@
       "menu": "Move around",
       "auto": true,
       "category": "wandering",
-      "pose": 0,
+      "poses": [
+        [
+          0,
+          1.2
+        ],
+        [
+          12,
+          1.2
+        ]
+      ],
+      "loop": true,
       "quip": "watch this.",
       "effect": "∞",
       "seconds": 8,
@@ -772,7 +924,17 @@
       "title": "Bouncy flight",
       "menu": "Move around",
       "auto": true,
-      "pose": 1,
+      "poses": [
+        [
+          1,
+          0.4
+        ],
+        [
+          22,
+          0.4
+        ]
+      ],
+      "loop": true,
       "quip": "floor is lava.",
       "effect": "",
       "seconds": 7,
@@ -786,7 +948,16 @@
       "menu": "Move around",
       "auto": true,
       "category": "wandering",
-      "pose": 6,
+      "poses": [
+        [
+          21,
+          0.7
+        ],
+        [
+          0,
+          30
+        ]
+      ],
       "quip": "three... two...",
       "effect": "↑ ↑",
       "seconds": 4,
@@ -799,7 +970,20 @@
       "title": "Soft landing",
       "menu": "Move around",
       "auto": true,
-      "pose": 6,
+      "poses": [
+        [
+          0,
+          0.6
+        ],
+        [
+          6,
+          0.5
+        ],
+        [
+          12,
+          30
+        ]
+      ],
       "quip": "nailed it.",
       "effect": "*",
       "seconds": 3,
@@ -821,14 +1005,34 @@
       "seconds": 8,
       "speed": 35,
       "clampTarget": true,
-      "pose": 7
+      "poses": [
+        [
+          22,
+          0.4
+        ],
+        [
+          3,
+          0.4
+        ]
+      ],
+      "loop": true
     },
     {
       "id": "stretch",
       "title": "Stretch break",
       "menu": "Expressions",
       "auto": true,
-      "pose": 4,
+      "poses": [
+        [
+          11,
+          1.0
+        ],
+        [
+          21,
+          0.8
+        ]
+      ],
+      "loop": true,
       "quip": "stretch those pixels.",
       "effect": "~",
       "seconds": 5
@@ -838,7 +1042,16 @@
       "title": "Dramatic bow",
       "menu": "Expressions",
       "auto": true,
-      "pose": 5,
+      "poses": [
+        [
+          29,
+          1.4
+        ],
+        [
+          5,
+          5
+        ]
+      ],
       "quip": "thank you, thank you.",
       "effect": "★",
       "seconds": 4
@@ -848,7 +1061,17 @@
       "title": "Giggle wiggle",
       "menu": "Expressions",
       "auto": true,
-      "pose": 1,
+      "poses": [
+        [
+          10,
+          0.35
+        ],
+        [
+          1,
+          0.35
+        ]
+      ],
+      "loop": true,
       "quip": "hehehehe.",
       "effect": "♪",
       "seconds": 5
@@ -858,7 +1081,21 @@
       "title": "Grumpy stomp",
       "menu": "Expressions",
       "auto": true,
-      "pose": 2,
+      "poses": [
+        [
+          20,
+          0.45
+        ],
+        [
+          23,
+          0.3
+        ],
+        [
+          24,
+          0.3
+        ]
+      ],
+      "loop": true,
       "quip": "who moved my pixels?",
       "effect": "!",
       "seconds": 5
@@ -868,7 +1105,17 @@
       "title": "Dizzy wobble",
       "menu": "Expressions",
       "auto": true,
-      "pose": 6,
+      "poses": [
+        [
+          6,
+          0.5
+        ],
+        [
+          30,
+          0.5
+        ]
+      ],
+      "loop": true,
       "quip": "okay. too many spins.",
       "effect": "@ @",
       "seconds": 5
@@ -878,7 +1125,17 @@
       "title": "Happy pulse",
       "menu": "Expressions",
       "auto": true,
-      "pose": 1,
+      "poses": [
+        [
+          29,
+          0.5
+        ],
+        [
+          1,
+          0.5
+        ]
+      ],
+      "loop": true,
       "quip": "you are alright, choom.",
       "effect": "♥",
       "seconds": 5
@@ -888,7 +1145,17 @@
       "title": "Pixel shivers",
       "menu": "Expressions",
       "auto": true,
-      "pose": 2,
+      "poses": [
+        [
+          22,
+          0.25
+        ],
+        [
+          30,
+          0.25
+        ]
+      ],
+      "loop": true,
       "quip": "who turned on the AC?",
       "effect": "~ ~",
       "seconds": 5
@@ -898,7 +1165,17 @@
       "title": "Scan the desktop",
       "menu": "Idle tricks",
       "auto": true,
-      "pose": 7,
+      "poses": [
+        [
+          7,
+          1.0
+        ],
+        [
+          17,
+          0.6
+        ]
+      ],
+      "loop": true,
       "quip": "scanning for snacks...",
       "effect": "[ - - ]",
       "seconds": 7,
@@ -909,7 +1186,17 @@
       "title": "Charge up",
       "menu": "Idle tricks",
       "auto": true,
-      "pose": 5,
+      "poses": [
+        [
+          20,
+          0.5
+        ],
+        [
+          21,
+          0.5
+        ]
+      ],
+      "loop": true,
       "quip": "charging chaos...",
       "effect": "+ + +",
       "seconds": 5
@@ -919,7 +1206,21 @@
       "title": "Tiny pirouette",
       "menu": "Idle tricks",
       "auto": true,
-      "pose": 0,
+      "poses": [
+        [
+          0,
+          0.3
+        ],
+        [
+          6,
+          0.3
+        ],
+        [
+          1,
+          0.3
+        ]
+      ],
+      "loop": true,
       "quip": "zero gravity mode.",
       "effect": "*",
       "seconds": 5,
@@ -933,7 +1234,17 @@
       "title": "Watch digital rain",
       "menu": "Idle tricks",
       "auto": true,
-      "pose": 7,
+      "poses": [
+        [
+          7,
+          2.0
+        ],
+        [
+          12,
+          1.0
+        ]
+      ],
+      "loop": true,
       "quip": "weather: very binary.",
       "effect": "1 0 1 0",
       "seconds": 8
@@ -943,7 +1254,21 @@
       "title": "Victory party",
       "menu": "Idle tricks",
       "auto": true,
-      "pose": 4,
+      "poses": [
+        [
+          11,
+          0.4
+        ],
+        [
+          21,
+          0.4
+        ],
+        [
+          4,
+          0.4
+        ]
+      ],
+      "loop": true,
       "quip": "another flawless operation.",
       "effect": "★ ♪ ★",
       "seconds": 7
@@ -954,7 +1279,17 @@
       "menu": "Idle tricks",
       "auto": true,
       "category": "resting",
-      "pose": 3,
+      "poses": [
+        [
+          15,
+          2.5
+        ],
+        [
+          13,
+          1.0
+        ]
+      ],
+      "loop": true,
       "quip": "one peaceful thought... nope.",
       "effect": "○",
       "seconds": 9,
@@ -968,7 +1303,7 @@
       "title": "Pendulum swing",
       "menu": "Idle tricks",
       "auto": true,
-      "pose": 0,
+      "pose": 3,
       "quip": "tick. tock.",
       "effect": "",
       "seconds": 7
@@ -978,7 +1313,17 @@
       "title": "Jelly wobble",
       "menu": "Idle tricks",
       "auto": true,
-      "pose": 1,
+      "poses": [
+        [
+          1,
+          0.3
+        ],
+        [
+          15,
+          0.3
+        ]
+      ],
+      "loop": true,
       "quip": "bones? optional.",
       "effect": "~",
       "seconds": 5
@@ -988,7 +1333,17 @@
       "title": "Attention bait",
       "menu": "Specials",
       "auto": true,
-      "pose": 16,
+      "poses": [
+        [
+          4,
+          0.5
+        ],
+        [
+          16,
+          0.5
+        ]
+      ],
+      "loop": true,
       "seconds": 7,
       "next": "sideglance",
       "tags": [
@@ -1008,7 +1363,17 @@
       "title": "Fake window scan",
       "menu": "Specials",
       "auto": true,
-      "pose": 17,
+      "poses": [
+        [
+          17,
+          1.0
+        ],
+        [
+          7,
+          0.8
+        ]
+      ],
+      "loop": true,
       "seconds": 6,
       "next": "smug",
       "tags": [
@@ -1040,7 +1405,20 @@
       "title": "Failed attack",
       "menu": "Specials",
       "rare": true,
-      "pose": 6,
+      "poses": [
+        [
+          18,
+          0.4
+        ],
+        [
+          6,
+          0.8
+        ],
+        [
+          20,
+          30
+        ]
+      ],
       "seconds": 3,
       "next": "rivalglare"
     },
@@ -1099,7 +1477,17 @@
     },
     {
       "id": "remind",
-      "pose": 4,
+      "poses": [
+        [
+          21,
+          0.8
+        ],
+        [
+          4,
+          0.8
+        ]
+      ],
+      "loop": true,
       "seconds": 7,
       "target": "cursor",
       "speed": 650,
@@ -1114,7 +1502,17 @@
     },
     {
       "id": "weather",
-      "pose": 19,
+      "poses": [
+        [
+          21,
+          1.2
+        ],
+        [
+          19,
+          1.5
+        ]
+      ],
+      "loop": true,
       "seconds": 3.5,
       "tags": [
         "noCaught",
@@ -1126,7 +1524,7 @@
       "id": "wilt",
       "title": "Wilt in the heat",
       "menu": "Expressions",
-      "pose": 28,
+      "pose": 30,
       "seconds": 6,
       "tags": [
         "noYap"
@@ -1222,7 +1620,17 @@
     {
       "id": "possess",
       "title": "Possess a window",
-      "pose": 17,
+      "poses": [
+        [
+          17,
+          0.8
+        ],
+        [
+          18,
+          0.6
+        ]
+      ],
+      "loop": true,
       "seconds": 2.5,
       "next": "smug",
       "tags": [
@@ -1265,7 +1673,17 @@
       "title": "Peek from behind a window",
       "menu": "Idle tricks",
       "auto": true,
-      "pose": 7,
+      "poses": [
+        [
+          7,
+          1.5
+        ],
+        [
+          3,
+          1.0
+        ]
+      ],
+      "loop": true,
       "seconds": [
         8,
         12
