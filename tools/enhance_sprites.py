@@ -1,4 +1,4 @@
-"""Polishes Capri's frames and redraws her eyes in the show's style.
+"""Polishes Capri's frames (and can redraw her eyes in the show's style).
 Run after normalize_sprites.py and before the other make_*_frames.py tools:
     python tools/enhance_sprites.py
     python tools/make_music_frames.py
@@ -6,10 +6,10 @@ Run after normalize_sprites.py and before the other make_*_frames.py tools:
     python tools/make_eye_frames.py
 
 Every frame gets one neon visor green (the sheets were drawn with different greens) and a light
-sharpen. Every open-eyed frame gets the show's eyes: a black socket with a spike up toward the nose
+sharpen; her original eyes are kept. With REDRAW_EYES = True every open-eyed frame gets the show's eyes: a black socket with a spike up toward the nose
 and one down and out, a thin green ring, a blue iris and a white pupil, tilted with the visor.
 Closed, squinting and blinking eyes (KEEP_EYES) stay as drawn.
-The untouched frames are kept in sprites-originals\ and every run starts from them, so running this
+The untouched frames are kept in sprites-originals and every run starts from them, so running this
 again changes nothing. The eye positions it found are stored in frames.json ("eyeShapes") and
 make_eye_frames.py uses them to draw the irises looking in 8 directions.
 """
@@ -29,6 +29,8 @@ ORIGINALS = os.path.join(ROOT, 'sprites-originals')
 SOCKET = (6, 8, 14, 255)
 IRIS = (44, 112, 226, 255)
 PUPIL = (250, 252, 255, 255)
+# Redraw the eyes in the show's style? Off: her original eyes are kept (set True to try it).
+REDRAW_EYES = False
 # Frames whose eyes stay as drawn: blink (13), squint and laughing (3, 10, 11), asleep (28).
 KEEP_EYES = [3, 10, 11, 13, 28]
 
@@ -295,7 +297,7 @@ def enhanced(meta, i, gaze=(0.0, 0.0)):
     """The finished frame i (from its original), with the eyes looking toward gaze."""
     a = np.array(Image.open(os.path.join(ORIGINALS, f'frame-{i:02d}.png')).convert('RGBA'))
     a = unify_green(a)
-    if i not in KEEP_EYES:
+    if REDRAW_EYES and i not in KEEP_EYES:
         a = redraw_eyes(meta, i, a, gaze)
     return sharpen(a)
 
