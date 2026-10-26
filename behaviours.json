@@ -1691,6 +1691,8 @@
       "path": "peekbehind",
       "speed": 320,
       "tags": [
+        "noClamp",
+        "noFace",
         "noCaught",
         "noYap",
         "noRemark",

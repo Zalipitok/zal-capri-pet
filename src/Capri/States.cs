@@ -306,6 +306,7 @@ namespace Capri
             caughtCooldown = Now + 3;
             nextRetry = double.PositiveInfinity;
             nextYap = Now + 15; nextRemark = Now + 15;
+            if (stayPut) stayAway = true;
         }
 
         public void InvokeHeadPat()

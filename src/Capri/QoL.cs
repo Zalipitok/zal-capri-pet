@@ -8,7 +8,7 @@ namespace Capri
     // window you're working in.
     partial class Pet
     {
-        public bool stayPut, avoidWork = true, clickThrough;
+        public bool stayPut, avoidWork = true, clickThrough; bool stayAway;
         public double stayX = double.NaN, stayY = double.NaN;
         double nextWorkCheck = 5;
 
@@ -22,11 +22,22 @@ namespace Capri
         }
 
         // Wherever you put her by hand becomes her new spot.
-        public void MarkStayHere() { if (stayPut) { stayX = w.Left; stayY = w.Top; SaveSettings(); } }
+        public void MarkStayHere() { if (stayPut) { stayX = w.Left; stayY = w.Top; stayAway = false; SaveSettings(); } }
+
+        // Anything you ask for from the menu still happens with Stay here on; afterwards she hops back.
+        bool ReturnToStaySpot()
+        {
+            if (!stayPut || !stayAway || double.IsNaN(stayX)) { stayAway = false; return false; }
+            double dist = Math.Sqrt(Math.Pow(w.Left - stayX, 2) + Math.Pow(w.Top - stayY, 2));
+            if (dist < 12) { stayAway = false; return false; }
+            BeginState("hop"); targetX = stayX; targetY = stayY;
+            until = Now + dist / 160.0 + 1.0;
+            return true;
+        }
 
         void ApplyStayPut()
         {
-            if (!stayPut || double.IsNaN(stayX) || busyMode || dragging) return;
+            if (!stayPut || stayAway || double.IsNaN(stayX) || busyMode || dragging) return;
             if (state == "windowperch" || state == "thrown" || state == "catchgame") return;   // things you started yourself
             w.Left = stayX; w.Top = stayY;
         }

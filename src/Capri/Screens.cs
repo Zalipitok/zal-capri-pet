@@ -183,9 +183,41 @@ namespace Capri
         public long preferPerch;
         public KeyValuePair<long, Rect>? FindPerchWindow() => FindWindowWithRoom(PerchRoom());
         // Peeking needs only room for her head over the edge (her body hides behind the window).
-        public int PeekPose { get { return AnimPose("peekbehind", 7); } }
-        public double PeekRoom() => Math.Max(40.0, VisorOffset() - EmptyAbove(PeekPose) + 24);
-        public KeyValuePair<long, Rect>? FindPeekWindow() => FindWindowWithRoom(PeekRoom());
+        // Peeking: she hides behind the left or right edge of a window and leans her head out.
+        public struct PeekSpot { public long handle; public Rect rect; public int side; }
+        public PeekSpot? FindPeekWindow()
+        {
+            if (DeviceScale() == null) return null;
+            var first = new List<long>();
+            try { var fg = CapriDesktop.ForegroundWindow(); if (fg != null) first.Add(fg[0]); } catch { }
+            if (lastAppWindow != 0 && !first.Contains(lastAppWindow)) first.Add(lastAppWindow);
+            long[] all = new long[0]; try { all = CapriDesktop.AppWindows(); } catch { }
+            var stack = new List<KeyValuePair<long, Rect>>();
+            foreach (var h in all) { var rr = WindowRectDip(h); if (rr != null) stack.Add(new KeyValuePair<long, Rect>(h, rr.Value)); }
+            var order = first.Concat(all.Where(h => !first.Contains(h))).ToList();
+            var ok = new List<PeekSpot>();
+            foreach (var h in order)
+            {
+                if (h == 0 || CapriWindows.Maximized(h)) continue;
+                var r = WindowRectDip(h); if (r == null || r.Value.Width < 200 || r.Value.Height < 180) continue;
+                var area = WorkAreaAtDip(r.Value.Left + r.Value.Width / 2, r.Value.Top + r.Value.Height / 2); if (area == null) continue;
+                double y = r.Value.Top + r.Value.Height * 0.35;
+                if (y < area.Value.Top + 50 || y > area.Value.Bottom - 50) continue;
+                int at = stack.FindIndex(z => z.Key == h);
+                foreach (int side in new[] { 1, -1 })
+                {
+                    double edge = side > 0 ? r.Value.Right : r.Value.Left;
+                    if (side > 0 ? edge + 70 > area.Value.Right : edge - 70 < area.Value.Left) continue;
+                    var outside = new Point(edge + side * 25, y); var inside = new Point(edge - side * 6, y);
+                    bool covered = at > 0 && stack.Take(at).Any(z => z.Value.Contains(outside) || z.Value.Contains(inside));
+                    if (!covered) ok.Add(new PeekSpot { handle = h, rect = r.Value, side = side });
+                }
+                if (ok.Count >= 6) break;
+            }
+            if (ok.Count == 0) return null;
+            var mine = ok.Where(p => first.Count > 0 && p.handle == first[0]).ToList();
+            return mine.Count > 0 && rng.NextDouble() < 0.6 ? mine[rng.Next(mine.Count)] : ok[rng.Next(ok.Count)];
+        }
 
         KeyValuePair<long, Rect>? FindWindowWithRoom(double room)
         {

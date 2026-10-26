@@ -170,7 +170,7 @@ namespace Capri
                 if (!chase && spec.nextNoChase != "") next = spec.nextNoChase;
                 if (next == "@attack") FinishCursorAttack();
                 else if (next != "" && next != "choose") BeginState(next);
-                else ChooseState();
+                else if (!ReturnToStaySpot()) ChooseState();
             }
             // This session's greeting (first meeting, a long absence, an anniversary).
             if (greeting != null && t > 3 && state != "arrive" && !voiceBusy) { ShowRemark((string)greeting[0], false, greeting[1]); greeting = null; }

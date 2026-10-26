@@ -16,7 +16,7 @@ namespace Capri
         Window possessWin; TextBlock possessLabel;
         long possessHandle; int possessX, possessY; bool possessing;
         List<Window> trailWindows = new List<Window>(); public double trailUntil = -10000; List<Point> trailHistory = new List<Point>();
-        public bool behindWindow; long peekHandle; double peekOffsetX;
+        public bool behindWindow; long peekHandle;
 
         void InitPowers()
         {
@@ -50,33 +50,54 @@ namespace Capri
                 }
                 var r = WindowRectDip(peekHandle);
                 if (r == null || CapriWindows.Maximized(peekHandle)) { RestoreInFront(); peekHandle = 0; ChooseState(); return; }
-                // Duck down and pop up again, eyes just over the edge.
-                double bob = phase < 1.6 ? 0.0 : 18.0 * (0.5 + 0.5 * Math.Cos((phase - 1.6) * 1.7));
-                targetX = r.Value.Left + peekOffsetX;
-                targetY = r.Value.Top - VisorOffset() - 14 + bob;
-                bool close = Math.Abs(targetX - w.Left) + Math.Abs(targetY - w.Top) < 10;
-                if (!behindWindow && (close || phase > 1.6))
+                // Lean out past the edge, duck back, lean out again.
+                double edge = peekSide > 0 ? r.Value.Right : r.Value.Left;
+                double outBy = phase < 2.0 ? 20.0 : 4.0 + 20.0 * (0.5 + 0.5 * Math.Cos((phase - 2.0) * 1.6));
+                var head = PeekHeadOffset();
+                targetX = edge + peekSide * outBy - head.X;
+                targetY = r.Value.Top + r.Value.Height * peekHeight - head.Y;
+                direction = peekSide > 0 ? 1.0 : -1.0;
+                bool close = Math.Abs(targetX - w.Left) + Math.Abs(targetY - w.Top) < 12;
+                if (!behindWindow && (close || phase > 2.5))
                 {
                     behindWindow = true; w.Topmost = false;
                     try { CapriWindows.PlaceBehind(petHandle, peekHandle); } catch { }
                 }
                 if (behindWindow) { w.Left = targetX; w.Top = targetY; }
             };
-            motions["peekbehind"] = () => { rotation.Angle = Math.Sin(phase * 1.3) * 4; };
+            motions["peekbehind"] = () => { rotation.Angle = peekSide * PeekLean + Math.Sin(phase * 1.3) * 2; shift.X = 0; shift.Y = 0; };
         }
 
-        void SetPeekTarget(KeyValuePair<long, Rect> spot)
+        const double PeekLean = 22;
+        int peekSide = 1; double peekHeight = 0.35;
+
+        // Where her head is inside her window when she leans for peeking.
+        Point PeekHeadOffset()
         {
-            peekHandle = spot.Key; peekOffsetX = (spot.Value.Width - w.Width) * (0.15 + 0.7 * rng.NextDouble());
+            try
+            {
+                var origin = scene.TransformToAncestor(w).Transform(new Point(0, 0));
+                var off = VisualTreeHelper.GetOffset(sprite);
+                double W = sprite.ActualWidth, H = sprite.ActualHeight;
+                double cx = origin.X + off.X + W / 2, cy = origin.Y + off.Y + H / 2;
+                double th = peekSide * PeekLean * Math.PI / 180, dy = (visorFraction - 0.5) * H;
+                return new Point(cx - dy * Math.Sin(th), cy + dy * Math.Cos(th));
+            }
+            catch { return new Point(w.Width / 2, w.Height * 0.45); }
         }
 
-        // Peek over the top of a window: false when there's no window with room above it.
+        void SetPeekTarget(PeekSpot spot)
+        {
+            peekHandle = spot.handle; peekSide = spot.side; peekHeight = 0.2 + 0.35 * rng.NextDouble();
+        }
+
+        // Peek out from behind a window: false when there's no window to hide behind.
         public bool StartPeek(bool manual)
         {
             var spot = FindPeekWindow();
             if (spot == null)
             {
-                if (manual) ShowStatus("No window to hide behind. I need one that isn't maximized, with a little room above it.", 5);
+                if (manual) ShowStatus("No window to hide behind. I need one that isn't maximized, with some room beside it.", 5);
                 return false;
             }
             if (manual) { PrepareManualAction(); routine.Clear(); }
