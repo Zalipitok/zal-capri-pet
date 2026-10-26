@@ -12,5 +12,7 @@ Run from a scratch folder holding `sheet.jpg` (paths in the scripts are relative
 5. `normalize.py` – same head size and visor position as the original frames, overall size
    partly evened out, fitted to the 677x897 canvas; writes `norm/` and `norm.json` (feet).
 6. `fixups.py` – removes the balls drawn in the chase/bat poses (the toy ball is its own window).
-7. Copy `norm/*.png` to `sprites/anim-<state>.png`, write `sprites/anim-feet.json`, then run
+7. `stretch.py` – lengthens the body below the neck (more for chibi-like drawings) so her head
+   isn't oversized and poses match in height.
+8. Copy `norm/*.png` to `sprites/anim-<state>.png`, write `sprites/anim-feet.json`, then run
    `python tools/make_anim_frames.py` for blink, talking-mouth and headphone variants.

@@ -17,6 +17,12 @@ for f in os.listdir('keyed'):
     a = np.array(Image.open('keyed/' + f)); s, _, _ = scale_of(f[:-4], a)
     areas[f[:-4]] = (a[..., 3] > 128).sum() * s * s
 MED = float(np.median(list(areas.values())))
+pink = {}
+for f in os.listdir('keyed'):
+    a = np.array(Image.open('keyed/' + f)).astype(int); s0, _, _ = scale_of(f[:-4], a)
+    m = (a[..., 0] > 170) & (a[..., 1] < 110) & (a[..., 2] > 40) & (a[..., 3] > 128)
+    pink[f[:-4]] = m.sum() * s0 * s0
+PINK_MED = float(np.median(list(pink.values())))
 
 os.makedirs('norm', exist_ok=True)
 report = {}
@@ -25,7 +31,9 @@ for f in sorted(os.listdir('keyed')):
     rgba = np.array(Image.open('keyed/' + f))
     s, cx, cy = scale_of(name, rgba)
     L = np.sqrt(areas[name] / MED)
-    comp = min(1.15, max(0.9, L ** -0.4))
+    # Her mane is most of what you see: even out its size so she doesn't grow and shrink between
+    # poses (the head may end up a little bigger in the chibi-like drawings).
+    comp = min(1.3, max(0.85, (PINK_MED / max(1.0, pink[name])) ** 0.45))
     s *= comp
     ys, xs = np.nonzero(rgba[..., 3] > 20)
     x0, x1, y0, y1 = xs.min(), xs.max() + 1, ys.min(), ys.max() + 1
