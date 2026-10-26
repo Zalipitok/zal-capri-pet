@@ -18,7 +18,7 @@
   <Setter Property="Padding" Value="12,5"/><Setter Property="Cursor" Value="Hand"/><Setter Property="FocusVisualStyle" Value="{x:Null}"/>
   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
    <Grid x:Name="G" SnapsToDevicePixels="True">
-    <Path x:Name="Bg" Stretch="Fill" Fill="#121A27" Stroke="#3A4A66" StrokeThickness="1" Data="M7,0 L100,0 L100,24 L93,31 L0,31 L0,7 Z"/>
+    <Path x:Name="Bg" Stretch="Fill" Fill="#121A27" Stroke="#3A4A66" StrokeThickness="1" Data="M2,0 L24,0 L24,6 L22,8 L0,8 L0,2 Z"/>
     <ContentPresenter Margin="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
    </Grid>
    <ControlTemplate.Triggers>

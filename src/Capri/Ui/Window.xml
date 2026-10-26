@@ -26,7 +26,7 @@
    <Grid>
     <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="12"/></Grid.RowDefinitions>
     <!-- cut-corner panel with a cyan wire edge, a pink rail and a little tail pointing at her -->
-    <Path Stretch="Fill" Fill="#F20A0F18" Stroke="#3FE6F5" StrokeThickness="1.4" Data="M12,0 L1000,0 L1000,988 L988,1000 L0,1000 L0,12 Z">
+    <Path Name="BubbleFrame" Stretch="None" Width="0" Height="0" HorizontalAlignment="Left" VerticalAlignment="Top" Fill="#F20A0F18" Stroke="#3FE6F5" StrokeThickness="1.4">
      <Path.Effect><DropShadowEffect Color="#3FE6F5" BlurRadius="12" ShadowDepth="0" Opacity="0.55"/></Path.Effect>
     </Path>
     <Path Grid.Row="1" HorizontalAlignment="Center" Margin="40,-2,0,0" Data="M0,0 L16,0 L4,12 Z" Fill="#F20A0F18" Stroke="#3FE6F5" StrokeThickness="1.4"/>

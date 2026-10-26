@@ -51,6 +51,12 @@ namespace Capri
         Action Act(Action a) => () => Defer(a);
         Action State(string id) => () => Defer(() => { PrepareManualAction(); routine.Clear(); BeginState(id); });
 
+        void MenuSlabResize(object sender, SizeChangedEventArgs e)
+        {
+            var host = (Grid)sender;
+            foreach (var c in host.Children) if (c is System.Windows.Shapes.Path p) { p.Data = CutCorners(host.ActualWidth, host.ActualHeight, 14); break; }
+        }
+
         void BuildMenu()
         {
             menu = new ContextMenu();
@@ -267,6 +273,15 @@ namespace Capri
                     var theme = (ResourceDictionary)XamlReader.Load(reader);
                     menu.Resources.MergedDictionaries.Add(theme);
                     menu.Style = theme[typeof(ContextMenu)] as Style;
+                    // size the cut-corner slab to the menu once it's laid out
+                    menu.Opened += (s, e) =>
+                    {
+                        var slab = menu.Template?.FindName("Slab", menu) as System.Windows.Shapes.Path;
+                        var host = slab?.Parent as FrameworkElement;
+                        if (slab == null || host == null) return;
+                        slab.Data = CutCorners(host.ActualWidth, host.ActualHeight, 14);
+                        host.SizeChanged -= MenuSlabResize; host.SizeChanged += MenuSlabResize;
+                    };
                 }
             }
             catch (Exception e) { App.Log("runtime-error.log", "menu theme: " + e.Message); }

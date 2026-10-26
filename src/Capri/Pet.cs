@@ -123,7 +123,11 @@ namespace Capri
                 foreach (var tb in FindAll<TextBlock>(w)) if (tb.Text == "CAPRI:") tb.Text = "ECHO:";
             }
             effect = (TextBlock)w.FindName("Effect"); effect.Visibility = Visibility.Collapsed;
-            sprite = (Image)w.FindName("Sprite"); bubble = (Border)w.FindName("Bubble"); words = (TextBlock)w.FindName("Words");
+            sprite = (Image)w.FindName("Sprite"); bubble = (Border)w.FindName("Bubble");
+            // The bubble's cut-corner frame is sized in code: a stretched path would make it as big as its drawing.
+            var bubbleFrame = (System.Windows.Shapes.Path)w.FindName("BubbleFrame");
+            var bubbleGrid = (Grid)bubble.Child;
+            bubbleGrid.SizeChanged += (s, e) => bubbleFrame.Data = CutCorners(bubbleGrid.ActualWidth, Math.Max(0, bubbleGrid.ActualHeight - 12), 10); words = (TextBlock)w.FindName("Words");
             scene = (Grid)w.FindName("Scene"); shadow = (Ellipse)w.FindName("Shadow");
             focusBadge = (Border)w.FindName("FocusBadge"); focusText = (TextBlock)w.FindName("FocusText");
             sabotagePanel = (Border)w.FindName("SabotagePanel"); sabotageText = (TextBlock)w.FindName("SabotageText");

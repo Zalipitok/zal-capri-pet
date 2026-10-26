@@ -7,7 +7,7 @@
   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ContextMenu">
    <Grid Margin="6">
     <!-- cut-corner slab with a cyan wire edge and a soft glow -->
-    <Path Stretch="Fill" Fill="{TemplateBinding Background}" Stroke="#3FE6F5" StrokeThickness="1.2" Data="M14,0 L1000,0 L1000,986 L986,1000 L0,1000 L0,14 Z">
+    <Path x:Name="Slab" Stretch="None" Width="0" Height="0" HorizontalAlignment="Left" VerticalAlignment="Top" Fill="{TemplateBinding Background}" Stroke="#3FE6F5" StrokeThickness="1.2">
      <Path.Effect><DropShadowEffect Color="#3FE6F5" BlurRadius="12" ShadowDepth="0" Opacity="0.35"/></Path.Effect>
     </Path>
     <Rectangle Width="3" Fill="#FF2A6D" HorizontalAlignment="Left" Margin="0,30,0,22"/>
@@ -33,7 +33,7 @@
      <TextBlock x:Name="Arrow" Grid.Column="2" Text=">" Foreground="#3FE6F5" Visibility="Collapsed" HorizontalAlignment="Right" VerticalAlignment="Center"/>
      <Popup x:Name="PART_Popup" Placement="Right" HorizontalOffset="2" AllowsTransparency="True" Focusable="False" IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" PopupAnimation="None">
       <Grid Margin="4">
-       <Path Stretch="Fill" Fill="#F70E131D" Stroke="#FF2A6D" StrokeThickness="1" Data="M10,0 L1000,0 L1000,990 L990,1000 L0,1000 L0,10 Z"/>
+       <Border Background="#F70E131D" BorderBrush="#FF2A6D" BorderThickness="1"/>
        <ScrollViewer Margin="6" CanContentScroll="True" VerticalScrollBarVisibility="Auto" MaxHeight="600"><ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"/></ScrollViewer>
       </Grid>
      </Popup>
