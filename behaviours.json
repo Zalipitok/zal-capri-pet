@@ -613,17 +613,7 @@
       "title": "Sip a drink",
       "menu": "New poses",
       "auto": true,
-      "poses": [
-        [
-          27,
-          2.5
-        ],
-        [
-          8,
-          1.5
-        ]
-      ],
-      "loop": true,
+      "pose": 27,
       "quip": "mandatory drink break.",
       "effect": "~ ~",
       "seconds": 10,
