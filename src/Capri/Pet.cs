@@ -60,6 +60,7 @@ namespace Capri
         // blink, talking-mouth and headphone variants where they exist.
         public Dictionary<string, int> animPoses = new Dictionary<string, int>();
         public Dictionary<int, int> blinkPoses = new Dictionary<int, int>();
+        public Dictionary<int, double> poseFacing = new Dictionary<int, double>(); ScaleTransform facingFlip = new ScaleTransform();
         public bool newSprites = true; int curAnimPose = -1;
         public int AnimPose(string id, int fallback) { int p; return newSprites && animPoses.TryGetValue(id, out p) ? p : fallback; }
         public double visorFraction = 0.41, spriteScale = 1.0;
@@ -185,6 +186,8 @@ namespace Capri
             sfxPlayer.MediaFailed += (s, e) => sfxPlayer.Close();
             var group = (TransformGroup)sprite.RenderTransform;
             scale = (ScaleTransform)group.Children[0]; rotation = (RotateTransform)group.Children[1]; shift = (TranslateTransform)group.Children[2];
+            // Some drawings face right while the rest of the app assumes left: those are mirrored first.
+            group.Children.Insert(0, facingFlip);
             ghost = (Image)w.FindName("Ghost"); ghost.RenderTransform = sprite.RenderTransform;
             RenderOptions.SetBitmapScalingMode(sprite, BitmapScalingMode.HighQuality);
             RenderOptions.SetBitmapScalingMode(ghost, BitmapScalingMode.HighQuality);
@@ -289,9 +292,11 @@ namespace Capri
                     var set = AddFrameSet(new[] { "anim-" + kv.Key + ".png" }, feet);
                     if (set == null) continue;
                     int basePose = set[0]; animPoses[kv.Key] = basePose;
-                    if (Json.Bool(Json.Get(info, "blink")) == true) { var b = AddFrameSet(new[] { "anim-" + kv.Key + "-blink.png" }, feet); if (b != null) blinkPoses[basePose] = b[0]; }
-                    if (Json.Bool(Json.Get(info, "mouth")) == true) { var m = AddFrameSet(new[] { "anim-" + kv.Key + "-mouth-1.png", "anim-" + kv.Key + "-mouth-2.png" }, feet); if (m != null) mouthPoses[basePose] = m; }
-                    if (Json.Bool(Json.Get(info, "headphones")) == true) { var h = AddFrameSet(new[] { "anim-" + kv.Key + "-hp.png" }, feet); if (h != null) hpPoses[basePose] = h[0]; }
+                    bool right = Json.Str(Json.Get(info, "facing")) == "right";
+                    if (right) poseFacing[basePose] = -1;
+                    if (Json.Bool(Json.Get(info, "blink")) == true) { var b = AddFrameSet(new[] { "anim-" + kv.Key + "-blink.png" }, feet); if (b != null) { blinkPoses[basePose] = b[0]; if (right) poseFacing[b[0]] = -1; } }
+                    if (Json.Bool(Json.Get(info, "mouth")) == true) { var m = AddFrameSet(new[] { "anim-" + kv.Key + "-mouth-1.png", "anim-" + kv.Key + "-mouth-2.png" }, feet); if (m != null) { mouthPoses[basePose] = m; if (right) foreach (var i in m) poseFacing[i] = -1; } }
+                    if (Json.Bool(Json.Get(info, "headphones")) == true) { var h = AddFrameSet(new[] { "anim-" + kv.Key + "-hp.png" }, feet); if (h != null) { hpPoses[basePose] = h[0]; if (right) poseFacing[h[0]] = -1; } }
                 }
             if (anims != null) foreach (var kv in anims)
                 {
@@ -325,6 +330,7 @@ namespace Capri
                 ghost.Source = sprite.Source; ghost.Opacity = sprite.Opacity; ghost.Visibility = Visibility.Visible; fadeStart = now;
             }
             sprite.Source = Frame(index); poseIndex = index; lastPoseChange = now;
+            double f; facingFlip.ScaleX = poseFacing.TryGetValue(index, out f) ? f : 1.0;
         }
 
         void UpdatePoseFade()

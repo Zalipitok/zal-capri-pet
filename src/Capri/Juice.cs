@@ -114,7 +114,7 @@ namespace Capri
                 if (past == null) { trail[i].Visibility = Visibility.Collapsed; continue; }
                 trail[i].Source = sprite.Source;
                 trail[i].Width = sprite.ActualWidth; trail[i].Height = sprite.ActualHeight;
-                trailScale[i].ScaleX = scale.ScaleX; trailScale[i].ScaleY = scale.ScaleY; trailRot[i].Angle = rotation.Angle;
+                trailScale[i].ScaleX = scale.ScaleX * facingFlip.ScaleX; trailScale[i].ScaleY = scale.ScaleY; trailRot[i].Angle = rotation.Angle;
                 trailShift[i].X = shift.X + (past[1] - w.Left); trailShift[i].Y = shift.Y + (past[2] - w.Top);
                 trail[i].Opacity = Min(1.0, (speed - 520) / 600) * new[] { 0.32, 0.18, 0.09 }[i];
                 trail[i].Visibility = Visibility.Visible;

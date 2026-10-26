@@ -96,7 +96,8 @@
   },
   "ballbat": {
    "feet": 0.845,
-   "mouth": true
+   "mouth": true,
+   "facing": "right"
   },
   "ballguard": {
    "feet": 0.738,
@@ -132,7 +133,8 @@
   },
   "catchgame": {
    "feet": 0.7469,
-   "mouth": true
+   "mouth": true,
+   "facing": "right"
   },
   "caught": {
    "feet": 0.8606
@@ -142,15 +144,18 @@
   },
   "charge": {
    "feet": 0.7692,
-   "mouth": true
+   "mouth": true,
+   "facing": "right"
   },
   "chase": {
    "feet": 0.8149,
-   "mouth": true
+   "mouth": true,
+   "facing": "right"
   },
   "chaseball": {
    "feet": 0.7547,
-   "mouth": true
+   "mouth": true,
+   "facing": "right"
   },
   "chatreply": {
    "feet": 0.9911,
@@ -163,18 +168,21 @@
   },
   "creep": {
    "feet": 0.7804,
-   "mouth": true
+   "mouth": true,
+   "facing": "right"
   },
   "dance": {
    "feet": 0.8963
   },
   "dash": {
    "feet": 0.7514,
-   "mouth": true
+   "mouth": true,
+   "facing": "right"
   },
   "depart": {
    "feet": 0.8785,
-   "mouth": true
+   "mouth": true,
+   "facing": "right"
   },
   "dizzy": {
    "feet": 0.8718,
@@ -299,7 +307,8 @@
   },
   "pounce": {
    "feet": 0.8372,
-   "mouth": true
+   "mouth": true,
+   "facing": "right"
   },
   "rain": {
    "feet": 0.9911,
@@ -340,7 +349,8 @@
   },
   "scan": {
    "feet": 0.9186,
-   "mouth": true
+   "mouth": true,
+   "facing": "right"
   },
   "scanverdict": {
    "feet": 0.961,
@@ -348,7 +358,8 @@
   },
   "scanwindow": {
    "feet": 0.7993,
-   "mouth": true
+   "mouth": true,
+   "facing": "right"
   },
   "shaken": {
    "feet": 0.8261,
@@ -389,7 +400,8 @@
   },
   "swat": {
    "feet": 0.8361,
-   "mouth": true
+   "mouth": true,
+   "facing": "right"
   },
   "taskbar": {
    "feet": 0.8127,
@@ -426,7 +438,8 @@
   "wander": {
    "feet": 0.9576,
    "mouth": true,
-   "headphones": true
+   "headphones": true,
+   "facing": "right"
   },
   "watch": {
    "feet": 0.8685,
@@ -454,7 +467,8 @@
   },
   "windup": {
    "feet": 0.6934,
-   "mouth": true
+   "mouth": true,
+   "facing": "right"
   },
   "yawn": {
    "feet": 0.9889
