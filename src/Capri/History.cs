@@ -102,6 +102,7 @@ namespace Capri
             }
             win.Closed += (s, e) => { historyWindow = null; RegisterInteraction(); };
             historyWindow = win;
+            CyberChrome(win, "Capri // Memory", "our history");
             win.Show();
         }
     }

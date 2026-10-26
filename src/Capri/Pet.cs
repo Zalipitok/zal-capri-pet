@@ -95,6 +95,7 @@ namespace Capri
             InitWeather();
             InitFriend();
             InitPowers();
+            InitHerCursor();
             InitFocus();
             InitNotes();
             InitUpdate();
@@ -119,7 +120,7 @@ namespace Capri
             w = LoadXaml<Window>("Window.xml");
             if (App.Friend)
             {
-                foreach (var tb in FindAll<TextBlock>(w)) if (tb.Text == "CAPRI // LIVE") tb.Text = "CAPRI // ECHO";
+                foreach (var tb in FindAll<TextBlock>(w)) if (tb.Text == "CAPRI:") tb.Text = "ECHO:";
             }
             effect = (TextBlock)w.FindName("Effect"); effect.Visibility = Visibility.Collapsed;
             sprite = (Image)w.FindName("Sprite"); bubble = (Border)w.FindName("Bubble"); words = (TextBlock)w.FindName("Words");

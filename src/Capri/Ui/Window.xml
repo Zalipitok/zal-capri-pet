@@ -21,20 +21,23 @@
    <TextBlock Name="FocusText" Foreground="#FCEE0A" FontFamily="Consolas" FontSize="12" FontWeight="Bold"/>
   </Border>
   <TextBlock Name="Effect" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,10,0,0" Foreground="#FF75D6" FontFamily="Segoe UI Symbol" FontSize="24" IsHitTestVisible="False"/>
-  <Border Grid.Row="0" Name="Bubble" VerticalAlignment="Bottom" HorizontalAlignment="Center" MaxWidth="{Binding ActualWidth, ElementName=Scene}" Margin="6,0,6,8" IsHitTestVisible="False"
-   Background="#F2070A12" BorderBrush="#00E5FF" BorderThickness="1" CornerRadius="0" Visibility="Collapsed">
-   <Border.Effect><DropShadowEffect Color="#00E5FF" BlurRadius="12" ShadowDepth="0" Opacity="0.55"/></Border.Effect>
+  <Border Grid.Row="0" Name="Bubble" VerticalAlignment="Bottom" HorizontalAlignment="Center" MaxWidth="{Binding ActualWidth, ElementName=Scene}" Margin="6,0,6,6" IsHitTestVisible="False"
+   Background="Transparent" BorderThickness="0" Visibility="Collapsed">
    <Grid>
-    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-    <Border Grid.Row="0" Background="#FCEE0A" Padding="8,1">
-     <DockPanel LastChildFill="False">
-      <TextBlock DockPanel.Dock="Left" Text="CAPRI // LIVE" Foreground="#0A0A0A" FontFamily="Consolas" FontSize="10" FontWeight="Bold"/>
-      <TextBlock DockPanel.Dock="Right" Text="[ LINK OK ]" Foreground="#B0000000" FontFamily="Consolas" FontSize="10"/>
+    <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="12"/></Grid.RowDefinitions>
+    <!-- cut-corner panel with a cyan wire edge, a pink rail and a little tail pointing at her -->
+    <Path Stretch="Fill" Fill="#F20A0F18" Stroke="#3FE6F5" StrokeThickness="1.4" Data="M12,0 L1000,0 L1000,988 L988,1000 L0,1000 L0,12 Z">
+     <Path.Effect><DropShadowEffect Color="#3FE6F5" BlurRadius="12" ShadowDepth="0" Opacity="0.55"/></Path.Effect>
+    </Path>
+    <Path Grid.Row="1" HorizontalAlignment="Center" Margin="40,-2,0,0" Data="M0,0 L16,0 L4,12 Z" Fill="#F20A0F18" Stroke="#3FE6F5" StrokeThickness="1.4"/>
+    <Rectangle Width="3" HorizontalAlignment="Left" Margin="7,9,0,9" Fill="#FF2A6D"/>
+    <StackPanel Margin="17,7,12,9">
+     <DockPanel LastChildFill="False" Margin="0,0,0,2">
+      <TextBlock Name="BubbleTag" DockPanel.Dock="Left" Text="CAPRI:" Foreground="#FF2A6D" FontFamily="Consolas" FontSize="11" FontWeight="Bold"/>
+      <TextBlock DockPanel.Dock="Right" Text="// live" Foreground="#5B6B88" FontFamily="Consolas" FontSize="10"/>
      </DockPanel>
-    </Border>
-    <Rectangle Grid.Row="1" Width="3" HorizontalAlignment="Left" Fill="#FF2A6D"/>
-    <Rectangle Grid.Row="1" Width="22" Height="3" HorizontalAlignment="Right" VerticalAlignment="Bottom" Fill="#FF2A6D"/>
-    <TextBlock Grid.Row="1" Name="Words" Margin="14,8,12,11" Foreground="#E8FBFF" FontFamily="Consolas" FontSize="14" TextWrapping="Wrap" TextAlignment="Left"/>
+     <TextBlock Name="Words" Foreground="#5EF0FA" FontFamily="Consolas" FontSize="14" TextWrapping="Wrap" TextAlignment="Left"/>
+    </StackPanel>
    </Grid>
   </Border>
  </Grid>

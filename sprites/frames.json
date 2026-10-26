@@ -83,43 +83,55 @@
  "enhanced": 1,
  "anims": {
   "arrive": {
-   "feet": 0.8696
+   "feet": 0.8696,
+   "mouth": true
   },
   "attentionbait": {
-   "feet": 0.8573
+   "feet": 0.8573,
+   "mouth": true
   },
   "baitjudge": {
    "feet": 0.9331
   },
   "ballbat": {
-   "feet": 0.845
+   "feet": 0.845,
+   "mouth": true
   },
   "ballguard": {
-   "feet": 0.738
+   "feet": 0.738,
+   "mouth": true
   },
   "ballsteal": {
-   "feet": 0.8216
+   "feet": 0.8216,
+   "mouth": true
   },
   "beckon": {
-   "feet": 0.9231
+   "feet": 0.9231,
+   "mouth": true
   },
   "bossfight": {
-   "feet": 0.8551
+   "feet": 0.8551,
+   "mouth": true,
+   "headphones": true
   },
   "bounce": {
-   "feet": 0.7581
+   "feet": 0.7581,
+   "mouth": true
   },
   "bow": {
-   "feet": 0.8016
+   "feet": 0.8016,
+   "mouth": true
   },
   "breaktime": {
-   "feet": 0.7982
+   "feet": 0.7982,
+   "mouth": true
   },
   "casting": {
    "feet": 0.8372
   },
   "catchgame": {
-   "feet": 0.7469
+   "feet": 0.7469,
+   "mouth": true
   },
   "caught": {
    "feet": 0.8606
@@ -128,7 +140,8 @@
    "feet": 0.8406
   },
   "charge": {
-   "feet": 0.7692
+   "feet": 0.7692,
+   "mouth": true
   },
   "chase": {
    "feet": 0.8149
@@ -137,10 +150,12 @@
    "feet": 0.7547
   },
   "chatreply": {
-   "feet": 0.9911
+   "feet": 0.9911,
+   "headphones": true
   },
   "cheers": {
-   "feet": 0.9309
+   "feet": 0.9309,
+   "mouth": true
   },
   "creep": {
    "feet": 0.7804
@@ -152,82 +167,105 @@
    "feet": 0.7514
   },
   "depart": {
-   "feet": 0.8785
+   "feet": 0.8785,
+   "mouth": true
   },
   "dizzy": {
-   "feet": 0.8718
+   "feet": 0.8718,
+   "mouth": true
   },
   "failedattack": {
-   "feet": 0.6901
+   "feet": 0.6901,
+   "mouth": true
   },
   "figure8": {
-   "feet": 0.8952
+   "feet": 0.8952,
+   "mouth": true
   },
   "filescan": {
-   "feet": 0.8841
+   "feet": 0.8841,
+   "mouth": true
   },
   "float": {
-   "feet": 0.9521
+   "feet": 0.9521,
+   "mouth": true,
+   "headphones": true
   },
   "friendchase": {
    "feet": 0.9643
   },
   "friendflee": {
-   "feet": 0.854
+   "feet": 0.854,
+   "mouth": true
   },
   "friendmeet": {
-   "feet": 0.9142
+   "feet": 0.9142,
+   "mouth": true
   },
   "friendtalk": {
    "feet": 0.9041
   },
   "friendwave": {
-   "feet": 0.9454
+   "feet": 0.9454,
+   "mouth": true
   },
   "gamerwin": {
    "feet": 0.864
   },
   "gaming": {
-   "feet": 0.8305
+   "feet": 0.8305,
+   "mouth": true,
+   "headphones": true
   },
   "giggle": {
-   "feet": 0.8573
+   "feet": 0.8573,
+   "mouth": true
   },
   "glitch": {
-   "feet": 0.8807
+   "feet": 0.8807,
+   "mouth": true
   },
   "grumpy": {
-   "feet": 0.874
+   "feet": 0.874,
+   "mouth": true
   },
   "headpat": {
-   "feet": 0.8138
+   "feet": 0.8138,
+   "mouth": true
   },
   "heartbeat": {
-   "feet": 0.8963
+   "feet": 0.8963,
+   "mouth": true
   },
   "hop": {
-   "feet": 0.7837
+   "feet": 0.7837,
+   "mouth": true
   },
   "impact": {
    "feet": 0.7046
   },
   "jelly": {
-   "feet": 0.9119
+   "feet": 0.9119,
+   "mouth": true
   },
   "landing": {
-   "feet": 0.9186
+   "feet": 0.9186,
+   "mouth": true
   },
   "laughing": {
    "feet": 0.9019
   },
   "meditate": {
-   "feet": 0.6745
+   "feet": 0.6745,
+   "mouth": true
   },
   "nap": {
-   "feet": 0.7559
+   "feet": 0.7559,
+   "mouth": true
   },
   "orbit": {
-   "feet": 0.8417
+   "feet": 0.8417,
+   "mouth": true
   },
   "patrol": {
    "feet": 0.8305
@@ -239,97 +277,127 @@
    "feet": 0.9409
   },
   "pendulum": {
-   "feet": 0.864
+   "feet": 0.864,
+   "mouth": true
   },
   "perch": {
-   "feet": 0.8573
+   "feet": 0.8573,
+   "mouth": true,
+   "headphones": true
   },
   "possess": {
-   "feet": 0.8227
+   "feet": 0.8227,
+   "mouth": true
   },
   "pounce": {
-   "feet": 0.8372
+   "feet": 0.8372,
+   "mouth": true
   },
   "rain": {
    "feet": 0.9911
   },
   "remind": {
-   "feet": 0.9431
+   "feet": 0.9431,
+   "mouth": true
   },
   "repaircursor": {
-   "feet": 0.8685
+   "feet": 0.8685,
+   "mouth": true
   },
   "repairshow": {
-   "feet": 0.961
+   "feet": 0.961,
+   "mouth": true
   },
   "rivalglare": {
-   "feet": 0.8696
+   "feet": 0.8696,
+   "mouth": true
   },
   "rivalsneak": {
-   "feet": 0.8395
+   "feet": 0.8395,
+   "mouth": true
   },
   "roam": {
-   "feet": 0.9799
+   "feet": 0.9799,
+   "headphones": true
   },
   "rocket": {
    "feet": 0.8428
   },
   "sabotage": {
-   "feet": 0.8517
+   "feet": 0.8517,
+   "mouth": true
   },
   "scan": {
    "feet": 0.9186
   },
   "scanverdict": {
-   "feet": 0.961
+   "feet": 0.961,
+   "mouth": true
   },
   "scanwindow": {
-   "feet": 0.7993
+   "feet": 0.7993,
+   "mouth": true
   },
   "shaken": {
-   "feet": 0.8261
+   "feet": 0.8261,
+   "mouth": true
   },
   "shiver": {
-   "feet": 0.8874
+   "feet": 0.8874,
+   "mouth": true
   },
   "sideglance": {
-   "feet": 0.9443
+   "feet": 0.9443,
+   "mouth": true,
+   "headphones": true
   },
   "sip": {
-   "feet": 0.9164
+   "feet": 0.9164,
+   "mouth": true,
+   "headphones": true
   },
   "sleepy": {
    "feet": 0.8785
   },
   "smug": {
-   "feet": 0.9331
+   "feet": 0.9331,
+   "headphones": true
   },
   "sneak": {
-   "feet": 0.8785
+   "feet": 0.8785,
+   "mouth": true
   },
   "spin": {
    "feet": 0.9889
   },
   "stretch": {
-   "feet": 0.9889
+   "feet": 0.9889,
+   "mouth": true
   },
   "swat": {
-   "feet": 0.8361
+   "feet": 0.8361,
+   "mouth": true
   },
   "taskbar": {
-   "feet": 0.8127
+   "feet": 0.8127,
+   "mouth": true,
+   "headphones": true
   },
   "taskpeek": {
-   "feet": 0.806
+   "feet": 0.806,
+   "mouth": true,
+   "headphones": true
   },
   "teleport": {
    "feet": 0.6421
   },
   "thrown": {
-   "feet": 0.8339
+   "feet": 0.8339,
+   "mouth": true
   },
   "tiptoe": {
-   "feet": 0.9911
+   "feet": 0.9911,
+   "mouth": true
   },
   "tumble": {
    "feet": 0.6901
@@ -338,28 +406,36 @@
    "feet": 0.728
   },
   "wakeglare": {
-   "feet": 0.8863
+   "feet": 0.8863,
+   "mouth": true
   },
   "wander": {
-   "feet": 0.9576
+   "feet": 0.9576,
+   "mouth": true,
+   "headphones": true
   },
   "watch": {
    "feet": 0.8685
   },
   "wave": {
-   "feet": 0.9777
+   "feet": 0.9777,
+   "mouth": true
   },
   "weather": {
-   "feet": 0.9242
+   "feet": 0.9242,
+   "mouth": true
   },
   "welcomeback": {
    "feet": 0.9911
   },
   "wilt": {
-   "feet": 0.8562
+   "feet": 0.8562,
+   "mouth": true
   },
   "windowperch": {
-   "feet": 0.9443
+   "feet": 0.9443,
+   "mouth": true,
+   "headphones": true
   },
   "windup": {
    "feet": 0.6934

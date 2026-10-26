@@ -77,6 +77,7 @@ namespace Capri
             NewMenuEntry(focusMenu, "Short break after focus", Toggle("focusBreaks", () => { if (!focusBreaks) EndFocusBreak(false); }), Is("focusBreaks"));
             NewMenuEntry(interact, "Possess a window", Act(() => InvokePossession(true)));
             NewMenuEntry(interact, "Upgrade my cursor", Act(() => StartCursorRepair(true)));
+            NewMenuEntry(interact, "Use her own cursor", Act(() => StartHerCursor(true)));
             NewMenuEntry(interact, "Peek from behind a window", State("peekbehind"));
             snoozeItem = NewMenuEntry(interact, "Snooze last reminder (10 min)", Act(() => SnoozeReminder(10)));
             friendItem = NewMenuEntry(interact, "Invite a friend (second Capri)", Act(() => { if (friendPresent) StopFriendCapri(); else StartFriendCapri(); }));
@@ -334,6 +335,7 @@ namespace Capri
                 buttons.Children.Add(button);
             }
             if (list.Items.Count > 0) list.SelectedIndex = 0;
+            CyberChrome(dialog, "Capri // Voice bank", "clips");
             try { dialog.ShowDialog(); } finally { voiceChooserOpen = false; RegisterInteraction(); SaveSettings(); ScheduleYap(); }
         }
 

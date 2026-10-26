@@ -235,6 +235,7 @@ namespace Capri
             };
             dialog.Closed += (s, e) => { reminderWindow = null; remList = null; RegisterInteraction(); };
             reminderWindow = dialog;
+            CyberChrome(dialog, "Capri // Reminders", "timers");
             dialog.Show(); remWhat.Focus();
         }
     }

@@ -107,9 +107,10 @@ namespace Capri
         void AddChatLine(string who, string text)
         {
             if (chatLog == null) return;
-            var line = new TextBlock { TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 8) };
-            var name = new Run(who + "  ") { FontWeight = FontWeights.Bold, Foreground = HexBrush(who == "Capri" ? "#FCEE0A" : who == "You" ? "#00E5FF" : "#8899AA") };
-            line.Inlines.Add(name); line.Inlines.Add(new Run(text));
+            var line = new TextBlock { TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 9), FontFamily = new FontFamily("Consolas"), FontSize = 13 };
+            if (who == "You") { line.Inlines.Add(new Run("> you: " + text) { Foreground = HexBrush("#8B97AD") }); }
+            else if (who == "Capri") { line.Inlines.Add(new Run("CAPRI: ") { FontWeight = FontWeights.Bold, Foreground = HexBrush("#FF2A6D") }); line.Inlines.Add(new Run(text) { Foreground = HexBrush("#5EF0FA") }); }
+            else line.Inlines.Add(new Run("// " + text) { Foreground = HexBrush("#7F8CA3"), FontStyle = FontStyles.Italic });
             chatLog.Children.Add(line); chatScroll.ScrollToEnd();
         }
 
@@ -244,13 +245,13 @@ namespace Capri
             var dialog = new Window { Title = "Capri // Chat", Width = 420, Height = 560, WindowStartupLocation = WindowStartupLocation.CenterScreen, Background = HexBrush("#111722"), Foreground = Brushes.White };
             var grid = new Grid { Margin = new Thickness(12) }; dialog.Content = grid;
             foreach (var h in new[] { "*", "Auto", "Auto", "Auto" }) grid.RowDefinitions.Add(new RowDefinition { Height = (GridLength)new GridLengthConverter().ConvertFromString(h) });
-            chatScroll = new ScrollViewer { VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Background = HexBrush("#0B1018"), Padding = new Thickness(10) };
+            chatScroll = new ScrollViewer { VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Background = HexBrush("#090D14"), Padding = new Thickness(10), BorderBrush = HexBrush("#2A3550"), BorderThickness = new Thickness(1) };
             chatLog = new StackPanel(); chatScroll.Content = chatLog;
             Grid.SetRow(chatScroll, 0); grid.Children.Add(chatScroll);
             chatTyping = new TextBlock { Opacity = 0.7, FontStyle = FontStyles.Italic, Margin = new Thickness(0, 4, 0, 4) };
             Grid.SetRow(chatTyping, 1); grid.Children.Add(chatTyping);
             var inputRow = new DockPanel { Margin = new Thickness(0, 2, 0, 8) };
-            var send = new Button { Content = "Send", IsDefault = true, Padding = new Thickness(14, 4, 14, 4), Margin = new Thickness(6, 0, 0, 0) };
+            var send = new Button { Content = "SEND >", IsDefault = true, Padding = new Thickness(14, 4, 14, 4), Margin = new Thickness(6, 0, 0, 0) };
             DockPanel.SetDock(send, Dock.Right); inputRow.Children.Add(send);
             chatInput = new TextBox { Padding = new Thickness(4), MaxLength = 1000 }; inputRow.Children.Add(chatInput);
             Grid.SetRow(inputRow, 2); grid.Children.Add(inputRow);
@@ -273,6 +274,7 @@ namespace Capri
             Grid.SetRow(panel, 3); grid.Children.Add(panel);
             dialog.Closed += (s, e) => { chatWindow = null; chatLog = null; chatTyping = null; RegisterInteraction(); };
             chatWindow = dialog;
+            CyberChrome(dialog, "Capri // Link", "chat");
             dialog.Show();
             foreach (var entry in chatHistory) AddChatLine(entry.Key == "user" ? "You" : "Capri", entry.Value);
             if (chatHistory.Count == 0) AddChatLine("Capri", chatEnabled && GetChatKey() != "" ? "Well? Say something." : "I can hold reminders for you: \"remind me in 20 minutes to stretch\". Or type \"play\". Want me to actually talk back? Tick the box below.");

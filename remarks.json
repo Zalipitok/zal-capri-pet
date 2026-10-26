@@ -499,6 +499,12 @@
     "Good kid. {0} minutes. That's {1} days in a row.",
     "Done! {0} minutes. Streak at {1}. Did you have some fun?"
   ],
+  "hercursor": [
+    "Borrowing the screen for a sec. Don't mind my cursor.",
+    "My turn to click stuff.",
+    "Got my own pointer now. Watch this.",
+    "Hands off, choom. I'm driving."
+  ],
   "focusbreak": [
     "{0} minutes done, streak {1}. Now {2} minutes off. Stretch, drink something. I'm timing you.",
     "Good kid. {0} minutes. Take {2}, stand up, look at something that isn't a screen.",

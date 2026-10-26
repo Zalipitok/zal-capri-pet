@@ -120,7 +120,7 @@ namespace Capri
         public string settingsPath;
         public bool sfxEnabled = true, talkingMouth = true;
 
-        static readonly string[] SavedBools = { "facialMotion", "chase", "blackwallEnabled", "sfxEnabled", "windowPerch", "throwPhysics", "timeOfDay", "remarksEnabled", "subtitles", "muted", "smoothPoses", "musicEnabled", "appAware", "hotkeyEnabled", "talkingMouth", "eyesFollow", "batteryReactions", "shadowEnabled", "beatSync", "dndAware", "weatherEnabled", "chatEnabled", "chatVoice", "possessWindows", "cursorRepairs", "autoUpdate", "focusBreaks", "newSprites", "effectsEnabled" };
+        static readonly string[] SavedBools = { "facialMotion", "chase", "blackwallEnabled", "sfxEnabled", "windowPerch", "throwPhysics", "timeOfDay", "remarksEnabled", "subtitles", "muted", "smoothPoses", "musicEnabled", "appAware", "hotkeyEnabled", "talkingMouth", "eyesFollow", "batteryReactions", "shadowEnabled", "beatSync", "dndAware", "weatherEnabled", "chatEnabled", "chatVoice", "possessWindows", "cursorRepairs", "autoUpdate", "focusBreaks", "newSprites", "effectsEnabled", "herCursorEnabled" };
 
         void InitSpeech()
         {

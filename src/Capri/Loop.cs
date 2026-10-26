@@ -107,7 +107,7 @@ namespace Capri
             if (memoryDirty && t >= nextMemorySave) { nextMemorySave = t + 30; SaveMemory(); }
             UpdateMusic(t); UpdateBeatSync(t); UpdateBattery(t); UpdateAppAwareness(t);
             UpdateQuietMode(t); UpdateReminders(t); UpdateWeather(t); UpdateFriend(t);
-            UpdateBall(t, dt); UpdatePowers(t); UpdateFocus(t); UpdateNotes(t); UpdateUpdates(t);
+            UpdateBall(t, dt); UpdatePowers(t); UpdateHerCursor(t); UpdateFocus(t); UpdateNotes(t); UpdateUpdates(t);
             if (isHidden)
             {
                 lastInteraction = t; stateStart += elapsedTick; until += elapsedTick; nextRetry += elapsedTick; nextMood += elapsedTick;

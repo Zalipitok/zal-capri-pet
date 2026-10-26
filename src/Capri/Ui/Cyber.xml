@@ -1,0 +1,142 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+ <!-- Capri's netrunner look for her windows: dark slate panels, cut corners, a hot-pink rail,
+      yellow section tags, cyan wire buttons. Loaded into every dialog by Cyber.cs. -->
+ <SolidColorBrush x:Key="Cy.Bg" Color="#0E131D"/>
+ <SolidColorBrush x:Key="Cy.Panel" Color="#141B28"/>
+ <SolidColorBrush x:Key="Cy.Field" Color="#0A0F17"/>
+ <SolidColorBrush x:Key="Cy.Line" Color="#2A3550"/>
+ <SolidColorBrush x:Key="Cy.Cyan" Color="#3FE6F5"/>
+ <SolidColorBrush x:Key="Cy.Pink" Color="#FF2A6D"/>
+ <SolidColorBrush x:Key="Cy.Yellow" Color="#FCEE0A"/>
+ <SolidColorBrush x:Key="Cy.Text" Color="#DDF6FA"/>
+ <SolidColorBrush x:Key="Cy.Dim" Color="#7F8CA3"/>
+
+ <Style TargetType="TextBlock"><Setter Property="FontFamily" Value="Consolas"/></Style>
+
+ <Style TargetType="Button">
+  <Setter Property="Foreground" Value="{StaticResource Cy.Text}"/><Setter Property="FontFamily" Value="Consolas"/><Setter Property="FontSize" Value="12"/>
+  <Setter Property="Padding" Value="12,5"/><Setter Property="Cursor" Value="Hand"/><Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+   <Grid x:Name="G" SnapsToDevicePixels="True">
+    <Path x:Name="Bg" Stretch="Fill" Fill="#121A27" Stroke="#3A4A66" StrokeThickness="1" Data="M7,0 L100,0 L100,24 L93,31 L0,31 L0,7 Z"/>
+    <ContentPresenter Margin="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+   </Grid>
+   <ControlTemplate.Triggers>
+    <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Bg" Property="Stroke" Value="#3FE6F5"/><Setter TargetName="Bg" Property="Fill" Value="#13283A"/><Setter Property="Foreground" Value="#3FE6F5"/></Trigger>
+    <Trigger Property="IsPressed" Value="True"><Setter TargetName="Bg" Property="Fill" Value="#3FE6F5"/><Setter Property="Foreground" Value="#06111A"/></Trigger>
+    <Trigger Property="IsDefault" Value="True"><Setter TargetName="Bg" Property="Stroke" Value="#FF2A6D"/></Trigger>
+    <Trigger Property="IsEnabled" Value="False"><Setter TargetName="G" Property="Opacity" Value="0.45"/></Trigger>
+   </ControlTemplate.Triggers>
+  </ControlTemplate></Setter.Value></Setter>
+ </Style>
+
+ <Style x:Key="Cy.FieldBase" TargetType="Control">
+  <Setter Property="Foreground" Value="{StaticResource Cy.Text}"/><Setter Property="Background" Value="{StaticResource Cy.Field}"/>
+  <Setter Property="BorderBrush" Value="{StaticResource Cy.Line}"/><Setter Property="BorderThickness" Value="1"/>
+  <Setter Property="FontFamily" Value="Consolas"/><Setter Property="FontSize" Value="13"/><Setter Property="Padding" Value="6,4"/>
+ </Style>
+ <Style TargetType="TextBox" BasedOn="{StaticResource Cy.FieldBase}">
+  <Setter Property="CaretBrush" Value="{StaticResource Cy.Yellow}"/><Setter Property="SelectionBrush" Value="{StaticResource Cy.Pink}"/>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TextBox">
+   <Border x:Name="B" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+    <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+   </Border>
+   <ControlTemplate.Triggers><Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="B" Property="BorderBrush" Value="#3FE6F5"/></Trigger></ControlTemplate.Triggers>
+  </ControlTemplate></Setter.Value></Setter>
+ </Style>
+ <Style TargetType="PasswordBox" BasedOn="{StaticResource Cy.FieldBase}">
+  <Setter Property="CaretBrush" Value="{StaticResource Cy.Yellow}"/>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="PasswordBox">
+   <Border x:Name="B" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+    <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+   </Border>
+   <ControlTemplate.Triggers><Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="B" Property="BorderBrush" Value="#3FE6F5"/></Trigger></ControlTemplate.Triggers>
+  </ControlTemplate></Setter.Value></Setter>
+ </Style>
+
+ <Style TargetType="CheckBox">
+  <Setter Property="Foreground" Value="{StaticResource Cy.Text}"/><Setter Property="FontFamily" Value="Consolas"/><Setter Property="FontSize" Value="13"/><Setter Property="Cursor" Value="Hand"/>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="CheckBox">
+   <StackPanel Orientation="Horizontal" Background="Transparent">
+    <Border x:Name="Box" Width="14" Height="14" BorderBrush="#5B6B88" BorderThickness="1" Background="#0A0F17" Margin="0,1,9,0" VerticalAlignment="Top">
+     <Rectangle x:Name="Dot" Margin="2" Fill="#3FE6F5" Visibility="Collapsed"/>
+    </Border>
+    <ContentPresenter VerticalAlignment="Center"/>
+   </StackPanel>
+   <ControlTemplate.Triggers>
+    <Trigger Property="IsChecked" Value="True"><Setter TargetName="Dot" Property="Visibility" Value="Visible"/><Setter TargetName="Box" Property="BorderBrush" Value="#3FE6F5"/></Trigger>
+    <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Box" Property="BorderBrush" Value="#FF2A6D"/></Trigger>
+   </ControlTemplate.Triggers>
+  </ControlTemplate></Setter.Value></Setter>
+ </Style>
+
+ <Style TargetType="ComboBox" BasedOn="{StaticResource Cy.FieldBase}">
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ComboBox">
+   <Grid>
+    <ToggleButton x:Name="T" Focusable="False" ClickMode="Press" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+     <ToggleButton.Template><ControlTemplate TargetType="ToggleButton">
+      <Border x:Name="B" Background="#0A0F17" BorderBrush="#2A3550" BorderThickness="1">
+       <Path HorizontalAlignment="Right" Margin="0,0,9,0" VerticalAlignment="Center" Data="M0,0 L8,0 L4,5 Z" Fill="#3FE6F5"/>
+      </Border>
+      <ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="B" Property="BorderBrush" Value="#3FE6F5"/></Trigger></ControlTemplate.Triggers>
+     </ControlTemplate></ToggleButton.Template>
+    </ToggleButton>
+    <ContentPresenter IsHitTestVisible="False" Margin="8,4,28,4" VerticalAlignment="Center" Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"/>
+    <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" AllowsTransparency="True" Focusable="False" PopupAnimation="None">
+     <Border MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}" Background="#F00B1019" BorderBrush="#3FE6F5" BorderThickness="1" MaxHeight="300">
+      <ScrollViewer><ItemsPresenter/></ScrollViewer>
+     </Border>
+    </Popup>
+   </Grid>
+  </ControlTemplate></Setter.Value></Setter>
+ </Style>
+ <Style TargetType="ComboBoxItem">
+  <Setter Property="Foreground" Value="{StaticResource Cy.Text}"/><Setter Property="FontFamily" Value="Consolas"/><Setter Property="Padding" Value="8,5"/>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ComboBoxItem">
+   <Border x:Name="B" Padding="{TemplateBinding Padding}" BorderThickness="2,0,0,0" BorderBrush="Transparent" Background="Transparent"><ContentPresenter/></Border>
+   <ControlTemplate.Triggers>
+    <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="B" Property="Background" Value="#39202B"/><Setter TargetName="B" Property="BorderBrush" Value="#FF2A6D"/><Setter Property="Foreground" Value="#FCEE0A"/></Trigger>
+    <Trigger Property="IsSelected" Value="True"><Setter Property="Foreground" Value="#3FE6F5"/></Trigger>
+   </ControlTemplate.Triggers>
+  </ControlTemplate></Setter.Value></Setter>
+ </Style>
+
+ <Style TargetType="TabControl">
+  <Setter Property="Background" Value="Transparent"/><Setter Property="BorderThickness" Value="0"/><Setter Property="Padding" Value="0"/>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TabControl">
+   <DockPanel>
+    <Border DockPanel.Dock="Top" BorderBrush="#2A3550" BorderThickness="0,0,0,1" Margin="0,0,0,6"><TabPanel IsItemsHost="True"/></Border>
+    <ContentPresenter ContentSource="SelectedContent"/>
+   </DockPanel>
+  </ControlTemplate></Setter.Value></Setter>
+ </Style>
+ <Style TargetType="TabItem">
+  <Setter Property="Foreground" Value="{StaticResource Cy.Dim}"/><Setter Property="FontFamily" Value="Consolas"/><Setter Property="FontSize" Value="12"/><Setter Property="Cursor" Value="Hand"/>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TabItem">
+   <Border x:Name="B" Padding="12,6" BorderThickness="0,0,0,2" BorderBrush="Transparent" Background="Transparent">
+    <ContentPresenter ContentSource="Header"/>
+   </Border>
+   <ControlTemplate.Triggers>
+    <Trigger Property="IsSelected" Value="True"><Setter TargetName="B" Property="BorderBrush" Value="#FF2A6D"/><Setter Property="Foreground" Value="#FCEE0A"/></Trigger>
+    <Trigger Property="IsMouseOver" Value="True"><Setter Property="Foreground" Value="#3FE6F5"/></Trigger>
+   </ControlTemplate.Triggers>
+  </ControlTemplate></Setter.Value></Setter>
+ </Style>
+
+ <Style TargetType="ListBox">
+  <Setter Property="Background" Value="{StaticResource Cy.Field}"/><Setter Property="Foreground" Value="{StaticResource Cy.Text}"/>
+  <Setter Property="BorderBrush" Value="{StaticResource Cy.Line}"/><Setter Property="FontFamily" Value="Consolas"/>
+ </Style>
+
+ <Style TargetType="ScrollBar">
+  <Setter Property="Width" Value="6"/><Setter Property="MinWidth" Value="6"/>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ScrollBar">
+   <Track x:Name="PART_Track" IsDirectionReversed="True">
+    <Track.Thumb><Thumb><Thumb.Template><ControlTemplate TargetType="Thumb"><Rectangle Fill="#3A4A66"/></ControlTemplate></Thumb.Template></Thumb></Track.Thumb>
+   </Track>
+  </ControlTemplate></Setter.Value></Setter>
+  <Style.Triggers><Trigger Property="Orientation" Value="Horizontal"><Setter Property="Visibility" Value="Collapsed"/></Trigger></Style.Triggers>
+ </Style>
+
+ <Style TargetType="Slider"><Setter Property="Foreground" Value="#3FE6F5"/></Style>
+</ResourceDictionary>

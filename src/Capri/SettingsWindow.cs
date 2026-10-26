@@ -66,6 +66,7 @@ namespace Capri
                 BoolField("Behaviour", "Throwing physics", "throwPhysics"),
                 BoolField("Behaviour", "Time-of-day moods", "timeOfDay"),
                 BoolField("Behaviour", "Possess windows sometimes", "possessWindows", "Shakes the window you are using a few pixels for two seconds with a red flicker, then puts it back exactly where it was."),
+                BoolField("Behaviour", "Her own cursor sometimes", "herCursorEnabled", "She flies a neon pointer of her own around your screen and 'clicks' on things. Only a picture: your cursor and apps are never touched."),
                 BoolField("Behaviour", "Glitch trail on the cursor sometimes", "cursorRepairs", "A picture follows the pointer for a minute. The real cursor is never changed."),
                 BoolField("Behaviour", "Battery reactions (laptops)", "batteryReactions"),
                 SliderDef("Behaviour", "Attacks", 0, 200, 25, () => activityRates["attacks"], v => { activityRates["attacks"] = (int)v; autoBag.Clear(); if (v == 0) nextRetry = double.PositiveInfinity; }),
@@ -100,7 +101,7 @@ namespace Capri
         {
             if (settingsWindow != null) { settingsWindow.Activate(); return; }
             var dialog = new Window { Title = "Capri // Settings", Width = 520, Height = 560, WindowStartupLocation = WindowStartupLocation.CenterScreen, Background = HexBrush("#111722"), Foreground = Brushes.White };
-            var tabs = new TabControl { Background = HexBrush("#151c2a"), Margin = new Thickness(10) };
+            var tabs = new TabControl { Margin = new Thickness(0) };
             dialog.Content = tabs;
             var pages = new Dictionary<string, StackPanel>();
             foreach (var def in settingDefs)
@@ -109,6 +110,7 @@ namespace Capri
                 if (!pages.TryGetValue(def.tab, out stack))
                 {
                     stack = new StackPanel { Margin = new Thickness(14, 12, 14, 12) };
+                    stack.Children.Add(CyberHeading(def.tab));
                     tabs.Items.Add(new TabItem { Header = def.tab, Content = new ScrollViewer { VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Content = stack } });
                     pages[def.tab] = stack;
                 }
@@ -172,6 +174,7 @@ namespace Capri
             }
             dialog.Closed += (s, e) => { settingsWindow = null; SaveSettings(); RegisterInteraction(); };
             settingsWindow = dialog;
+            CyberChrome(dialog, "Capri // Mainframe");
             dialog.Show();
         }
 

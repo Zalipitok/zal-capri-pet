@@ -1,12 +1,24 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
  <Style TargetType="ContextMenu">
-  <Setter Property="Background" Value="#F5091019"/><Setter Property="Foreground" Value="#E1F8FF"/>
+  <Setter Property="Background" Value="#F40E131D"/><Setter Property="Foreground" Value="#DDF6FA"/>
   <Setter Property="FontFamily" Value="Consolas"/><Setter Property="FontSize" Value="13"/>
-  <Setter Property="BorderBrush" Value="#F4E62B"/><Setter Property="BorderThickness" Value="1"/>
+  <Setter Property="BorderBrush" Value="#3FE6F5"/><Setter Property="BorderThickness" Value="1"/>
+  <Setter Property="HasDropShadow" Value="False"/>
   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ContextMenu">
-   <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" Padding="5">
-    <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" MaxHeight="650"><ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"/></ScrollViewer>
-   </Border>
+   <Grid Margin="6">
+    <!-- cut-corner slab with a cyan wire edge and a soft glow -->
+    <Path Stretch="Fill" Fill="{TemplateBinding Background}" Stroke="#3FE6F5" StrokeThickness="1.2" Data="M14,0 L1000,0 L1000,986 L986,1000 L0,1000 L0,14 Z">
+     <Path.Effect><DropShadowEffect Color="#3FE6F5" BlurRadius="12" ShadowDepth="0" Opacity="0.35"/></Path.Effect>
+    </Path>
+    <Rectangle Width="3" Fill="#FF2A6D" HorizontalAlignment="Left" Margin="0,30,0,22"/>
+    <DockPanel Margin="10,8,8,10">
+     <DockPanel DockPanel.Dock="Top" Margin="6,0,4,6" LastChildFill="False">
+      <TextBlock DockPanel.Dock="Left" Text="CAPRI // NETMENU" Foreground="#FCEE0A" FontWeight="Bold" FontSize="12"/>
+      <TextBlock DockPanel.Dock="Right" Text="[ LINK OK ]" Foreground="#5B6B88" FontSize="10" VerticalAlignment="Center"/>
+     </DockPanel>
+     <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" MaxHeight="650"><ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"/></ScrollViewer>
+    </DockPanel>
+   </Grid>
   </ControlTemplate></Setter.Value></Setter>
  </Style>
  <Style TargetType="MenuItem">
@@ -16,24 +28,25 @@
   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="MenuItem">
    <Border x:Name="Row" Background="{TemplateBinding Background}" BorderBrush="Transparent" BorderThickness="2,0,0,0" Padding="{TemplateBinding Padding}">
     <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="22"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="20"/></Grid.ColumnDefinitions>
-     <TextBlock x:Name="Check" Text="✓" Foreground="#F4E62B" Visibility="Collapsed" VerticalAlignment="Center"/>
+     <TextBlock x:Name="Check" Text="■" FontSize="9" Foreground="#3FE6F5" Visibility="Collapsed" VerticalAlignment="Center"/>
      <ContentPresenter Grid.Column="1" ContentSource="Header" RecognizesAccessKey="True" VerticalAlignment="Center"/>
-     <TextBlock x:Name="Arrow" Grid.Column="2" Text="›" Foreground="#50EFF0" Visibility="Collapsed" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+     <TextBlock x:Name="Arrow" Grid.Column="2" Text=">" Foreground="#3FE6F5" Visibility="Collapsed" HorizontalAlignment="Right" VerticalAlignment="Center"/>
      <Popup x:Name="PART_Popup" Placement="Right" HorizontalOffset="2" AllowsTransparency="True" Focusable="False" IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" PopupAnimation="None">
-      <Border Background="#FA091019" BorderBrush="#50EFF0" BorderThickness="1" Padding="5">
-       <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" MaxHeight="600"><ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"/></ScrollViewer>
-      </Border>
+      <Grid Margin="4">
+       <Path Stretch="Fill" Fill="#F70E131D" Stroke="#FF2A6D" StrokeThickness="1" Data="M10,0 L1000,0 L1000,990 L990,1000 L0,1000 L0,10 Z"/>
+       <ScrollViewer Margin="6" CanContentScroll="True" VerticalScrollBarVisibility="Auto" MaxHeight="600"><ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle"/></ScrollViewer>
+      </Grid>
      </Popup>
     </Grid>
    </Border>
    <ControlTemplate.Triggers>
     <Trigger Property="HasItems" Value="True"><Setter TargetName="Arrow" Property="Visibility" Value="Visible"/></Trigger>
     <Trigger Property="IsChecked" Value="True"><Setter TargetName="Check" Property="Visibility" Value="Visible"/></Trigger>
-    <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="Row" Property="Background" Value="#39202B"/><Setter TargetName="Row" Property="BorderBrush" Value="#FF4262"/><Setter Property="Foreground" Value="#FFF16A"/></Trigger>
+    <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="Row" Property="Background" Value="#3A1A2A"/><Setter TargetName="Row" Property="BorderBrush" Value="#FF2A6D"/><Setter Property="Foreground" Value="#3FE6F5"/></Trigger>
     <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.65"/></Trigger>
    </ControlTemplate.Triggers>
   </ControlTemplate></Setter.Value></Setter>
  </Style>
- <Style TargetType="Separator"><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Separator"><Border Height="1" Margin="8,5" Background="#405463"/></ControlTemplate></Setter.Value></Setter></Style>
+ <Style TargetType="Separator"><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Separator"><Border Height="1" Margin="8,5" Background="#2A3550"/></ControlTemplate></Setter.Value></Setter></Style>
  <Style TargetType="Slider"><Setter Property="Foreground" Value="#50EFF0"/><Setter Property="Background" Value="#293447"/></Style>
 </ResourceDictionary>
