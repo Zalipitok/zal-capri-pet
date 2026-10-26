@@ -17,10 +17,15 @@ from make_music_frames import add_headphones
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SPR = os.path.join(ROOT, 'sprites')
 CENTER = (338, 367)
+# The current drawings (2nd style: small face, long body) don't suit painted-on headphones or mouths:
+# she bobs to music and talks with motion instead.
+MOUTHS = False
+BLINKS = False
+HEADPHONES_ON = False
 HEADPHONES = ['float', 'wander', 'perch', 'windowperch', 'roam', 'taskbar', 'taskpeek', 'dance', 'gaming', 'sip', 'nap',
               'smug', 'wave', 'sleepy', 'meditate', 'chatreply', 'bossfight', 'gamerwin', 'yawn', 'stretch', 'sideglance']
 # Drawings that came out chopped at the edges: these animations borrow a clean one instead.
-ALIASES = {'float': 'perch', 'peek': 'watch', 'dance': 'celebrate'}
+ALIASES = {}
 NO_MOUTH = {'laughing', 'sip', 'nap', 'spin', 'thrown', 'upsidedown', 'tumble', 'yawn', 'dash', 'stretch', 'peek', 'rivalsneak', 'zigzag', 'ballsteal', 'pendulum'}  # mouth hidden, asleep, upside down or already wide open
 
 
@@ -134,19 +139,19 @@ def main():
             continue
         a = np.array(Image.open(os.path.join(SPR, f)).convert('RGBA'))
         info = {'feet': feet[name]}
-        if name in blinkers:
+        if BLINKS and name in blinkers:
             b = blink(a)
             if b is not None:
                 b.save(os.path.join(SPR, f'anim-{name}-blink.png'), optimize=True)
                 info['blink'] = True
-        if name not in NO_MOUTH:
+        if MOUTHS and name not in NO_MOUTH:
             mouth = find_mouth2(a, vx, vy)
             if mouth is not None:
                 clean = erase(a, mouth)
                 for level, ratio in HEIGHTS.items():
                     paint(clean, template, mouth, ratio).save(os.path.join(SPR, f'anim-{name}-mouth-{level}.png'), optimize=True)
                 info['mouth'] = True
-        if name in HEADPHONES:
+        if HEADPHONES_ON and name in HEADPHONES:
             try:
                 im = Image.fromarray(a)
                 add_headphones(im, a).save(os.path.join(SPR, f'anim-{name}-hp.png'), optimize=True)

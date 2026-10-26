@@ -18,7 +18,7 @@ namespace Capri
         const double BallSize = 44;
         Grid ballGrid;
         // Where the ball sits in the drawings that hold it (fractions of the sprite canvas).
-        static readonly Dictionary<string, Point> BallHold = new Dictionary<string, Point> { { "ballsteal", new Point(0.465, 0.496) }, { "ballguard", new Point(0.418, 0.537) } };
+        static readonly Dictionary<string, Point> BallHold = new Dictionary<string, Point>(); // none of the current drawings has a ball in her arms
         double ballStashX, ballStashY;
 
         public bool BallAvailable => ballShown && !ballCarried && !ballDragging;

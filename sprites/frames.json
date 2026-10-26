@@ -83,396 +83,292 @@
  "enhanced": 1,
  "anims": {
   "arrive": {
-   "feet": 0.8517,
-   "mouth": true
+   "feet": 0.8696
   },
   "attentionbait": {
-   "feet": 0.9677,
-   "mouth": true
-  },
-  "baitjudge": {
-   "feet": 0.9632,
-   "mouth": true
-  },
-  "ballbat": {
-   "feet": 0.8952,
-   "mouth": true
-  },
-  "ballguard": {
-   "feet": 0.8595,
-   "blink": true,
-   "mouth": true
-  },
-  "ballsteal": {
-   "feet": 0.8339
-  },
-  "beckon": {
-   "feet": 0.922,
-   "mouth": true
-  },
-  "bossfight": {
-   "feet": 0.806,
-   "mouth": true,
-   "headphones": true
-  },
-  "bounce": {
-   "feet": 0.8283,
-   "mouth": true
-  },
-  "bow": {
-   "feet": 0.7882,
-   "mouth": true
-  },
-  "breaktime": {
-   "feet": 0.8361,
-   "mouth": true
-  },
-  "casting": {
-   "feet": 0.8662,
-   "mouth": true
-  },
-  "catchgame": {
-   "feet": 0.9398,
-   "mouth": true
-  },
-  "caught": {
-   "feet": 0.8528,
-   "blink": true,
-   "mouth": true
-  },
-  "celebrate": {
-   "feet": 0.8462,
-   "mouth": true
-  },
-  "charge": {
-   "feet": 0.8216,
-   "mouth": true
-  },
-  "chase": {
-   "feet": 0.8328,
-   "mouth": true
-  },
-  "chaseball": {
-   "feet": 0.8751,
-   "mouth": true
-  },
-  "chatreply": {
-   "feet": 0.8841,
-   "mouth": true,
-   "headphones": true
-  },
-  "cheers": {
-   "feet": 0.913,
-   "mouth": true
-  },
-  "creep": {
-   "feet": 0.7637,
-   "blink": true,
-   "mouth": true
-  },
-  "dash": {
-   "feet": 0.7291
-  },
-  "depart": {
-   "feet": 0.9298,
-   "mouth": true
-  },
-  "dizzy": {
-   "feet": 0.8205,
-   "mouth": true
-  },
-  "failedattack": {
-   "feet": 0.8049,
-   "mouth": true
-  },
-  "figure8": {
-   "feet": 0.825,
-   "mouth": true
-  },
-  "filescan": {
-   "feet": 0.9108,
-   "mouth": true
-  },
-  "friendchase": {
-   "feet": 0.8584,
-   "mouth": true
-  },
-  "friendflee": {
-   "feet": 0.9019,
-   "mouth": true
-  },
-  "friendmeet": {
-   "feet": 0.8785,
-   "blink": true,
-   "mouth": true
-  },
-  "friendtalk": {
-   "feet": 0.9052,
-   "mouth": true
-  },
-  "friendwave": {
-   "feet": 0.8774,
-   "mouth": true
-  },
-  "gamerwin": {
-   "feet": 0.9041,
-   "mouth": true,
-   "headphones": true
-  },
-  "gaming": {
-   "feet": 0.8517,
-   "mouth": true,
-   "headphones": true
-  },
-  "giggle": {
-   "feet": 0.8473,
-   "mouth": true
-  },
-  "glitch": {
-   "feet": 0.8919,
-   "mouth": true
-  },
-  "grumpy": {
-   "feet": 0.8116,
-   "mouth": true
-  },
-  "headpat": {
-   "feet": 0.8506,
-   "mouth": true
-  },
-  "heartbeat": {
-   "feet": 0.8551,
-   "mouth": true
-  },
-  "hop": {
-   "feet": 0.8618,
-   "mouth": true
-  },
-  "impact": {
-   "feet": 0.8049,
-   "mouth": true
-  },
-  "jelly": {
-   "feet": 0.8986,
-   "mouth": true
-  },
-  "landing": {
-   "feet": 0.8216,
-   "mouth": true
-  },
-  "laughing": {
-   "feet": 0.9142
-  },
-  "meditate": {
-   "feet": 0.8049,
-   "mouth": true,
-   "headphones": true
-  },
-  "nap": {
-   "feet": 0.7915,
-   "headphones": true
-  },
-  "orbit": {
-   "feet": 0.8751,
-   "mouth": true
-  },
-  "patrol": {
-   "feet": 0.8919,
-   "mouth": true
-  },
-  "peekbehind": {
-   "feet": 0.8807,
-   "mouth": true
-  },
-  "pendulum": {
-   "feet": 0.8707
-  },
-  "perch": {
-   "feet": 0.8774,
-   "blink": true,
-   "headphones": true
-  },
-  "possess": {
-   "feet": 0.8807,
-   "mouth": true
-  },
-  "pounce": {
-   "feet": 0.8239,
-   "mouth": true
-  },
-  "rain": {
-   "feet": 0.9365,
-   "mouth": true
-  },
-  "remind": {
-   "feet": 0.8852,
-   "mouth": true
-  },
-  "repaircursor": {
-   "feet": 0.8127,
-   "mouth": true
-  },
-  "repairshow": {
-   "feet": 0.8629,
-   "mouth": true
-  },
-  "rivalglare": {
-   "feet": 0.8673,
-   "mouth": true
-  },
-  "rivalsneak": {
-   "feet": 0.8417
-  },
-  "roam": {
-   "feet": 0.8618,
-   "blink": true,
-   "mouth": true,
-   "headphones": true
-  },
-  "rocket": {
-   "feet": 0.922,
-   "mouth": true
-  },
-  "sabotage": {
-   "feet": 0.8372,
-   "mouth": true
-  },
-  "scan": {
-   "feet": 0.8528,
-   "mouth": true
-  },
-  "scanverdict": {
-   "feet": 0.9632,
-   "mouth": true
-  },
-  "scanwindow": {
-   "feet": 0.8662,
-   "mouth": true
-  },
-  "shaken": {
-   "feet": 0.8473,
-   "mouth": true
-  },
-  "shiver": {
-   "feet": 0.8495,
-   "mouth": true
-  },
-  "sideglance": {
-   "feet": 0.9431,
-   "mouth": true,
-   "headphones": true
-  },
-  "sip": {
-   "feet": 0.9509,
-   "headphones": true
-  },
-  "sleepy": {
-   "feet": 0.8651,
-   "mouth": true,
-   "headphones": true
-  },
-  "smug": {
-   "feet": 0.8807,
-   "mouth": true,
-   "headphones": true
-  },
-  "sneak": {
-   "feet": 0.8729
-  },
-  "spin": {
-   "feet": 0.932
-  },
-  "stretch": {
-   "feet": 0.9387,
-   "headphones": true
-  },
-  "swat": {
-   "feet": 0.8105,
-   "mouth": true
-  },
-  "taskbar": {
-   "feet": 0.9142,
-   "mouth": true,
-   "headphones": true
-  },
-  "taskpeek": {
-   "feet": 0.6187,
-   "mouth": true,
-   "headphones": true
-  },
-  "teleport": {
-   "feet": 0.8997,
-   "mouth": true
-  },
-  "thrown": {
-   "feet": 0.7391
-  },
-  "tiptoe": {
-   "feet": 0.8718
-  },
-  "tumble": {
    "feet": 0.8573
   },
-  "upsidedown": {
-   "feet": 0.7848
+  "baitjudge": {
+   "feet": 0.9331
   },
-  "wakeglare": {
-   "feet": 0.8606,
-   "mouth": true
+  "ballbat": {
+   "feet": 0.845
   },
-  "wander": {
-   "feet": 0.8696,
-   "blink": true,
-   "mouth": true,
-   "headphones": true
+  "ballguard": {
+   "feet": 0.738
   },
-  "watch": {
-   "feet": 0.8852,
-   "blink": true,
-   "mouth": true
+  "ballsteal": {
+   "feet": 0.8216
   },
-  "wave": {
-   "feet": 0.9075,
-   "mouth": true,
-   "headphones": true
+  "beckon": {
+   "feet": 0.9231
   },
-  "weather": {
-   "feet": 0.8919,
-   "mouth": true
+  "bossfight": {
+   "feet": 0.8551
   },
-  "welcomeback": {
-   "feet": 0.9052,
-   "mouth": true
+  "bounce": {
+   "feet": 0.7581
   },
-  "wilt": {
-   "feet": 0.8305,
-   "mouth": true
+  "bow": {
+   "feet": 0.8016
   },
-  "windowperch": {
-   "feet": 0.8952,
-   "blink": true,
-   "mouth": true,
-   "headphones": true
+  "breaktime": {
+   "feet": 0.7982
   },
-  "windup": {
-   "feet": 0.7915,
-   "mouth": true
+  "casting": {
+   "feet": 0.8372
   },
-  "yawn": {
-   "feet": 0.8484,
-   "headphones": true
+  "catchgame": {
+   "feet": 0.7469
   },
-  "zigzag": {
-   "feet": 0.8751
+  "caught": {
+   "feet": 0.8606
   },
-  "float": {
-   "use": "perch"
+  "celebrate": {
+   "feet": 0.8406
   },
-  "peek": {
-   "use": "watch"
+  "charge": {
+   "feet": 0.7692
+  },
+  "chase": {
+   "feet": 0.8149
+  },
+  "chaseball": {
+   "feet": 0.7547
+  },
+  "chatreply": {
+   "feet": 0.9911
+  },
+  "cheers": {
+   "feet": 0.9309
+  },
+  "creep": {
+   "feet": 0.7804
   },
   "dance": {
-   "use": "celebrate"
+   "feet": 0.8963
+  },
+  "dash": {
+   "feet": 0.7514
+  },
+  "depart": {
+   "feet": 0.8785
+  },
+  "dizzy": {
+   "feet": 0.8718
+  },
+  "failedattack": {
+   "feet": 0.6901
+  },
+  "figure8": {
+   "feet": 0.8952
+  },
+  "filescan": {
+   "feet": 0.8841
+  },
+  "float": {
+   "feet": 0.9521
+  },
+  "friendchase": {
+   "feet": 0.9643
+  },
+  "friendflee": {
+   "feet": 0.854
+  },
+  "friendmeet": {
+   "feet": 0.9142
+  },
+  "friendtalk": {
+   "feet": 0.9041
+  },
+  "friendwave": {
+   "feet": 0.9454
+  },
+  "gamerwin": {
+   "feet": 0.864
+  },
+  "gaming": {
+   "feet": 0.8305
+  },
+  "giggle": {
+   "feet": 0.8573
+  },
+  "glitch": {
+   "feet": 0.8807
+  },
+  "grumpy": {
+   "feet": 0.874
+  },
+  "headpat": {
+   "feet": 0.8138
+  },
+  "heartbeat": {
+   "feet": 0.8963
+  },
+  "hop": {
+   "feet": 0.7837
+  },
+  "impact": {
+   "feet": 0.7046
+  },
+  "jelly": {
+   "feet": 0.9119
+  },
+  "landing": {
+   "feet": 0.9186
+  },
+  "laughing": {
+   "feet": 0.9019
+  },
+  "meditate": {
+   "feet": 0.6745
+  },
+  "nap": {
+   "feet": 0.7559
+  },
+  "orbit": {
+   "feet": 0.8417
+  },
+  "patrol": {
+   "feet": 0.8305
+  },
+  "peek": {
+   "feet": 0.8584
+  },
+  "peekbehind": {
+   "feet": 0.9409
+  },
+  "pendulum": {
+   "feet": 0.864
+  },
+  "perch": {
+   "feet": 0.8573
+  },
+  "possess": {
+   "feet": 0.8227
+  },
+  "pounce": {
+   "feet": 0.8372
+  },
+  "rain": {
+   "feet": 0.9911
+  },
+  "remind": {
+   "feet": 0.9431
+  },
+  "repaircursor": {
+   "feet": 0.8685
+  },
+  "repairshow": {
+   "feet": 0.961
+  },
+  "rivalglare": {
+   "feet": 0.8696
+  },
+  "rivalsneak": {
+   "feet": 0.8395
+  },
+  "roam": {
+   "feet": 0.9799
+  },
+  "rocket": {
+   "feet": 0.8428
+  },
+  "sabotage": {
+   "feet": 0.8517
+  },
+  "scan": {
+   "feet": 0.9186
+  },
+  "scanverdict": {
+   "feet": 0.961
+  },
+  "scanwindow": {
+   "feet": 0.7993
+  },
+  "shaken": {
+   "feet": 0.8261
+  },
+  "shiver": {
+   "feet": 0.8874
+  },
+  "sideglance": {
+   "feet": 0.9443
+  },
+  "sip": {
+   "feet": 0.9164
+  },
+  "sleepy": {
+   "feet": 0.8785
+  },
+  "smug": {
+   "feet": 0.9331
+  },
+  "sneak": {
+   "feet": 0.8785
+  },
+  "spin": {
+   "feet": 0.9889
+  },
+  "stretch": {
+   "feet": 0.9889
+  },
+  "swat": {
+   "feet": 0.8361
+  },
+  "taskbar": {
+   "feet": 0.8127
+  },
+  "taskpeek": {
+   "feet": 0.806
+  },
+  "teleport": {
+   "feet": 0.6421
+  },
+  "thrown": {
+   "feet": 0.8339
+  },
+  "tiptoe": {
+   "feet": 0.9911
+  },
+  "tumble": {
+   "feet": 0.6901
+  },
+  "upsidedown": {
+   "feet": 0.728
+  },
+  "wakeglare": {
+   "feet": 0.8863
+  },
+  "wander": {
+   "feet": 0.9576
+  },
+  "watch": {
+   "feet": 0.8685
+  },
+  "wave": {
+   "feet": 0.9777
+  },
+  "weather": {
+   "feet": 0.9242
+  },
+  "welcomeback": {
+   "feet": 0.9911
+  },
+  "wilt": {
+   "feet": 0.8562
+  },
+  "windowperch": {
+   "feet": 0.9443
+  },
+  "windup": {
+   "feet": 0.6934
+  },
+  "yawn": {
+   "feet": 0.9889
+  },
+  "zigzag": {
+   "feet": 0.8094
   }
  }
 }
