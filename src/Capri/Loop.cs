@@ -195,8 +195,9 @@ namespace Capri
             int animPose = -1; curAnimPose = -1;
             if (newSprites && animPoses.TryGetValue(state, out animPose)) { pose = animPose; curAnimPose = animPose; }
             bool moodPose = s.Has("mood") && !voiceBusy;
-            if (moodPose && curAnimPose >= 0 && state != "perch") {   // a standing mood drawing would float off her seat if (mood == "smug") pose = curAnimPose = AnimPose("smug", animPose); else if (mood == "irritated") pose = curAnimPose = AnimPose("rivalglare", animPose); }
-            else if (moodPose && s.timeline == null) { if (mood == "smug") pose = 5; else if (mood == "irritated") pose = 2; }
+            // (not on the perch: a standing mood drawing would float off her seat)
+            if (moodPose && curAnimPose >= 0 && state != "perch") { if (mood == "smug") pose = curAnimPose = AnimPose("smug", animPose); else if (mood == "irritated") pose = curAnimPose = AnimPose("rivalglare", animPose); }
+            else if (moodPose && curAnimPose < 0 && s.timeline == null) { if (mood == "smug") pose = 5; else if (mood == "irritated") pose = 2; }
             if (facialMotion && s.Has("blink"))
             {
                 if (t >= nextBlink) { blinkUntil = t + 0.14; nextBlink = t + 2.5 + rng.NextDouble() * 3.5; }
