@@ -59,6 +59,12 @@ namespace Capri
                 if (sizes.Count != 1) return "frames have different sizes: " + string.Join(", ", sizes);
                 return spriteFeet.Count != poses.Count ? "frames.json lists " + spriteFeet.Count + " feet positions for " + poses.Count + " frames" : null;
             });
+            Step("Per-animation sprites", () =>
+            {
+                var missing = specOrder.Where(id => !animPoses.ContainsKey(id)).ToList();
+                if (animPoses.Count == 0) return "WARN: no anim-*.png sprites; she uses the original poses";
+                return missing.Count > 0 ? "WARN: no drawing for " + string.Join(", ", missing) : null;
+            });
             Step("tuning.json", () => tuningError != "" ? tuningError : null);
             Step("Settings file", () =>
             {

@@ -120,7 +120,7 @@ namespace Capri
         public string settingsPath;
         public bool sfxEnabled = true, talkingMouth = true;
 
-        static readonly string[] SavedBools = { "facialMotion", "chase", "blackwallEnabled", "sfxEnabled", "windowPerch", "throwPhysics", "timeOfDay", "remarksEnabled", "subtitles", "muted", "smoothPoses", "musicEnabled", "appAware", "hotkeyEnabled", "talkingMouth", "eyesFollow", "batteryReactions", "shadowEnabled", "beatSync", "dndAware", "weatherEnabled", "chatEnabled", "chatVoice", "possessWindows", "cursorRepairs", "autoUpdate", "focusBreaks" };
+        static readonly string[] SavedBools = { "facialMotion", "chase", "blackwallEnabled", "sfxEnabled", "windowPerch", "throwPhysics", "timeOfDay", "remarksEnabled", "subtitles", "muted", "smoothPoses", "musicEnabled", "appAware", "hotkeyEnabled", "talkingMouth", "eyesFollow", "batteryReactions", "shadowEnabled", "beatSync", "dndAware", "weatherEnabled", "chatEnabled", "chatVoice", "possessWindows", "cursorRepairs", "autoUpdate", "focusBreaks", "newSprites", "effectsEnabled" };
 
         void InitSpeech()
         {
@@ -236,7 +236,7 @@ namespace Capri
         {
             if (!speechVisible || !voiceBusy || speechPose < 0) return;
             if (dragging || mouseDown || spec.Has("noSpeechPose")) return;
-            int pose = speechPose;
+            int pose = curAnimPose >= 0 ? curAnimPose : speechPose;
             int[] mouth;
             if (talkingMouth && speechEnvelope != null && mouthPoses.TryGetValue(pose, out mouth))
             {

@@ -50,6 +50,12 @@ namespace Capri
         public Dictionary<int, int[]> eyePoses = new Dictionary<int, int[]>();
         public Dictionary<int, int> hpPoses = new Dictionary<int, int>();
         public Dictionary<int, int[]> hpBobPoses = new Dictionary<int, int[]>();
+        // Per-animation art (sprites\anim-<state>.png): one drawing for each animation, plus its
+        // blink, talking-mouth and headphone variants where they exist.
+        public Dictionary<string, int> animPoses = new Dictionary<string, int>();
+        public Dictionary<int, int> blinkPoses = new Dictionary<int, int>();
+        public bool newSprites = true; int curAnimPose = -1;
+        public int AnimPose(string id, int fallback) { int p; return newSprites && animPoses.TryGetValue(id, out p) ? p : fallback; }
         public double visorFraction = 0.41, spriteScale = 1.0;
         int decodeHeight;
         public int poseIndex;
@@ -70,6 +76,7 @@ namespace Capri
             LoadEarlyTuning();
             BuildWindow();
             LoadSprites();
+            InitJuice();
             LoadData();
             InitScreens();
             InitSpeech();
@@ -240,6 +247,17 @@ namespace Capri
                     int pose = int.Parse(key);
                     var set = AddFrameSet(Enumerable.Range(0, 8).Select(i => "eye-" + pose + "-" + i + ".png").ToArray(), spriteFeet[pose]);
                     if (set != null) eyePoses[pose] = set;
+                }
+            var anims = Json.Dict(Json.Get(meta, "anims"));
+            if (anims != null) foreach (var kv in anims)
+                {
+                    var info = kv.Value; double feet = Json.Num(Json.Get(info, "feet"), 0.9);
+                    var set = AddFrameSet(new[] { "anim-" + kv.Key + ".png" }, feet);
+                    if (set == null) continue;
+                    int basePose = set[0]; animPoses[kv.Key] = basePose;
+                    if (Json.Bool(Json.Get(info, "blink")) == true) { var b = AddFrameSet(new[] { "anim-" + kv.Key + "-blink.png" }, feet); if (b != null) blinkPoses[basePose] = b[0]; }
+                    if (Json.Bool(Json.Get(info, "mouth")) == true) { var m = AddFrameSet(new[] { "anim-" + kv.Key + "-mouth-1.png", "anim-" + kv.Key + "-mouth-2.png" }, feet); if (m != null) mouthPoses[basePose] = m; }
+                    if (Json.Bool(Json.Get(info, "headphones")) == true) { var h = AddFrameSet(new[] { "anim-" + kv.Key + "-hp.png" }, feet); if (h != null) hpPoses[basePose] = h[0]; }
                 }
             // The shared canvas has more room around her than the old 768 px cells.
             spriteScale = metaHeight / 768.0;

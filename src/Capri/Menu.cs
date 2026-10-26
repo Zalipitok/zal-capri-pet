@@ -145,7 +145,9 @@ namespace Capri
             NewMenuEntry(appearance, "Shadow when perched", Toggle("shadowEnabled"), Is("shadowEnabled"));
             NewMenuEntry(appearance, "Eyes follow the cursor", Toggle("eyesFollow"), Is("eyesFollow"));
             NewMenuEntry(appearance, "Talking mouth", Toggle("talkingMouth"), Is("talkingMouth"));
+            NewMenuEntry(appearance, "New per-animation sprites", Toggle("newSprites"), Is("newSprites"));
             NewMenuEntry(appearance, "Smooth pose changes", Toggle("smoothPoses"), Is("smoothPoses"));
+            NewMenuEntry(appearance, "Animation effects (sparkles, z's, confetti)", Toggle("effectsEnabled"), Is("effectsEnabled"));
             NewMenuEntry(appearance, "Idle blinking", Toggle("facialMotion"), Is("facialMotion"));
             NewMenuEntry(appearance, "Blackwall effects", Toggle("blackwallEnabled"), Is("blackwallEnabled"));
             NewMenuEntry(appearance, "Sound effects (swat, head pat)", Toggle("sfxEnabled", () => { if (!sfxEnabled) sfxPlayer.Close(); }), Is("sfxEnabled"));

@@ -29,7 +29,7 @@ namespace Capri
                 {
                     shakeAngry = true; shakeNext = now + 8; AddMemory("shakes");
                     nextHoldRemark = now + 8; messageUntil = 0;
-                    SetPose(20); ShowRemark("shaken");
+                    SetPose(AnimPose("shaken", 20)); ShowRemark("shaken");
                 }
             };
             w.PreviewMouseLeftButtonDown += (s, e) =>
@@ -49,7 +49,7 @@ namespace Capri
                 if (Math.Abs(point.X - downPoint.Value.X) + Math.Abs(point.Y - downPoint.Value.Y) < 5) return;
                 mouseDown = false; dragging = true; dragSamples.Clear();
                 shakeAngry = false; shakeLastX = w.Left; shakeDirection = 0; shakeTravel = 0; shakeTurns = 0; shakeWindow = Now;
-                SetPose(2); PlayVoice("drag");
+                SetPose(AnimPose("thrown", 2)); PlayVoice("drag");
                 heldLongEnough = true;
                 ShowRemark("hold"); nextHoldRemark = Now + 5;
                 try { w.DragMove(); } catch { }

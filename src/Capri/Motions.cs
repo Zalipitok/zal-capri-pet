@@ -188,7 +188,7 @@ namespace Capri
             motions["windowperch"] = () => { if (perchArrived) { shift.Y = Sin(phase * 1.5) * 1.2; rotation.Angle = 0; } };
             motions["thrown"] = () =>
             {
-                if (shakeAngry) SetPose(20);
+                if (shakeAngry) SetPose(AnimPose("shaken", 20));
                 rotation.Angle = Max(-28.0, Min(28.0, -throwVX / 45)); shift.Y = 0;
                 scale.ScaleY = 1 - 0.12 * throwSquash; scale.ScaleX = direction * (1 + 0.08 * throwSquash);
             };

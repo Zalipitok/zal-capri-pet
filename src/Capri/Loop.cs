@@ -120,7 +120,7 @@ namespace Capri
             if (dragging)
             {
                 UpdateShadow(false, false);
-                SetPose(shakeAngry ? 20 : 30);
+                SetPose(shakeAngry ? AnimPose("shaken", 20) : AnimPose("thrown", 30));
                 rotation.Angle = Math.Sin(t * 16) * 9;
                 scale.ScaleX = direction * (1 + Math.Sin(t * 14) * 0.025); scale.ScaleY = 1 + Math.Sin(t * 18) * 0.04;
                 shift.X = Math.Sin(t * 22) * 3; shift.Y = Math.Sin(t * 16) * 3; sprite.Opacity = 1;
@@ -193,13 +193,21 @@ namespace Capri
             var s = spec;
             phase = t - stateStart;
             int? pose = s.PoseAt(phase);
+            int animPose; curAnimPose = -1;
+            if (newSprites && animPoses.TryGetValue(state, out animPose)) { pose = animPose; curAnimPose = animPose; }
+            bool moodPose = s.Has("mood") && !voiceBusy;
+            if (moodPose && curAnimPose >= 0) { if (mood == "smug") pose = curAnimPose = AnimPose("smug", animPose); else if (mood == "irritated") pose = curAnimPose = AnimPose("rivalglare", animPose); }
+            else if (moodPose && s.timeline == null) { if (mood == "smug") pose = 5; else if (mood == "irritated") pose = 2; }
             if (facialMotion && s.Has("blink"))
             {
                 if (t >= nextBlink) { blinkUntil = t + 0.14; nextBlink = t + 2.5 + rng.NextDouble() * 3.5; }
-                if (t < blinkUntil && (state != "caught" || phase > 0.7)) pose = 13;
+                if (t < blinkUntil && (state != "caught" || phase > 0.7))
+                {
+                    int closed;
+                    if (curAnimPose < 0) pose = 13;
+                    else if (blinkPoses.TryGetValue(curAnimPose, out closed)) pose = closed;
+                }
             }
-            bool moodPose = s.Has("mood") && !voiceBusy;
-            if (moodPose && s.timeline == null) { if (mood == "smug") pose = 5; else if (mood == "irritated") pose = 2; }
             musicFrameActive = false;
             if (musicPoseStart >= 0 && (pose == 12 || pose == 13) && MusicGroove) { pose = MusicPose(t); musicFrameActive = true; }
             int[] eyes;
@@ -236,6 +244,7 @@ namespace Capri
             Action motion;
             if (motions.TryGetValue(s.motion, out motion)) motion();
             ApplyMusicGroove(t);
+            ApplyJuice(t, dt);
             if (voiceBusy && !s.Has("noWobble")) scale.ScaleY += Math.Sin(t * 16) * 0.015;
             if (moodPose && mood == "bored") rotation.Angle = -3;
             if (state == "pounce" && phase > 0.12 && CursorContact()) { attackContact = true; until = t; }
@@ -270,12 +279,12 @@ namespace Capri
             wall.Visibility = Visibility.Collapsed; effect.Text = "";
             switch (busyActivity)
             {
-                case "gaming": SetPose(25); rotation.Angle = Math.Sin(bp * 3) * 2; shift.Y = Math.Sin(bp * 5) * 1.5; break;
-                case "dance": SetPose((int)Math.Floor(bp / 0.45) % 2 == 0 ? 11 : 6); rotation.Angle = Math.Sin(bp * 3) * 7; shift.X = Math.Sin(bp * 3) * 5; shift.Y = -Math.Abs(Math.Sin(bp * 3)) * 5; break;
-                case "sip": SetPose(27); rotation.Angle = -3 + 2 * Math.Sin(bp); break;
-                case "stretch": SetPose((bp % 2.2) < 1.2 ? 11 : 21); scale.ScaleY = 1 + 0.025 * Math.Sin(bp * 1.5); break;
-                case "peek": SetPose(7); rotation.Angle = Math.Sin(bp) * 3; break;
-                case "rest": SetPose(5); break;
+                case "gaming": SetPose(AnimPose("gaming", 25)); rotation.Angle = Math.Sin(bp * 3) * 2; shift.Y = Math.Sin(bp * 5) * 1.5; break;
+                case "dance": SetPose(newSprites && animPoses.ContainsKey("dance") ? animPoses["dance"] : (int)Math.Floor(bp / 0.45) % 2 == 0 ? 11 : 6); rotation.Angle = Math.Sin(bp * 3) * 7; shift.X = Math.Sin(bp * 3) * 5; shift.Y = -Math.Abs(Math.Sin(bp * 3)) * 5; break;
+                case "sip": SetPose(AnimPose("sip", 27)); rotation.Angle = -3 + 2 * Math.Sin(bp); break;
+                case "stretch": SetPose(AnimPose("stretch", (bp % 2.2) < 1.2 ? 11 : 21)); scale.ScaleY = 1 + 0.025 * Math.Sin(bp * 1.5); break;
+                case "peek": SetPose(AnimPose("peek", 7)); rotation.Angle = Math.Sin(bp) * 3; break;
+                case "rest": SetPose(AnimPose("taskbar", 5)); break;
             }
             UpdateShadow(true, false);
         }
