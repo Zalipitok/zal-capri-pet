@@ -88,6 +88,41 @@ namespace Capri
             catch { v = 0.25; }
             artTops[pose] = v; return v;
         }
+        // Middle of the drawing's bounding box (fractions of the frame), for spinning around her.
+        Dictionary<int, Point> artCenters = new Dictionary<int, Point>();
+        public Point ArtCenter(int pose)
+        {
+            Point c;
+            if (artCenters.TryGetValue(pose, out c)) return c;
+            c = new Point(0.5, 0.58);
+            try
+            {
+                var bmp = new FormatConvertedBitmap(Frame(pose), PixelFormats.Bgra32, null, 0);
+                int wd = bmp.PixelWidth, ht = bmp.PixelHeight, stride = wd * 4;
+                var px = new byte[stride * ht]; bmp.CopyPixels(px, stride, 0);
+                int x0 = wd, x1 = -1, y0 = ht, y1 = -1;
+                for (int y = 0; y < ht; y += 2)
+                    for (int x = 0; x < wd; x += 2)
+                        if (px[y * stride + x * 4 + 3] > 60) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+                if (x1 >= 0) c = new Point((x0 + x1) / 2.0 / wd, (y0 + y1) / 2.0 / ht);
+            }
+            catch { }
+            artCenters[pose] = c; return c;
+        }
+
+        // Rotate her around the middle of the drawing instead of the middle of the frame, so a full
+        // spin stays inside her window at (almost) full size.
+        public void SpinAround(double angle, double size)
+        {
+            var c = ArtCenter(poseIndex);
+            double W = sprite.ActualWidth, H = sprite.ActualHeight;
+            double sx = size * Math.Sign(direction == 0 ? 1 : direction) * facingFlip.ScaleX;
+            double px = (c.X - 0.5) * W * sx, py = (c.Y - 0.5) * H * size;
+            double a = angle * Math.PI / 180, cos = Math.Cos(a), sin = Math.Sin(a);
+            rotation.Angle = angle; scale.ScaleX = Math.Sign(direction == 0 ? 1 : direction) * size; scale.ScaleY = size;
+            shift.X = px - (px * cos - py * sin); shift.Y = py - (px * sin + py * cos);
+        }
+
         // Transparent space between the top of her window and the top of the drawing.
         public double EmptyAbove(int pose)
         {

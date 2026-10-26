@@ -139,7 +139,7 @@ namespace Capri
             motions["dizzy"] = () => { rotation.Angle = Sin(phase * 3) * 17; shift.X = Cos(phase * 3) * 8; };
             motions["scan"] = () => { rotation.Angle = Sin(phase) * 9; effect.Text = "[ " + new string('.', (int)(phase * 3) % 5) + " ]"; };
             motions["charge"] = () => { shift.X = Sin(phase * 32) * Min(4.0, phase); effect.Text = "CHARGE " + Min(100.0, (int)(phase * 20)) + "%"; };
-            motions["spin"] = () => { rotation.Angle = phase * 150; scale.ScaleX = direction * 0.52; scale.ScaleY = 0.52; };
+            motions["spin"] = () => SpinAround(phase * 150, 0.95);
             motions["heartbeat"] = () => { scale.ScaleY = 1 + 0.025 * Sin(phase * 8); effect.Opacity = 0.5 + 0.5 * Abs(Sin(phase * 4)); };
             motions["rain"] = () => { effect.Text = ((int)(phase * 3) % 2) == 0 ? "1 0 1 0" : "0 1 0 1"; rotation.Angle = -7; };
             motions["celebrate"] = () => { shift.Y = -Abs(Sin(phase * 5)) * 14; rotation.Angle = Sin(phase * 5) * 9; };
@@ -150,7 +150,7 @@ namespace Capri
             motions["jelly"] = () => { scale.ScaleY = 0.94 + 0.06 * Sin(phase * 8); scale.ScaleX = direction * (1 - 0.05 * Sin(phase * 8)); };
             motions["wave"] = () => { rotation.Angle = Sin(phase * 7) * 6; shift.Y = Sin(phase * 3) * 5; };
             motions["smug"] = () => { rotation.Angle = -6 + Sin(phase * 1.5) * 2; scale.ScaleY = 1 + Sin(phase * 2) * 0.012; };
-            motions["tumble"] = () => { rotation.Angle = (phase * 200) % 360; scale.ScaleX = direction * 0.55; scale.ScaleY = 0.55; shift.Y = Sin(phase * 4) * 10; };
+            motions["tumble"] = () => { SpinAround((phase * 200) % 360, 0.95); shift.Y += Sin(phase * 4) * 10; };
             motions["peek"] = () => { rotation.Angle = direction * 12; shift.X = Sin(phase * 2.5) * 7; };
             motions["dash"] = () => { rotation.Angle = -direction * 15; scale.ScaleX = direction * 1.06; scale.ScaleY = 0.92; };
             motions["orbit"] = () => { rotation.Angle = Sin(phase * 2) * 15; };
