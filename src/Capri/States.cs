@@ -165,6 +165,7 @@ namespace Capri
         public void StartThrow(double vx, double vy, string reason)
         {
             throwVX = vx; throwVY = vy; throwSquash = 0; throwReason = reason;
+            if (reason != "fell") PlaySfx("throw.wav", 0.7);
             if (stayPut) stayAway = true;   // Stay here doesn't stop a throw; where she lands is her new spot
             routine.Clear(); BeginState("thrown");
         }
@@ -173,6 +174,7 @@ namespace Capri
         {
             rotation.Angle = 0;
             if (stayPut && throwReason != "fell") { stayX = w.Left; stayY = FloorTop(WorkArea(), PoseFor("landing")); stayAway = false; SaveSettings(); }
+            PlaySfx("land.wav", 0.8);
             if (shakeAngry) { shakeAngry = false; BeginState("shaken"); caughtCooldown = until + 1; }
             else
             {
@@ -443,7 +445,7 @@ namespace Capri
             paused = false; BeginState("swat");
             int count = AddMemory("swats");
             if (Milestone(count, 10, 30, 60)) ShowRemark("memoryswats", false, count);
-            PlaySfx("cartoon-swat.wav");
+            PlaySfx("swat.wav");
         }
 
         // Brings Capri next to the pointer, on whichever monitor it's on.

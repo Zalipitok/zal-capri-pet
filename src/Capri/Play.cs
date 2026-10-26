@@ -38,7 +38,7 @@ namespace Capri
         {
             if (!gameActive || state != "catchgame") return false;
             gameScore++; gameFlash = Now;
-            PlaySfx("cartoon-swat.wav", 0.7);
+            PlaySfx("catch.wav", 0.8);
             MoveGameTarget();
             return true;
         }
@@ -122,7 +122,7 @@ namespace Capri
                 if (have.Contains(id) || !UnlockMet(u)) continue;
                 have.Add(id); memText["unlocked"] = string.Join(",", have); memoryDirty = true;
                 EnableUnlock(u);
-                ShowRemark("unlocked", true, Json.Str(Json.Get(u, "title")));
+                ShowRemark("unlocked", true, Json.Str(Json.Get(u, "title"))); PlaySfx("unlock.wav", 0.7);
                 try { tray?.ShowBalloonTip(5000, "Capri unlocked something", "New: " + Json.Str(Json.Get(u, "title")), System.Windows.Forms.ToolTipIcon.Info); } catch { }
                 return; // one announcement at a time
             }

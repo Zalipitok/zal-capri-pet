@@ -60,7 +60,7 @@ namespace Capri
                 bool close = Math.Abs(targetX - w.Left) + Math.Abs(targetY - w.Top) < 12;
                 if (!behindWindow && (close || phase > 2.5))
                 {
-                    behindWindow = true; w.Topmost = false;
+                    behindWindow = true; w.Topmost = false; PlaySfx("peek.wav", 0.6);
                     try { CapriWindows.PlaceBehind(petHandle, peekHandle); } catch { }
                 }
                 if (behindWindow) { w.Left = targetX; w.Top = targetY; }
@@ -138,7 +138,7 @@ namespace Capri
             if (!manual && !possessWindows) return false;
             if (manual) { PrepareManualAction(); routine.Clear(); }
             if (!StartPossession()) { if (manual) ShowStatus("No window to possess. Click one first (not maximized)."); return false; }
-            BeginState("possess");
+            BeginState("possess"); PlaySfx("possess.wav", 0.6);
             ShowRemark("possess", true);
             return true;
         }
@@ -159,7 +159,7 @@ namespace Capri
             if (manual) { PrepareManualAction(); routine.Clear(); }
             if (trailWindows.Count == 0) for (int i = 0; i < 8; i++) trailWindows.Add(NewTrailWindow(i));
             trailUntil = Now + 60; trailHistory.Clear();
-            BeginState("repaircursor");
+            BeginState("repaircursor"); PlaySfx("zap.wav", 0.6);
             ShowRemark("cursorrepair", true);
         }
 

@@ -45,7 +45,7 @@ namespace Capri
             Step("Required files", () =>
             {
                 var missing = new[] { "behaviours.json", "remarks.json", "voice-pack.json", "menu-theme.xaml", "tuning.json", "app-reactions.json", "unlocks.json", "games.json", "VERSION",
-                    @"sounds\cartoon-swat.wav", @"sounds\headpat.wav", @"sounds\ballhit.wav", @"sounds\reminder.wav", @"sprites\frames.json" }.Where(f => !File.Exists(App.PathOf(f))).ToList();
+                    @"sounds\swat.wav", @"sounds\headpat.wav", @"sounds\ballhit.wav", @"sounds\reminder.wav", @"sprites\frames.json" }.Where(f => !File.Exists(App.PathOf(f))).ToList();
                 return missing.Count > 0 ? "missing: " + string.Join(", ", missing) : null;
             });
             Step("Sprite frames", () => poses.Count < 33 ? "expected at least 33 frames, found " + poses.Count : null);

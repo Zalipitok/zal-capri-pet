@@ -131,7 +131,7 @@ namespace Capri
             }
             herCursorTag.Text = HerTags[rng.Next(HerTags.Length)];
             herCursorTagBox.Visibility = Visibility.Visible;
-            if (sfxEnabled && rng.NextDouble() < 0.5) PlaySfx("ballhit.wav", 0.35, false);
+            PlaySfx("cursorclick.wav", 0.5);
         }
     }
 }

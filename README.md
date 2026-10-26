@@ -26,8 +26,10 @@ Needs Windows 10 (1809 or newer) or Windows 11. Nothing to install: she's a smal
 - **Talks** — a chat window with games (rock paper scissors, guess the number, trivia). With your own [Claude API key](https://console.anthropic.com) she replies in character, read aloud by a Windows voice.
 - **Remembers** — days together, head pats, throws, high scores, and unlocks new routines as you go.
 - **Invite a friend** — a second, recoloured Capri who visits, chats with her, plays tag and dances.
+- **Stays out of your way** — *Stay here* keeps her in one spot, *Let clicks through her* makes her click-through, and she moves off the window you're working in.
+- **Little sounds** — her own synthesized sound effects for pats, swats, clicks, throws, landings, sitting, peeking and more.
 
-Everything is in *Settings* (right-click → Settings window…). `README.txt` in the download is the full guide.
+Everything is in *Settings* (right-click → Settings window…). `README.txt` in the download is a short guide.
 
 ## Privacy
 
@@ -40,7 +42,7 @@ Beat detection listens to your PC's sound in memory only; nothing is recorded or
 
 ## For tinkerers
 
-Behaviour, lines, tuning, unlocks and trivia are plain JSON files next to the exe (`behaviours.json`, `remarks.json`, `tuning.json`, `unlocks.json`, `games.json`). The code is C# (WPF, .NET Framework 4.8) in `src\Capri`; GitHub Actions builds it on every push. `Run-SelfTest.bat` checks everything and writes `selftest-report.txt`. Pushing to the `release` branch builds a new release (version from `VERSION`).
+Behaviour, lines, tuning, unlocks and trivia are plain JSON files next to the exe (`behaviours.json`, `remarks.json`, `tuning.json`, `unlocks.json`, `games.json`). The code is C# (WPF, .NET Framework 4.8) in `src\Capri`; GitHub Actions builds it on every push. `Run-SelfTest.bat` checks everything and writes `selftest-report.txt`. The drawings' talking, headphone and facing data come from `tools/make_style2_variants.py`; the sound effects from `tools/make_sfx.py`. Pushing to the `release` branch builds a new release (version from `VERSION`).
 
 ---
 

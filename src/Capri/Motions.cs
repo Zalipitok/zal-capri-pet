@@ -43,7 +43,7 @@ namespace Capri
                 var r = WindowRectDip(perchHandle);
                 if (r == null || CapriWindows.Maximized(perchHandle) || r.Value.Top - PerchRoom() < area.Top - 2) { StartThrow(0, 0, "fell"); return; }
                 targetX = r.Value.Left + perchOffsetX; targetY = r.Value.Top - w.Height + SpriteFoot(PerchPose) + tuning.perchSink;
-                if (!perchArrived && Abs(targetX - w.Left) + Abs(targetY - w.Top) <= 4) perchArrived = true;
+                if (!perchArrived && Abs(targetX - w.Left) + Abs(targetY - w.Top) <= 4) { perchArrived = true; PlaySfx("sit.wav", 0.7); }
                 if (perchArrived) { w.Left = targetX; w.Top = targetY; }
             };
             // Gravity, wall bounces and a floor at the bottom of the current monitor's work area.
