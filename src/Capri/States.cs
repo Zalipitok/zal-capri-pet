@@ -110,6 +110,7 @@ namespace Capri
                 var rare = specOrder.Where(id => specs[id].rare).ToList();
                 if (rare.Count > 0) { BeginState(rare[rng.Next(rare.Count)]); return; }
             }
+            if (TryTrick(now)) return;
             if (BallAvailable && !stayPut && activityRates["antics"] > 0 && rng.NextDouble() < tuning.ballChance) { StartBallChase(); return; }
             double powers = QuietNow ? 0 : tuning.powersChance;
             if (activityRates["antics"] > 0 && possessWindows && rng.NextDouble() < powers) { if (InvokePossession(false)) return; }

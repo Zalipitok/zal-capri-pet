@@ -99,7 +99,7 @@ namespace Capri
                 if (FindPerchWindow() == null) ShowStatus("No window to sit on. Click one first, and leave room above it."); else BeginState("windowperch");
             }));
             NewMenuEntry(interact, "Perch at taskbar", State("taskbar"));
-            NewMenuEntry(interact, "Peek from behind a window", State("peekbehind"));
+            NewMenuEntry(interact, "Peek from behind a window", Act(() => StartPeek(true)));
             NewMenuEntry(interact, "Use her own cursor", Act(() => StartHerCursor(true)));
             NewMenuEntry(interact, "Upgrade my cursor", Act(() => StartCursorRepair(true)));
             NewMenuEntry(interact, "Possess a window", Act(() => InvokePossession(true)));

@@ -44,9 +44,9 @@ namespace Capri
             {
                 if (peekHandle == 0)
                 {
-                    var perch = FindPerchWindow();
-                    if (perch == null) { ChooseState(); return; }
-                    peekHandle = perch.Value.Key; peekOffsetX = (perch.Value.Value.Width - w.Width) * (0.15 + 0.7 * rng.NextDouble());
+                    var spot = FindPeekWindow();
+                    if (spot == null) { ChooseState(); return; }
+                    SetPeekTarget(spot.Value);
                 }
                 var r = WindowRectDip(peekHandle);
                 if (r == null || CapriWindows.Maximized(peekHandle)) { RestoreInFront(); peekHandle = 0; ChooseState(); return; }
@@ -63,6 +63,25 @@ namespace Capri
                 if (behindWindow) { w.Left = targetX; w.Top = targetY; }
             };
             motions["peekbehind"] = () => { rotation.Angle = Math.Sin(phase * 1.3) * 4; };
+        }
+
+        void SetPeekTarget(KeyValuePair<long, Rect> spot)
+        {
+            peekHandle = spot.Key; peekOffsetX = (spot.Value.Width - w.Width) * (0.15 + 0.7 * rng.NextDouble());
+        }
+
+        // Peek over the top of a window: false when there's no window with room above it.
+        public bool StartPeek(bool manual)
+        {
+            var spot = FindPeekWindow();
+            if (spot == null)
+            {
+                if (manual) ShowStatus("No window to hide behind. I need one that isn't maximized, with a little room above it.", 5);
+                return false;
+            }
+            if (manual) { PrepareManualAction(); routine.Clear(); }
+            BeginState("peekbehind"); SetPeekTarget(spot.Value);
+            return true;
         }
 
         // --- Possession

@@ -181,10 +181,16 @@ namespace Capri
         // A window with room above its title bar for Capri to sit on: the one she was dropped on,
         // the active one, the last one used, then any other visible window whose top edge isn't covered.
         public long preferPerch;
-        public KeyValuePair<long, Rect>? FindPerchWindow()
+        public KeyValuePair<long, Rect>? FindPerchWindow() => FindWindowWithRoom(PerchRoom());
+        // Peeking needs only room for her head over the edge (her body hides behind the window).
+        public int PeekPose { get { return AnimPose("peekbehind", 7); } }
+        public double PeekRoom() => Math.Max(40.0, VisorOffset() - EmptyAbove(PeekPose) + 24);
+        public KeyValuePair<long, Rect>? FindPeekWindow() => FindWindowWithRoom(PeekRoom());
+
+        KeyValuePair<long, Rect>? FindWindowWithRoom(double room)
         {
             var m = DeviceScale(); if (m == null) return null;
-            Func<long, Rect?> fits = PerchFits;
+            Func<long, Rect?> fits = h => FitsWithRoom(h, room);
             if (preferPerch != 0) { long p = preferPerch; preferPerch = 0; var r = fits(p); if (r != null) return new KeyValuePair<long, Rect>(p, r.Value); }
             var first = new List<long>();
             try { var fg = CapriDesktop.ForegroundWindow(); if (fg != null) first.Add(fg[0]); } catch { }
@@ -209,13 +215,14 @@ namespace Capri
             return ok[rng.Next(ok.Count)];
         }
 
-        public Rect? PerchFits(long handle)
+        public Rect? PerchFits(long handle) => FitsWithRoom(handle, PerchRoom());
+        Rect? FitsWithRoom(long handle, double room)
         {
             if (handle == 0 || CapriWindows.Maximized(handle)) return null;
             var r = WindowRectDip(handle);
             if (r == null || r.Value.Width < 260 || r.Value.Height < 120) return null;
             var area = WorkAreaAtDip(r.Value.Left + r.Value.Width / 2, r.Value.Top + 5);
-            if (area == null || r.Value.Top - PerchRoom() < area.Value.Top || r.Value.Top > area.Value.Bottom - 40) return null;
+            if (area == null || r.Value.Top - room < area.Value.Top || r.Value.Top > area.Value.Bottom - 40) return null;
             return r;
         }
 

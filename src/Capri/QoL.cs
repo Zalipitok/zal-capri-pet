@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace Capri
@@ -103,6 +104,27 @@ namespace Capri
             var p = ClearSpot(z.Value, a, w.Top, false); if (p == null) return;
             BeginState("wander"); targetX = p.Value.X; targetY = p.Value.Y;
             until = Now + 4 + Math.Sqrt(Math.Pow(targetX - w.Left, 2) + Math.Pow(targetY - w.Top, 2)) / 120;
+        }
+
+        // --- Tricks on her own: every few minutes (Antics slider) she picks one of the things you
+        // can also start from the menu: sit on a window, peek from behind one, fly her own cursor,
+        // the cursor glitch trail, possess a window (if allowed), play with the ball, the taskbar.
+        double nextTrick = 75;
+        bool TryTrick(double now)
+        {
+            int rate; if (!activityRates.TryGetValue("antics", out rate)) rate = 100;
+            if (rate <= 0 || stayPut || QuietNow || voiceBusy || busyMode || now < nextTrick || App.SelfTest) return false;
+            nextTrick = now + (90 + rng.NextDouble() * 120) * 100.0 / rate;
+            var tricks = new List<Func<bool>>();
+            if (windowPerch) { tricks.Add(() => { if (FindPerchWindow() == null) return false; BeginState("windowperch"); return true; }); tricks.Add(tricks[0]); }
+            tricks.Add(() => StartPeek(false));
+            if (herCursorEnabled && !herCursorActive && !App.Friend) tricks.Add(() => { StartHerCursor(false); return herCursorActive; });
+            if (possessWindows) tricks.Add(() => InvokePossession(false));
+            if (cursorRepairs && now > trailUntil + 600) tricks.Add(() => { StartCursorRepair(false); return true; });
+            if (BallAvailable) tricks.Add(() => { StartBallChase(); return true; });
+            tricks.Add(() => { BeginState("taskbar"); return true; });
+            foreach (var trick in Shuffle(tricks)) if (trick()) return true;
+            return false;
         }
     }
 }
