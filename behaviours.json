@@ -92,17 +92,17 @@
     },
     {
       "id": "dance",
-      "title": "Folded-arms hover",
+      "title": "Jam out",
       "menu": "Basic",
       "auto": true,
       "poses": [
         [
-          21,
-          0.55
+          11,
+          0.45
         ],
         [
-          22,
-          0.55
+          6,
+          0.45
         ]
       ],
       "loop": true

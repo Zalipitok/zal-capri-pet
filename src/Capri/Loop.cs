@@ -266,7 +266,7 @@ namespace Capri
             switch (busyActivity)
             {
                 case "gaming": SetPose(25); rotation.Angle = Math.Sin(bp * 3) * 2; shift.Y = Math.Sin(bp * 5) * 1.5; break;
-                case "dance": SetPose(21 + (int)Math.Floor(bp / 0.55) % 2); rotation.Angle = Math.Sin(bp * 3) * 7; shift.X = Math.Sin(bp * 3) * 5; shift.Y = -Math.Abs(Math.Sin(bp * 3)) * 5; break;
+                case "dance": SetPose((int)Math.Floor(bp / 0.45) % 2 == 0 ? 11 : 6); rotation.Angle = Math.Sin(bp * 3) * 7; shift.X = Math.Sin(bp * 3) * 5; shift.Y = -Math.Abs(Math.Sin(bp * 3)) * 5; break;
                 case "sip": SetPose((bp % 4) < 2.5 ? 27 : 8); rotation.Angle = -3 + 2 * Math.Sin(bp); break;
                 case "stretch": SetPose(11); scale.ScaleY = 1 + 0.025 * Math.Sin(bp * 1.5); break;
                 case "peek": SetPose(7); rotation.Angle = Math.Sin(bp) * 3; break;

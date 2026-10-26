@@ -12,7 +12,7 @@ from scipy import ndimage
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SPR = os.path.join(ROOT, 'sprites')
 BASE = 12                 # hover pose
-HP_POSES = [21, 22, 25, 26, 27, 28, 5, 4]  # dance, gaming, game win, sip, nap, smug, wave
+HP_POSES = [11, 6, 25, 26, 27, 28, 5, 4]  # dance (fists up, jazz hands), gaming, game win, sip, nap, smug, wave
 NO_BOB = {28}  # asleep: headphones on, but no head bob
 PIVOT = (340.0, 440.0)    # neck, in canvas pixels
 HEAD_END, NECK = 400.0, 500.0   # full head rotation above HEAD_END, none below NECK

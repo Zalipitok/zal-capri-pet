@@ -59,13 +59,16 @@ namespace Capri
                 else
                 {
                     var info = session.GetType().GetMethod("GetPlaybackInfo").Invoke(session, null);
-                    musicPlaying = info != null && Convert.ToString(Prop(info, "PlaybackStatus")) == "Playing";
+                    bool playing = info != null && Convert.ToString(Prop(info, "PlaybackStatus")) == "Playing";
                     musicApp = Convert.ToString(Prop(session, "SourceAppUserModelId"));
                     var op = session.GetType().GetMethod("TryGetMediaPropertiesAsync").Invoke(session, null);
                     var task = (Task)asTask.MakeGenericMethod(propsType).Invoke(null, new[] { op });
                     await task;
                     var props = task.GetType().GetProperty("Result").GetValue(task);
                     string title = Convert.ToString(Prop(props, "Title")), artist = Convert.ToString(Prop(props, "Artist"));
+                    // Videos (YouTube and the like) aren't music: no headphones, no head-bobbing.
+                    videoPlaying = playing && IsVideo(props, info);
+                    musicPlaying = playing && !videoPlaying;
                     if (!string.IsNullOrEmpty(title) && title != musicTitle)
                     {
                         musicTitle = title; musicArtist = artist;
@@ -77,6 +80,7 @@ namespace Capri
                         }
                     }
                 }
+                if (session == null) videoPlaying = false;
                 if (musicPlaying && !was) musicPlayingSince = Now;
                 if (was && !musicPlaying && Now - musicPlayingSince > 60 && rng.NextDouble() < 0.5) ShowRemark("musicstop");
                 musicFailures = 0;
@@ -86,6 +90,26 @@ namespace Capri
                 if (++musicFailures >= 5) { musicAvailable = false; musicError = e.Message; }
             }
             finally { musicBusy = false; }
+        }
+
+        public bool videoPlaying;
+        static readonly string[] Browsers = { "chrome", "msedge", "firefox", "308046b0af4a39cb", "opera", "brave", "vivaldi", "thebrowsercompany", "yandex" };
+        static readonly string[] MusicSites = { "youtube music", "music.youtube", "spotify", "soundcloud", "deezer", "tidal", "bandcamp", "apple music", "music.apple", "pandora" };
+
+        // A video: Windows says so, or a browser is playing something without an album (YouTube
+        // videos have none; music sites like YouTube Music and Spotify set one). Foreground window
+        // titles help too: a browser showing YouTube (but not YouTube Music) counts as video.
+        bool IsVideo(object props, object info)
+        {
+            if (Convert.ToString(Prop(props, "PlaybackType")) == "Video" || Convert.ToString(Prop(info, "PlaybackType")) == "Video") return true;
+            string app = (musicApp ?? "").ToLowerInvariant();
+            if (!Browsers.Any(b => app.Contains(b))) return false;
+            string album = Convert.ToString(Prop(props, "AlbumTitle"));
+            string title = "";
+            try { var fg = CapriDesktop.ForegroundApp(); if (fg != null) title = (fg[1] ?? "").ToLowerInvariant(); } catch { }
+            if (MusicSites.Any(site => title.Contains(site))) return false;
+            if (title.Contains("youtube")) return true;
+            return string.IsNullOrEmpty(album);
         }
 
         bool MusicGroove => musicEnabled && musicPlaying && !voiceBusy && spec.Has("calm");

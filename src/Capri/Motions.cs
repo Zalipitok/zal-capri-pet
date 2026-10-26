@@ -154,7 +154,12 @@ namespace Capri
             motions["peek"] = () => { rotation.Angle = direction * 12; shift.X = Sin(phase * 2.5) * 7; };
             motions["dash"] = () => { rotation.Angle = -direction * 15; scale.ScaleX = direction * 1.06; scale.ScaleY = 0.92; };
             motions["orbit"] = () => { rotation.Angle = Sin(phase * 2) * 15; };
-            motions["dance"] = () => { rotation.Angle = -3 + Sin(phase * 1.3) * 2; scale.ScaleY = 1 + Sin(phase * 1.5) * 0.008; shift.Y = Sin(phase * 1.6) * 3; };
+            // A bouncy jam: a hop and a lean on every pose change.
+            motions["dance"] = () =>
+            {
+                double beat = (phase % 0.45) / 0.45, side = ((int)(phase / 0.45)) % 2 == 0 ? 1.0 : -1.0;
+                shift.Y = -Abs(Sin(beat * PI)) * 10; rotation.Angle = side * 6 * Sin(beat * PI); scale.ScaleY = 1 - 0.04 * Cos(beat * PI * 2);
+            };
             motions["glitch"] = () => { if (rng.NextDouble() < 0.28) { shift.X = rng.Next(-9, 10); sprite.Opacity = 0.55; scale.ScaleX = direction * 1.08; } };
             motions["nap"] = () => { rotation.Angle = Sin(t * 0.8) * 2; scale.ScaleY = 0.94 + Sin(t * 1.6) * 0.02; shift.Y = 0; sprite.Opacity = 0.8; };
             motions["glide"] = () => { rotation.Angle = -direction * 6; scale.ScaleY = 1 + Sin(t * 2) * 0.012; };
