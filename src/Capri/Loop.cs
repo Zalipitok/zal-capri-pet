@@ -12,6 +12,7 @@ namespace Capri
     {
         public DispatcherTimer timer;
         double lastRuntimeError = -60;
+        List<double> errorTimes = new List<double>();
         Queue<Action> deferred = new Queue<Action>();
         public List<string> selfTestErrors = new List<string>();
 
@@ -61,6 +62,10 @@ namespace Capri
             {
                 if (Now - lastRuntimeError > 5) { lastRuntimeError = Now; App.Log("runtime-error.log", ex.ToString()); }
                 if (App.SelfTest) { selfTestErrors.Add(state + ": " + ex.Message + " " + (ex.StackTrace ?? "").Split('\n').FirstOrDefault()?.Trim()); return; }
+                // A one-off hiccup: skip this frame and start something fresh. Only a run of errors pauses her.
+                errorTimes.Add(Now); errorTimes.RemoveAll(x => Now - x > 10);
+                if (errorTimes.Count < 5) { try { routine.Clear(); ChooseState(); } catch { } return; }
+                errorTimes.Clear();
                 paused = true; wall.Visibility = Visibility.Collapsed;
                 if (cursorFx.IsVisible) cursorFx.Hide();
                 ShowProblem("I paused after an animation error (see runtime-error.log). Right-click me > Interact > Do something! to retry.");

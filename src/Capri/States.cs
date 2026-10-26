@@ -24,6 +24,7 @@ namespace Capri
         void InitStates()
         {
             startupLink = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "Capri.lnk");
+            UpgradeStartupLink();
             InitMotions();
         }
 
@@ -312,10 +313,13 @@ namespace Capri
             if (Milestone(count, 3, 10, 25, 50, 100)) ShowRemark("memorypets", false, count); else ShowRemark("pet");
         }
 
+        // Windows refuses the cursor position while a secure screen is up (a UAC prompt, the lock
+        // screen, Ctrl+Alt+Del): use the last position we saw instead of failing.
+        Point lastCursorScreen;
         public Point LocalCursor()
         {
-            var p = CapriCursor.ReadPosition();
-            return w.PointFromScreen(new Point(p.X, p.Y));
+            try { var p = CapriCursor.ReadPosition(); lastCursorScreen = new Point(p.X, p.Y); } catch { }
+            return w.PointFromScreen(lastCursorScreen);
         }
 
         bool CursorContact()
@@ -445,6 +449,28 @@ namespace Capri
 
         // Start with Windows: a Startup-folder shortcut.
         public bool StartsWithWindows => File.Exists(startupLink);
+
+        // A "Start with Windows" shortcut from the PowerShell days starts PowerShell first; point it
+        // straight at Capri.exe (faster, no console flash).
+        void UpgradeStartupLink()
+        {
+            if (App.SelfTest || App.Friend || !File.Exists(startupLink)) return;
+            try
+            {
+                dynamic shell = Activator.CreateInstance(Type.GetTypeFromProgID("WScript.Shell"));
+                dynamic link = shell.CreateShortcut(startupLink);
+                string target = (string)link.TargetPath ?? "";
+                if (string.Equals(target, App.ExePath, StringComparison.OrdinalIgnoreCase)) return;
+                string name = Path.GetFileName(target).ToLowerInvariant();
+                if (name == "powershell.exe" || name == "wscript.exe" || name == "pwsh.exe" || name == "capri.exe")
+                {
+                    link.TargetPath = App.ExePath; link.Arguments = ""; link.WorkingDirectory = App.Root;
+                    link.Description = "Capri desktop companion"; link.IconLocation = App.ExePath + ",0";
+                    link.Save();
+                }
+            }
+            catch { }
+        }
         public void SetStartWithWindows(bool on)
         {
             try

@@ -10,6 +10,7 @@ namespace Capri
     // Two Capris share their positions through shared memory (CapriLink) and play together.
     partial class Pet
     {
+        static readonly int Pid = Process.GetCurrentProcess().Id;
         bool linkOk; public string linkError = ""; int linkSlot, linkSeq; double[] linkMessage = { 0, 0 };
         public bool friendPresent; int friendSeenSeq = -1; FriendInfo friendInfo; bool friendEverSeen, friendPlaced;
         double nextFriendPublish, nextFriendPlay = 40, friendMeetX, friendMeetY;
@@ -51,14 +52,14 @@ namespace Capri
             if (!linkOk || App.SelfTest) return;
             bool available = CanReact && spec.Has("calm") && !voiceBusy && state != "catchgame";
             int flags = (available ? 1 : 0) + (musicPlaying ? 2 : 0);
-            CapriLink.Write(linkSlot, new[] { CapriLink.Clock(), w.Left + w.Width / 2, w.Top + w.Height, w.Width, w.Height, flags, linkSeq, linkMessage[0], linkMessage[1], Process.GetCurrentProcess().Id, direction, w.Left, w.Top });
+            CapriLink.Write(linkSlot, new[] { CapriLink.Clock(), w.Left + w.Width / 2, w.Top + w.Height, w.Width, w.Height, flags, linkSeq, linkMessage[0], linkMessage[1], Pid, direction, w.Left, w.Top });
         }
 
         FriendInfo ReadFriend()
         {
             if (!linkOk) return null;
             var v = CapriLink.Read(1 - linkSlot);
-            if (v[9] <= 0 || CapriLink.Clock() - v[0] > 4 || (int)v[9] == Process.GetCurrentProcess().Id) return null;
+            if (v[9] <= 0 || CapriLink.Clock() - v[0] > 4 || (int)v[9] == Pid) return null;
             return new FriendInfo { cx = v[1], feet = v[2], width = v[3], height = v[4], available = ((int)v[5] & 1) != 0, music = ((int)v[5] & 2) != 0, seq = (int)v[6], type = (int)v[7], arg = v[8], left = v[11], top = v[12] };
         }
 
