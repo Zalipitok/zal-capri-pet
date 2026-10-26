@@ -155,7 +155,7 @@ namespace Capri
             if (ballCarried && state != "ballsteal" && !dragging) { ballCarried = false; ballVX = 0; ballVY = 0; }
             // Her own drawing shows the ball in her arms: the real one sits on top of it, almost
             // invisible but still there to grab.
-            Point hold;
+            Point hold = new Point();
             bool drawn = newSprites && animPoses.ContainsKey(state) && BallHold.TryGetValue(state, out hold) && (state == "ballguard" || ballCarried) && !isHidden;
             ballGrid.Opacity = drawn ? 0.02 : 1;
             if (drawn)
