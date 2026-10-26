@@ -13,7 +13,7 @@
     <RootNamespace>Capri</RootNamespace>
     <ApplicationIcon>capri.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>3.6.2</Version>
+    <Version>3.6.3</Version>
     <Product>Capri</Product>
     <Description>Capri desktop companion</Description>
     <PlatformTarget>AnyCPU</PlatformTarget>
