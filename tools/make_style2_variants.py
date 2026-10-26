@@ -10,6 +10,8 @@ FX, FY = 338, 367
 # Sitting drawings: where she sits (fraction of the canvas height); the app rests that on the
 # window top / taskbar instead of her feet.
 SEATS = {'perch': 0.63, 'windowperch': 0.645, 'taskbar': 0.705}
+# The drawings face right (the app mirrors them); these few face left and are left alone.
+FACING_LEFT = {'yawn', 'friendchase', 'teleport', 'rivalsneak', 'orbit', 'zigzag', 'friendflee', 'attentionbait'}
 DRAWN_OPEN = {'caught', 'dance', 'friendtalk', 'gamerwin', 'spin', 'casting',   # already open-mouthed, or no clean spot
               'celebrate', 'laughing', 'peek', 'zigzag', 'tumble'}
 
@@ -129,6 +131,8 @@ if __name__ == '__main__':
     meta_path = os.path.join(dst, 'frames.json'); meta = json.load(open(meta_path))
     for n, rec in info.items():
         if n in meta['anims']: meta['anims'][n].update(rec)
+    for n in FACING_LEFT:
+        if n in meta['anims']: meta['anims'][n]['facing'] = 'left'
     for n, v in SEATS.items():
         if n in meta['anims']: meta['anims'][n]['seat'] = v
     for n in DRAWN_OPEN:   # drop talking frames made by an earlier run

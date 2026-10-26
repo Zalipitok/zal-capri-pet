@@ -21,7 +21,7 @@ namespace Capri
         List<KeyValuePair<MenuItem, Func<bool>>> menuSync = new List<KeyValuePair<MenuItem, Func<bool>>>();
         public WF.NotifyIcon tray; IntPtr trayIconHandle = IntPtr.Zero;
         public bool voiceChooserOpen;
-        MenuItem hideItem, hotkeyItem, moodItem, rivalItem, snoozeItem, friendItem, focusStopItem, updateItem;
+        MenuItem hideItem, hotkeyItem, flipItem, moodItem, rivalItem, snoozeItem, friendItem, focusStopItem, updateItem;
 
         public MenuItem NewMenuEntry(ItemsControl parent, string header, Action onClick = null, Func<bool> isChecked = null)
         {
@@ -135,6 +135,7 @@ namespace Capri
                     "\nDragging: " + dragging + "\nVoice playing: " + voiceBusy + "\nLive volume: " + liveVolume + "\nMonitors: " + AllWorkAreas().Count + "\nYou idle for: " + (int)idle + " s\nBeat: " + beat +
                     "\nFrame time: " + tickMs + " ms\nVersion: " + appVersion + " (native)", "Capri movement status");
             });
+            flipItem = NewMenuEntry(debug, "Flip the drawing she's showing now", () => FlipCurrentDrawing());
             NewMenuEntry(debug, "Our history", Act(ShowHistoryWindow));
             NewMenuEntry(debug, "Run self-test", Act(StartSelfTestRun));
             NewMenuEntry(debug, "Reload tuning.json", () =>
@@ -173,6 +174,7 @@ namespace Capri
                 RegisterInteraction();
                 foreach (var sync in menuSync) sync.Key.IsChecked = sync.Value();
                 moodItem.Header = "Mood: " + mood;
+                flipItem.Header = "Flip the drawing she's showing now (" + state + ")";
                 rivalItem.Header = "Rivalry: " + rivalWins + " catches / " + rivalEscapes + " escapes";
                 hideItem.IsEnabled = tray != null;
                 snoozeItem.Visibility = CanSnooze ? Visibility.Visible : Visibility.Collapsed;

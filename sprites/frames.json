@@ -88,7 +88,8 @@
   },
   "attentionbait": {
    "feet": 0.8573,
-   "mouth": true
+   "mouth": true,
+   "facing": "left"
   },
   "baitjudge": {
    "feet": 0.9331,
@@ -199,11 +200,13 @@
   },
   "friendchase": {
    "feet": 0.9643,
-   "mouth": true
+   "mouth": true,
+   "facing": "left"
   },
   "friendflee": {
    "feet": 0.854,
-   "mouth": true
+   "mouth": true,
+   "facing": "left"
   },
   "friendmeet": {
    "feet": 0.9142,
@@ -273,7 +276,8 @@
   },
   "orbit": {
    "feet": 0.8417,
-   "mouth": true
+   "mouth": true,
+   "facing": "left"
   },
   "patrol": {
    "feet": 0.8305
@@ -324,7 +328,8 @@
   },
   "rivalsneak": {
    "feet": 0.8395,
-   "mouth": true
+   "mouth": true,
+   "facing": "left"
   },
   "roam": {
    "feet": 0.9799,
@@ -405,7 +410,8 @@
   },
   "teleport": {
    "feet": 0.6421,
-   "mouth": true
+   "mouth": true,
+   "facing": "left"
   },
   "thrown": {
    "feet": 0.8339,
@@ -460,10 +466,12 @@
    "mouth": true
   },
   "yawn": {
-   "feet": 0.9889
+   "feet": 0.9889,
+   "facing": "left"
   },
   "zigzag": {
-   "feet": 0.8094
+   "feet": 0.8094,
+   "facing": "left"
   }
  }
 }

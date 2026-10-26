@@ -61,6 +61,28 @@ namespace Capri
         public Dictionary<string, int> animPoses = new Dictionary<string, int>();
         public Dictionary<int, int> blinkPoses = new Dictionary<int, int>();
         public Dictionary<int, double> poseFacing = new Dictionary<int, double>(); ScaleTransform facingFlip = new ScaleTransform();
+        Dictionary<string, List<int>> animGroups = new Dictionary<string, List<int>>();
+        public List<string> flippedDrawings = new List<string>();   // drawings you flipped by hand (saved)
+
+        void FlipDrawing(string name)
+        {
+            List<int> group; int target;
+            if (animPoses.TryGetValue(name, out target)) foreach (var kv in animGroups) if (kv.Value.Contains(target)) { name = kv.Key; break; }   // a borrowed drawing
+            if (!animGroups.TryGetValue(name, out group)) return;
+            foreach (var p in group) { double f; poseFacing[p] = poseFacing.TryGetValue(p, out f) ? -f : -1.0; }
+            double now; facingFlip.ScaleX = poseFacing.TryGetValue(poseIndex, out now) ? now : 1.0;
+        }
+
+        // Debug and help > Flip the drawing she's showing now.
+        public void FlipCurrentDrawing()
+        {
+            string name = state;
+            if (!animPoses.ContainsKey(name)) { ShowStatus("This one isn't one of the new drawings.", 3); return; }
+            FlipDrawing(name);
+            if (flippedDrawings.Contains(name)) flippedDrawings.Remove(name); else flippedDrawings.Add(name);
+            SaveSettings();
+            ShowStatus("Flipped \"" + name + "\". Do it again to undo.", 4);
+        }
         public bool newSprites = true; int curAnimPose = -1;
         public int AnimPose(string id, int fallback) { int p; return newSprites && animPoses.TryGetValue(id, out p) ? p : fallback; }
         public double visorFraction = 0.41, spriteScale = 1.0;
@@ -296,10 +318,12 @@ namespace Capri
                     int basePose = set[0]; animPoses[kv.Key] = basePose;
                     // The new drawings face right (the original poses faced left); "facing": "left" opts one out.
                     bool right = Json.Str(Json.Get(info, "facing")) != "left";
-                    if (right) poseFacing[basePose] = -1;
-                    if (Json.Bool(Json.Get(info, "blink")) == true) { var b = AddFrameSet(new[] { "anim-" + kv.Key + "-blink.png" }, feet); if (b != null) { blinkPoses[basePose] = b[0]; if (right) poseFacing[b[0]] = -1; } }
-                    if (Json.Bool(Json.Get(info, "mouth")) == true) { var m = AddFrameSet(new[] { "anim-" + kv.Key + "-mouth-1.png", "anim-" + kv.Key + "-mouth-2.png" }, feet); if (m != null) { mouthPoses[basePose] = m; if (right) foreach (var i in m) poseFacing[i] = -1; } }
-                    if (Json.Bool(Json.Get(info, "headphones")) == true) { var h = AddFrameSet(new[] { "anim-" + kv.Key + "-hp.png" }, feet); if (h != null) { hpPoses[basePose] = h[0]; if (right) poseFacing[h[0]] = -1; } }
+                    var group = new List<int> { basePose };
+                    if (Json.Bool(Json.Get(info, "blink")) == true) { var b = AddFrameSet(new[] { "anim-" + kv.Key + "-blink.png" }, feet); if (b != null) { blinkPoses[basePose] = b[0]; group.AddRange(b); } }
+                    if (Json.Bool(Json.Get(info, "mouth")) == true) { var m = AddFrameSet(new[] { "anim-" + kv.Key + "-mouth-1.png", "anim-" + kv.Key + "-mouth-2.png" }, feet); if (m != null) { mouthPoses[basePose] = m; group.AddRange(m); } }
+                    if (Json.Bool(Json.Get(info, "headphones")) == true) { var h = AddFrameSet(new[] { "anim-" + kv.Key + "-hp.png" }, feet); if (h != null) { hpPoses[basePose] = h[0]; group.AddRange(h); } }
+                    animGroups[kv.Key] = group;
+                    if (right) foreach (var g in group) poseFacing[g] = -1;
                 }
             if (anims != null) foreach (var kv in anims)
                 {

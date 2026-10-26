@@ -172,6 +172,7 @@ namespace Capri
                     var city = Json.Get(saved, "weatherCity") as string; if (city != null && city.Length <= 80) weatherCity = city;
                     var unit = Json.Str(Json.Get(saved, "weatherUnit")); if (unit == "C" || unit == "F") weatherUnit = unit;
                     var qh = Json.Str(Json.Get(saved, "quietHours")); if (QuietHourChoices.Contains(qh)) quietHours = qh;
+                    foreach (var f in Json.List(Json.Get(saved, "flippedDrawings"))) { var n = Json.Str(f); if (n != "" && !flippedDrawings.Contains(n)) { flippedDrawings.Add(n); FlipDrawing(n); } }
                     if (Json.Get(saved, "stayX") != null && Json.Get(saved, "stayY") != null) { stayX = Json.Num(Json.Get(saved, "stayX")); stayY = Json.Num(Json.Get(saved, "stayY")); }
                 }
             }
@@ -204,6 +205,7 @@ namespace Capri
                     ["weatherCity"] = weatherCity, ["weatherUnit"] = weatherUnit, ["quietHours"] = quietHours
                 };
                 foreach (var name in SavedBools) d[name] = GetBoolSetting(name);
+                d["flippedDrawings"] = flippedDrawings.ToArray();
                 if (!double.IsNaN(stayX)) { d["stayX"] = Math.Round(stayX); d["stayY"] = Math.Round(stayY); }
                 Json.Save(settingsPath, d);
             }
