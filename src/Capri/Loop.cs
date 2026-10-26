@@ -37,7 +37,7 @@ namespace Capri
             };
             w.Closed += (s, e) =>
             {
-                timer.Stop(); SaveSettings(); SaveMemory(); StopVoice(); sfxPlayer.Close();
+                timer.Stop(); SaveSettings(); SaveMemory(); StopVoice(); StopSfx();
                 try { if (!App.Friend) StopFriendCapri(); } catch { }
                 try { StopPossession(); RestoreInFront(); } catch { }
                 try { CapriHotkey.Unregister(petHandle); } catch { }

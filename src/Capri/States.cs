@@ -208,7 +208,7 @@ namespace Capri
             isHidden = hidden;
             if (hidden)
             {
-                StopVoice(); sfxPlayer.Close(); menu.IsOpen = false;
+                StopVoice(); StopSfx(); menu.IsOpen = false;
                 if (cursorFx.IsVisible) cursorFx.Hide();
                 wall.Visibility = Visibility.Collapsed; bubble.Visibility = Visibility.Collapsed;
                 w.Topmost = false; w.Opacity = 0; w.IsHitTestVisible = false;
@@ -283,7 +283,7 @@ namespace Capri
             busyMode = on; RegisterInteraction();
             if (on)
             {
-                StopVoice(); sfxPlayer.Close(); nextRetry = double.PositiveInfinity;
+                StopVoice(); StopSfx(); nextRetry = double.PositiveInfinity;
                 var a = WorkArea(); w.Left = a.Right - w.Width - 12; w.Top = FloorTop(a, PoseFor("taskbar"));
                 busyUntil = 0; busyBag.Clear();
                 activeSince = Now;
@@ -295,10 +295,10 @@ namespace Capri
         public void SetPaused(bool on)
         {
             paused = on;
-            if (on) { StopVoice(); sfxPlayer.Close(); ShowStatus("chilling."); }
+            if (on) { StopVoice(); StopSfx(); ShowStatus("chilling."); }
         }
 
-        public void SetMuted(bool on) { muted = on; StopVoice(); if (on) sfxPlayer.Close(); SaveSettings(); }
+        public void SetMuted(bool on) { muted = on; StopVoice(); if (on) StopSfx(); SaveSettings(); }
 
         public void PrepareManualAction()
         {
@@ -423,6 +423,8 @@ namespace Capri
 
         // Sound effects share one player. important (reminders) plays in Busy mode, hidden, and with
         // sound effects off; only Mute stops it.
+        void StopSfx() { sfxPlayer.Close(); try { CapriSfx.StopAll(); } catch { } }
+
         public void PlaySfx(string file, double gain = 1.0, bool important = false)
         {
             if (muted || (!important && (!sfxEnabled || busyMode || isHidden))) return;
@@ -430,7 +432,9 @@ namespace Capri
             if (!File.Exists(path)) return;
             try
             {
-                sfxPlayer.Close(); UpdateSfxVolume(); sfxPlayer.Volume = Math.Min(1.0, sfxPlayer.Volume * gain);
+                UpdateSfxVolume();
+                if (CapriSfx.Play(path, Math.Min(1.0, sfxPlayer.Volume * gain))) return;
+                sfxPlayer.Close(); sfxPlayer.Volume = Math.Min(1.0, sfxPlayer.Volume * gain);
                 sfxPlayer.Open(new Uri(path, UriKind.Absolute)); sfxPlayer.Play();
             }
             catch { }

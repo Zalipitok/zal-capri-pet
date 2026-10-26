@@ -577,3 +577,84 @@ public static class CapriWindows {
  // Puts "self" directly behind "target" in the stacking order.
  public static bool PlaceBehind(IntPtr self, long target) { return SetWindowPos(self, new IntPtr(target), 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010); }
 }
+
+// Sound effects straight through waveOut: starts within a few milliseconds (MediaPlayer took a
+// noticeable moment to open each file), several can overlap, and voice clips keep playing.
+public static class CapriSfx {
+ [StructLayout(LayoutKind.Sequential)] struct WAVEFORMATEX { public ushort wFormatTag, nChannels; public uint nSamplesPerSec, nAvgBytesPerSec; public ushort nBlockAlign, wBitsPerSample, cbSize; }
+ [StructLayout(LayoutKind.Sequential)] struct WAVEHDR { public IntPtr lpData; public uint dwBufferLength, dwBytesRecorded; public IntPtr dwUser; public uint dwFlags, dwLoops; public IntPtr lpNext, reserved; }
+ [DllImport("winmm.dll")] static extern int waveOutOpen(out IntPtr h, uint device, ref WAVEFORMATEX format, IntPtr callback, IntPtr instance, uint flags);
+ [DllImport("winmm.dll")] static extern int waveOutPrepareHeader(IntPtr h, IntPtr hdr, uint size);
+ [DllImport("winmm.dll")] static extern int waveOutUnprepareHeader(IntPtr h, IntPtr hdr, uint size);
+ [DllImport("winmm.dll")] static extern int waveOutWrite(IntPtr h, IntPtr hdr, uint size);
+ [DllImport("winmm.dll")] static extern int waveOutReset(IntPtr h);
+ [DllImport("winmm.dll")] static extern int waveOutClose(IntPtr h);
+ class Clip { public short[] samples; public int rate, channels; }
+ static readonly Dictionary<string, Clip> cache = new Dictionary<string, Clip>();
+ static readonly List<IntPtr> playing = new List<IntPtr>();
+
+ // 16-bit PCM WAVs only; anything else returns null (the caller falls back to MediaPlayer).
+ static Clip Load(string path) {
+  Clip clip;
+  lock(cache) { if(cache.TryGetValue(path, out clip)) return clip; }
+  byte[] wav = System.IO.File.ReadAllBytes(path);
+  int channels = 0, rate = 0, bits = 0;
+  for(int pos = 12; pos + 8 <= wav.Length;) {
+   int length = BitConverter.ToInt32(wav, pos + 4);
+   if(length < 0 || length > wav.Length - pos - 8) length = wav.Length - pos - 8;
+   string kind = System.Text.Encoding.ASCII.GetString(wav, pos, 4);
+   if(kind == "fmt " && length >= 16) { if(BitConverter.ToInt16(wav, pos + 8) != 1) return null; channels = BitConverter.ToInt16(wav, pos + 10); rate = BitConverter.ToInt32(wav, pos + 12); bits = BitConverter.ToInt16(wav, pos + 22); }
+   if(kind == "data") {
+    if(bits != 16 || channels < 1 || rate <= 0) return null;
+    var s = new short[length / 2]; Buffer.BlockCopy(wav, pos + 8, s, 0, s.Length * 2);
+    clip = new Clip { samples = s, rate = rate, channels = channels };
+    lock(cache) cache[path] = clip;
+    return clip;
+   }
+   pos += 8 + length + (length & 1);
+  }
+  return null;
+ }
+
+ public static bool Play(string path, double gain) {
+  Clip clip;
+  try { clip = Load(path); } catch(Exception) { return false; }
+  if(clip == null) return false;
+  gain = Math.Max(0, Math.Min(1, gain));
+  var data = new short[clip.samples.Length];
+  for(int i = 0; i < data.Length; i++) data[i] = (short)(clip.samples[i] * gain);
+  var format = new WAVEFORMATEX { wFormatTag = 1, nChannels = (ushort)clip.channels, nSamplesPerSec = (uint)clip.rate, wBitsPerSample = 16 };
+  format.nBlockAlign = (ushort)(clip.channels * 2); format.nAvgBytesPerSec = (uint)(clip.rate * format.nBlockAlign);
+  IntPtr h;
+  if(waveOutOpen(out h, 0xFFFFFFFF, ref format, IntPtr.Zero, IntPtr.Zero, 0) != 0) return false;
+  int bytes = data.Length * 2;
+  IntPtr buffer = Marshal.AllocHGlobal(bytes); Marshal.Copy(data, 0, buffer, data.Length);
+  uint hdrSize = (uint)Marshal.SizeOf(typeof(WAVEHDR));
+  IntPtr hdr = Marshal.AllocHGlobal((int)hdrSize);
+  Marshal.StructureToPtr(new WAVEHDR { lpData = buffer, dwBufferLength = (uint)bytes }, hdr, false);
+  if(waveOutPrepareHeader(h, hdr, hdrSize) != 0 || waveOutWrite(h, hdr, hdrSize) != 0) {
+   waveOutUnprepareHeader(h, hdr, hdrSize); waveOutClose(h); Marshal.FreeHGlobal(hdr); Marshal.FreeHGlobal(buffer); return false;
+  }
+  lock(playing) playing.Add(h);
+  int ms = (int)(1000.0 * data.Length / clip.channels / clip.rate) + 400;
+  System.Threading.ThreadPool.QueueUserWorkItem(delegate(object unused) {
+   var start = Environment.TickCount;
+   while(Environment.TickCount - start < ms) {
+    var header = (WAVEHDR)Marshal.PtrToStructure(hdr, typeof(WAVEHDR));
+    if((header.dwFlags & 1) != 0) break;   // WHDR_DONE
+    System.Threading.Thread.Sleep(25);
+   }
+   lock(playing) playing.Remove(h);
+   waveOutReset(h); waveOutUnprepareHeader(h, hdr, hdrSize); waveOutClose(h);
+   Marshal.FreeHGlobal(hdr); Marshal.FreeHGlobal(buffer);
+  });
+  return true;
+ }
+
+ public static void StopAll() { lock(playing) foreach(var h in playing) waveOutReset(h); }
+ public static void Preload(string folder) {
+  System.Threading.ThreadPool.QueueUserWorkItem(delegate(object unused) {
+   try { foreach(var f in System.IO.Directory.GetFiles(folder, "*.wav")) { try { Load(f); } catch(Exception) { } } } catch(Exception) { }
+  });
+ }
+}

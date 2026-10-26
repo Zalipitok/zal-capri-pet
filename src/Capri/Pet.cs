@@ -148,6 +148,7 @@ namespace Capri
             BuildTray();
             InitInput();
             InitLoop();
+            CapriSfx.Preload(App.PathOf("sounds"));
             RestoreStayPut();
             activeSince = Now;
             StartMemorySession();
