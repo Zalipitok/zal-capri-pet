@@ -7,7 +7,7 @@ using System.Windows;
 
 namespace Capri
 {
-    // Self-test: Capri.exe --selftest (Run-SelfTest.bat, or Debug and help > Run self-test).
+    // Self-test: Capri.exe --selftest (or Debug and help > Run self-test).
     // Runs every state for a few frames and checks data, audio, menus and Windows features, then
     // writes selftest-report.txt. It never saves settings or memory, and plays no sound.
     partial class Pet
@@ -337,9 +337,9 @@ namespace Capri
 
             var header = new[] { "Capri self-test  " + DateTime.Now.ToString("yyyy-MM-dd HH:mm"), counts["PASS"] + " passed, " + counts["WARN"] + " warnings, " + counts["FAIL"] + " failed",
                 "Windows " + Environment.OSVersion.Version + "  .NET " + Environment.Version + "  Capri " + appVersion + " (native)", "" };
-            try { File.WriteAllLines(App.PathOf("selftest-report.txt"), header.Concat(report)); } catch { }
+            try { var reportPath = App.PathOf("selftest-report.txt"); Directory.CreateDirectory(Path.GetDirectoryName(reportPath)); File.WriteAllLines(reportPath, header.Concat(report)); } catch { }
             var notPassed = report.Where(r => !r.StartsWith("PASS")).Take(10).ToList();
-            MessageBox.Show(header[1] + (notPassed.Count > 0 ? "\n\n" + string.Join("\n", notPassed) : "\n\nEverything checks out.") + "\n\nFull report: selftest-report.txt", "Capri self-test");
+            MessageBox.Show(header[1] + (notPassed.Count > 0 ? "\n\n" + string.Join("\n", notPassed) : "\n\nEverything checks out.") + "\n\nFull report: logs\\selftest-report.txt", "Capri self-test");
             allowClose = true; w.Close();
         }
 

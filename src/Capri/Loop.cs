@@ -68,7 +68,7 @@ namespace Capri
                 errorTimes.Clear();
                 paused = true; wall.Visibility = Visibility.Collapsed;
                 if (cursorFx.IsVisible) cursorFx.Hide();
-                ShowProblem("I paused after an animation error (see runtime-error.log). Right-click me > Interact > Do something! to retry.");
+                ShowProblem("I paused after an animation error (see logs\\runtime-error.log). Right-click me > Tricks > Do something! to retry.");
             }
         }
 

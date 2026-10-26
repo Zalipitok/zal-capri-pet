@@ -75,7 +75,7 @@ namespace Capri
             return sb.ToString();
         }
 
-        public static void Save(string path, object value) => File.WriteAllText(path, Write(value), new UTF8Encoding(false));
+        public static void Save(string path, object value) { Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))); File.WriteAllText(path, Write(value), new UTF8Encoding(false)); }
 
         static void WriteValue(StringBuilder sb, object v, int indent)
         {

@@ -62,14 +62,15 @@ UPDATES
 
 IF SOMETHING'S WRONG
   Right-click > Debug and help > Movement status    what she's doing and why (busy, paused...)
-  Run-SelfTest.bat (or Debug and help > Run self-test)  checks everything and writes
-                                                    selftest-report.txt; send that report.
-  Problems also show in her speech bubble, a tray notification and *-error.log files here.
+  Right-click > Debug and help > Run self-test      checks everything and writes
+                                                    logs\selftest-report.txt; send that report.
+  Problems also show in her speech bubble, a tray notification and the logs folder.
 
-YOUR FILES (kept when updating)
-  voice-settings.json  your settings          memory.json      your history together
-  reminders.json       reminders              notes.json       sticky notes
-  chat-history.json    the chat               tuning.json      feel and the hotkey (editable;
-                                                                then Debug and help > Reload)
-  Also editable: remarks.json (her lines), behaviours.json (animations), games.json (trivia),
-  app-reactions.json (which apps count as games, code or video), unlocks.json.
+HER FOLDER
+  Capri.exe, README.txt   the app and this guide
+  save\     your settings, memory, reminders, notes and chat (kept when updating)
+  data\     her data. tuning.json (feel, the hotkey) is yours to edit, then
+            Debug and help > Reload tuning.json. Also editable: remarks.json (her lines),
+            behaviours.json (animations), games.json (trivia), app-reactions.json, unlocks.json.
+  logs\     error logs and the self-test report (safe to delete)
+  sprites\  sounds\  voices\   her drawings, sound effects and voice clips

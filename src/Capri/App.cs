@@ -39,6 +39,7 @@ namespace Capri
                 if (!Friend) MessageBox.Show("Capri is already running. Look for her icon in the system tray.", "Capri");
                 return 0;
             }
+            if (!SelfTest && !Friend) try { Layout.Tidy(Root); } catch { }
             try
             {
                 var app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
@@ -46,7 +47,7 @@ namespace Capri
                 {
                     Log("runtime-error.log", e.Exception.ToString());
                     e.Handled = true;
-                    try { Pet.Current?.ShowProblem("Something went wrong: " + e.Exception.Message + " (see runtime-error.log)"); } catch { }
+                    try { Pet.Current?.ShowProblem("Something went wrong: " + e.Exception.Message + " (see logs\\runtime-error.log)"); } catch { }
                 };
                 AppDomain.CurrentDomain.UnhandledException += (s, e) => Log("runtime-error.log", Convert.ToString(e.ExceptionObject));
                 var pet = new Pet();
@@ -57,7 +58,7 @@ namespace Capri
             catch (Exception ex)
             {
                 Log("startup-error.log", ex.ToString());
-                MessageBox.Show("Capri could not start:\n\n" + ex.Message + "\n\nDetails were written to startup-error.log.", "Capri");
+                MessageBox.Show("Capri could not start:\n\n" + ex.Message + "\n\nDetails were written to logs\\startup-error.log.", "Capri");
                 return 1;
             }
             finally
@@ -68,9 +69,9 @@ namespace Capri
 
         public static void Log(string file, string text)
         {
-            try { File.AppendAllText(Path.Combine(Root, file), DateTime.Now.ToString("o") + " " + text + "\r\n"); } catch { }
+            try { var path = PathOf(file); Directory.CreateDirectory(Path.GetDirectoryName(path)); File.AppendAllText(path, DateTime.Now.ToString("o") + " " + text + "\r\n"); } catch { }
         }
 
-        public static string PathOf(string relative) => Path.Combine(Root, relative);
+        public static string PathOf(string relative) => Layout.PathOf(Root, relative);
     }
 }

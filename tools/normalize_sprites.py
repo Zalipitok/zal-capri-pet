@@ -113,7 +113,7 @@ def main():
     for group in groups:
         parts = []
         for sheet in group:
-            path = os.path.join(ROOT, sheet)
+            path = os.path.join(ROOT, 'tools', 'sheets', sheet)
             parts += single(path) if sheet == 'pose-shaken.png' else split_sheet(path)
         scale = TARGET_VISOR / float(np.median([p[3] for p in parts]))
         raw += [(p[0], p[1], p[2], scale) for p in parts]

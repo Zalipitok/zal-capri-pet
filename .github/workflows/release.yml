@@ -23,10 +23,12 @@ jobs:
           $out = 'Capri-Companion'
           New-Item -ItemType Directory $out | Out-Null
           Copy-Item src/Capri/bin/Release/net48/Capri.exe $out
-          foreach($item in @('Capri.ps1','Capri.vbs','Start-Capri.bat','Run-SelfTest.bat','README.txt','VERSION','menu-theme.xaml','sprites','sounds')){
-            Copy-Item $item $out -Recurse
-          }
-          Get-ChildItem *.json | Copy-Item -Destination $out
+          # Capri.exe and README.txt on top; her data in data\, drawings and sounds in their folders.
+          # (save\ and logs\ are made by Capri on first start.)
+          foreach($item in @('README.txt','sprites','sounds')){ Copy-Item $item $out -Recurse }
+          New-Item -ItemType Directory "$out/data" | Out-Null
+          foreach($item in @('VERSION','menu-theme.xaml')){ Copy-Item $item "$out/data" }
+          Get-ChildItem *.json | Copy-Item -Destination "$out/data"
           Compress-Archive -Path $out -DestinationPath Capri-Companion.zip
       - name: Publish release
         env:

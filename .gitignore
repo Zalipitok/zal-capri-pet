@@ -18,3 +18,5 @@ notes.json
 backup-before-*/
 Capri.exe.old
 chat-history.json
+save/
+logs/

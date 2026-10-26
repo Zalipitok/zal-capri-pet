@@ -86,7 +86,7 @@ namespace Capri
                 foreach (var file in Directory.GetFiles(source, "*", SearchOption.AllDirectories))
                 {
                     var relative = file.Substring(source.Length).TrimStart('\\', '/');
-                    if (KeepOnUpdate.Contains(relative, StringComparer.OrdinalIgnoreCase) || relative.StartsWith("voices", StringComparison.OrdinalIgnoreCase)) continue;
+                    if (KeepOnUpdate.Contains(Path.GetFileName(relative), StringComparer.OrdinalIgnoreCase) || new[] { "voices", "save", "logs" }.Any(d => relative.StartsWith(d, StringComparison.OrdinalIgnoreCase))) continue;
                     var target = App.PathOf(relative);
                     Directory.CreateDirectory(Path.GetDirectoryName(target));
                     if (File.Exists(target))
