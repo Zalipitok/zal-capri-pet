@@ -46,10 +46,11 @@ namespace Capri
             win.Foreground = (Brush)CyberTheme["Cy.Text"];
 
             var root = new Grid { Margin = new Thickness(10) };   // room for the glow
-            var frame = new Path { Width = 0, Height = 0, HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top, Fill = (Brush)CyberTheme["Cy.Bg"], Stroke = (Brush)CyberTheme["Cy.Cyan"], StrokeThickness = 1.2, Opacity = 0.98 };
+            var frame = new Path { Fill = (Brush)CyberTheme["Cy.Bg"], Stroke = (Brush)CyberTheme["Cy.Cyan"], StrokeThickness = 1.2, Opacity = 0.98 };
             frame.Effect = new DropShadowEffect { Color = Color.FromRgb(63, 230, 245), BlurRadius = 14, ShadowDepth = 0, Opacity = 0.35 };
             root.SizeChanged += (s, e) => frame.Data = CutCorners(root.ActualWidth, root.ActualHeight, 16);
-            root.Children.Add(frame);
+            var frameHost = new Canvas(); frameHost.Children.Add(frame);   // a canvas lets it draw at full size without affecting layout
+            root.Children.Add(frameHost);
             var rail = new Rectangle { Width = 3, Fill = (Brush)CyberTheme["Cy.Pink"], HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(0, 26, 0, 24) };
             root.Children.Add(rail);
 

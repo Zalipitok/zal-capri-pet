@@ -26,9 +26,11 @@
    <Grid>
     <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="12"/></Grid.RowDefinitions>
     <!-- cut-corner panel with a cyan wire edge, a pink rail and a little tail pointing at her -->
-    <Path Name="BubbleFrame" Stretch="None" Width="0" Height="0" HorizontalAlignment="Left" VerticalAlignment="Top" Fill="#F20A0F18" Stroke="#3FE6F5" StrokeThickness="1.4">
+    <Canvas ClipToBounds="False">
+    <Path Name="BubbleFrame" Stretch="None" Fill="#F20A0F18" Stroke="#3FE6F5" StrokeThickness="1.4">
      <Path.Effect><DropShadowEffect Color="#3FE6F5" BlurRadius="12" ShadowDepth="0" Opacity="0.55"/></Path.Effect>
     </Path>
+    </Canvas>
     <Path Grid.Row="1" HorizontalAlignment="Center" Margin="40,-2,0,0" Data="M0,0 L16,0 L4,12 Z" Fill="#F20A0F18" Stroke="#3FE6F5" StrokeThickness="1.4"/>
     <Rectangle Width="3" HorizontalAlignment="Left" Margin="7,9,0,9" Fill="#FF2A6D"/>
     <StackPanel Margin="17,7,12,9">

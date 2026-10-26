@@ -54,7 +54,8 @@ namespace Capri
         void MenuSlabResize(object sender, SizeChangedEventArgs e)
         {
             var host = (Grid)sender;
-            foreach (var c in host.Children) if (c is System.Windows.Shapes.Path p) { p.Data = CutCorners(host.ActualWidth, host.ActualHeight, 14); break; }
+            foreach (var c in host.Children)
+                if (c is Canvas cv && cv.Children.Count > 0 && cv.Children[0] is System.Windows.Shapes.Path p) { p.Data = CutCorners(host.ActualWidth, host.ActualHeight, 14); break; }
         }
 
         void BuildMenu()
@@ -277,7 +278,7 @@ namespace Capri
                     menu.Opened += (s, e) =>
                     {
                         var slab = menu.Template?.FindName("Slab", menu) as System.Windows.Shapes.Path;
-                        var host = slab?.Parent as FrameworkElement;
+                        var host = (slab?.Parent as FrameworkElement)?.Parent as FrameworkElement;
                         if (slab == null || host == null) return;
                         slab.Data = CutCorners(host.ActualWidth, host.ActualHeight, 14);
                         host.SizeChanged -= MenuSlabResize; host.SizeChanged += MenuSlabResize;

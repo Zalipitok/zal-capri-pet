@@ -7,9 +7,11 @@
   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ContextMenu">
    <Grid Margin="6">
     <!-- cut-corner slab with a cyan wire edge and a soft glow -->
-    <Path x:Name="Slab" Stretch="None" Width="0" Height="0" HorizontalAlignment="Left" VerticalAlignment="Top" Fill="{TemplateBinding Background}" Stroke="#3FE6F5" StrokeThickness="1.2">
+    <Canvas x:Name="SlabHost" ClipToBounds="False">
+    <Path x:Name="Slab" Stretch="None" Fill="{TemplateBinding Background}" Stroke="#3FE6F5" StrokeThickness="1.2">
      <Path.Effect><DropShadowEffect Color="#3FE6F5" BlurRadius="12" ShadowDepth="0" Opacity="0.35"/></Path.Effect>
     </Path>
+    </Canvas>
     <Rectangle Width="3" Fill="#FF2A6D" HorizontalAlignment="Left" Margin="0,30,0,22"/>
     <DockPanel Margin="10,8,8,10">
      <DockPanel DockPanel.Dock="Top" Margin="6,0,4,6" LastChildFill="False">
