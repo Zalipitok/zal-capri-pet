@@ -161,8 +161,6 @@ namespace Capri
             }
             if (idleRest != "awake" && sleepReason == "ignored" && sysIdle >= 120) sleepReason = "away";
             if (idleRest == "yawning" && t > until) { idleRest = "sleeping"; BeginState("nap"); until = double.PositiveInfinity; }
-            if (!sprite.IsMouseOver) hoverLatched = false;
-            if (sprite.IsMouseOver && !hoverLatched && cursorMoved && t > caughtCooldown && !spec.Has("noCaught")) { hoverLatched = true; BeginState("caught"); }
             if (idleRest == "awake" && t > until && !voiceBusy)
             {
                 if (spec.setMood != "") mood = spec.setMood;

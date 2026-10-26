@@ -15,7 +15,7 @@ She has a tray icon (next to the clock), not a taskbar button.
                                   (change the key in tuning.json; turn off in Settings > Behaviour)
 
 CONTROLS
-  Click: reaction.  Double-click: dance.  Drag: carry her.
+  Click: she startles ("caught!").  Double-click: dance.  Hovering over her does nothing.  Drag: carry her.
   Flick and let go: throw her (she bounces and lands; turn off in Settings > Behaviour).
   Shake while dragging: she gets angry.  Shift-click: cartoon swat.  Ctrl-click: head pat (with a little sound).
   Drop a file on her: a mock "threat scan" of its name. She never opens, moves or changes it.

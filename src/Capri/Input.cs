@@ -73,7 +73,8 @@ namespace Capri
                 if (mouseDown)
                 {
                     mouseDown = false;
-                    if (state != "wakeglare") BeginState("wave");
+                    // A click (not a drag): the startled "caught" reaction that used to happen on hover.
+                    if (state != "wakeglare" && !spec.Has("noCaught")) { routine.Clear(); BeginState("caught"); }
                     if (heldLongEnough) ShowRemark("release"); else PlayVoice("click");
                 }
             };
