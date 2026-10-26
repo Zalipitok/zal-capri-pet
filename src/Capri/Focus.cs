@@ -75,10 +75,10 @@ namespace Capri
                 nextFocusTick = now + 0.5;
                 var rest = focusBreakEnds - DateTime.Now;
                 if (rest.TotalSeconds <= 0) { EndFocusBreak(true); return; }
-                string text = "BREAK " + (int)Math.Floor(rest.TotalMinutes) + ":" + rest.Seconds.ToString("00");
-                focusText.Text = text;
+                string breakText = "BREAK " + (int)Math.Floor(rest.TotalMinutes) + ":" + rest.Seconds.ToString("00");
+                focusText.Text = breakText;
                 if (focusBadge.Visibility != Visibility.Visible) focusBadge.Visibility = Visibility.Visible;
-                if (tray != null) try { tray.Text = "Capri - " + text.ToLowerInvariant() + " left"; } catch { }
+                if (tray != null) try { tray.Text = "Capri - " + breakText.ToLowerInvariant() + " left"; } catch { }
                 return;
             }
             if (!focusActive || now < nextFocusTick) return;
