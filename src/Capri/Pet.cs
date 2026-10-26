@@ -292,7 +292,8 @@ namespace Capri
                     var set = AddFrameSet(new[] { "anim-" + kv.Key + ".png" }, feet);
                     if (set == null) continue;
                     int basePose = set[0]; animPoses[kv.Key] = basePose;
-                    bool right = Json.Str(Json.Get(info, "facing")) == "right";
+                    // The new drawings face right (the original poses faced left); "facing": "left" opts one out.
+                    bool right = Json.Str(Json.Get(info, "facing")) != "left";
                     if (right) poseFacing[basePose] = -1;
                     if (Json.Bool(Json.Get(info, "blink")) == true) { var b = AddFrameSet(new[] { "anim-" + kv.Key + "-blink.png" }, feet); if (b != null) { blinkPoses[basePose] = b[0]; if (right) poseFacing[b[0]] = -1; } }
                     if (Json.Bool(Json.Get(info, "mouth")) == true) { var m = AddFrameSet(new[] { "anim-" + kv.Key + "-mouth-1.png", "anim-" + kv.Key + "-mouth-2.png" }, feet); if (m != null) { mouthPoses[basePose] = m; if (right) foreach (var i in m) poseFacing[i] = -1; } }

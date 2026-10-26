@@ -7,8 +7,6 @@ import numpy as np
 from PIL import Image, ImageDraw
 from scipy import ndimage
 FX, FY = 338, 367
-# Drawings that face (or move) to the right; the original art faced left, so the app mirrors these.
-FACING_RIGHT = {'ballbat', 'catchgame', 'charge', 'chase', 'chaseball', 'dash', 'depart', 'creep', 'pounce', 'scan', 'scanwindow', 'swat', 'wander', 'windup'}
 DRAWN_OPEN = {'caught', 'dance', 'friendtalk', 'gamerwin', 'spin', 'casting',   # already open-mouthed, or no clean spot
               'celebrate', 'laughing', 'peek', 'zigzag', 'tumble'}
 
@@ -128,8 +126,6 @@ if __name__ == '__main__':
     meta_path = os.path.join(dst, 'frames.json'); meta = json.load(open(meta_path))
     for n, rec in info.items():
         if n in meta['anims']: meta['anims'][n].update(rec)
-    for n in FACING_RIGHT:
-        if n in meta['anims']: meta['anims'][n]['facing'] = 'right'
     for n in DRAWN_OPEN:   # drop talking frames made by an earlier run
         if n in meta['anims']: meta['anims'][n].pop('mouth', None)
         for lvl in (1, 2):

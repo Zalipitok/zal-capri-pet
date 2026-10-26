@@ -56,7 +56,7 @@ namespace Capri
                 var head = PeekHeadOffset();
                 targetX = edge + peekSide * outBy - head.X;
                 targetY = r.Value.Top + r.Value.Height * peekHeight - head.Y;
-                direction = peekSide > 0 ? 1.0 : -1.0;
+                direction = peekSide > 0 ? -1.0 : 1.0;   // drawing mirrored: hair on the hidden side
                 bool close = Math.Abs(targetX - w.Left) + Math.Abs(targetY - w.Top) < 12;
                 if (!behindWindow && (close || phase > 2.5))
                 {
