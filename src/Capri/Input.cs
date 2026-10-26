@@ -58,10 +58,10 @@ namespace Capri
                 if (busyMode && !focusActive) { PrepareManualAction(); routine.Clear(); }
                 var velocity = throwPhysics ? SampleVelocity(dragSamples, Now) : null;
                 double speed = velocity != null ? Math.Sqrt(velocity[0] * velocity[0] + velocity[1] * velocity[1]) : 0;
-                if (speed > tuning.throwSpeed) StartThrow(Math.Max(-4000.0, Math.Min(4000.0, velocity[0])), Math.Max(-4000.0, Math.Min(4000.0, velocity[1])), "thrown");
+                if (speed > tuning.throwSpeed && !stayPut) StartThrow(Math.Max(-4000.0, Math.Min(4000.0, velocity[0])), Math.Max(-4000.0, Math.Min(4000.0, velocity[1])), "thrown");
                 else
                 {
-                    ClampPet();
+                    ClampPet(); MarkStayHere();
                     if (shakeAngry) { shakeAngry = false; BeginState("shaken"); caughtCooldown = until + 1; }
                     else if (TryDropPerch()) { }
                     else { BeginState("smug"); ShowRemark("release"); }

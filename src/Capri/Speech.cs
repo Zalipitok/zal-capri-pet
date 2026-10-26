@@ -120,7 +120,7 @@ namespace Capri
         public string settingsPath;
         public bool sfxEnabled = true, talkingMouth = true;
 
-        static readonly string[] SavedBools = { "facialMotion", "chase", "blackwallEnabled", "sfxEnabled", "windowPerch", "throwPhysics", "timeOfDay", "remarksEnabled", "subtitles", "muted", "smoothPoses", "musicEnabled", "appAware", "hotkeyEnabled", "talkingMouth", "eyesFollow", "batteryReactions", "shadowEnabled", "beatSync", "dndAware", "weatherEnabled", "chatEnabled", "chatVoice", "possessWindows", "cursorRepairs", "autoUpdate", "focusBreaks", "newSprites", "effectsEnabled", "herCursorEnabled" };
+        static readonly string[] SavedBools = { "facialMotion", "chase", "blackwallEnabled", "sfxEnabled", "windowPerch", "throwPhysics", "timeOfDay", "remarksEnabled", "subtitles", "muted", "smoothPoses", "musicEnabled", "appAware", "hotkeyEnabled", "talkingMouth", "eyesFollow", "batteryReactions", "shadowEnabled", "beatSync", "dndAware", "weatherEnabled", "chatEnabled", "chatVoice", "possessWindows", "cursorRepairs", "autoUpdate", "focusBreaks", "newSprites", "effectsEnabled", "herCursorEnabled", "stayPut", "avoidWork" };
 
         void InitSpeech()
         {
@@ -172,6 +172,7 @@ namespace Capri
                     var city = Json.Get(saved, "weatherCity") as string; if (city != null && city.Length <= 80) weatherCity = city;
                     var unit = Json.Str(Json.Get(saved, "weatherUnit")); if (unit == "C" || unit == "F") weatherUnit = unit;
                     var qh = Json.Str(Json.Get(saved, "quietHours")); if (QuietHourChoices.Contains(qh)) quietHours = qh;
+                    if (Json.Get(saved, "stayX") != null && Json.Get(saved, "stayY") != null) { stayX = Json.Num(Json.Get(saved, "stayX")); stayY = Json.Num(Json.Get(saved, "stayY")); }
                 }
             }
             catch { } // Invalid settings reset to defaults.
@@ -203,6 +204,7 @@ namespace Capri
                     ["weatherCity"] = weatherCity, ["weatherUnit"] = weatherUnit, ["quietHours"] = quietHours
                 };
                 foreach (var name in SavedBools) d[name] = GetBoolSetting(name);
+                if (!double.IsNaN(stayX)) { d["stayX"] = Math.Round(stayX); d["stayY"] = Math.Round(stayY); }
                 Json.Save(settingsPath, d);
             }
             catch { ShowProblem("Settings could not be saved."); }

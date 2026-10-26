@@ -332,6 +332,7 @@ namespace Capri
         // Hidden or far away: come here. Already next to the pointer: hide.
         void InvokeSummon()
         {
+            if (clickThrough) { SetClickThrough(false); return; }
             if (isHidden) { InvokeCallOver(); return; }
             bool near = false;
             try { var c = LocalCursor(); near = Math.Abs(c.X - w.Width / 2) < 220 && Math.Abs(c.Y - w.Height / 2) < 260; } catch { }

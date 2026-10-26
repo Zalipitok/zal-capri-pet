@@ -62,6 +62,8 @@ namespace Capri
                 BoolField("Look", "Sound effects (swat, head pat)", "sfxEnabled", "", () => { if (!sfxEnabled) sfxPlayer.Close(); }),
                 Bool("Behaviour", "Cursor chasing", () => chase, v => { chase = v; if (!v) { nextRetry = double.PositiveInfinity; if (spec.Has("needsChase")) BeginState("float"); } autoBag.Clear(); }),
                 Bool("Behaviour", "Cursor knockback (moves your pointer)", () => cursorKnockback, v => cursorKnockback = v, "Not saved: always starts off."),
+                Bool("Behaviour", "Stay where I put her", () => stayPut, SetStayPut, "She still moves, talks and reacts, but stays in one spot. Drag her to move the spot."),
+                BoolField("Behaviour", "Keep off the window I'm working in", "avoidWork", "She moves aside when she's on top of the window you're using (its title bar is still fair game)."),
                 BoolField("Behaviour", "Sit on windows", "windowPerch"),
                 BoolField("Behaviour", "Throwing physics", "throwPhysics"),
                 BoolField("Behaviour", "Time-of-day moods", "timeOfDay"),

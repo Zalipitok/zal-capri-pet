@@ -63,40 +63,47 @@ namespace Capri
             menu = new ContextMenu();
             var title = new MenuItem { Header = "CAPRI  //  NEURAL LINK", IsEnabled = false, Foreground = Brushes.Yellow, FontWeight = FontWeights.Bold };
             menu.Items.Add(title);
-            NewMenuEntry(menu, "Pause", () => SetPaused(!paused), () => paused);
-            NewMenuEntry(menu, "Busy, Capri (quiet corner)", () => SetBusyMode(!busyMode), () => busyMode);
-            NewMenuEntry(menu, "Mute", () => SetMuted(!muted), () => muted);
-            hideItem = NewMenuEntry(menu, "Hide (tray icon brings her back)", Act(() => { SetHidden(true); try { tray?.ShowBalloonTip(4000, "Capri", "Hiding. Double-click the tray icon to bring me back.", WF.ToolTipIcon.Info); } catch { } }));
-            Separator(menu);
-
-            var interact = NewSubMenu(menu, "Interact");
-            NewMenuEntry(interact, "Do something!", Act(() => { PrepareManualAction(); routine.Clear(); ChooseState(); }));
-            NewMenuEntry(interact, "Pet her (Ctrl-click)", Act(InvokeHeadPat));
-            NewMenuEntry(interact, "Play catch me (30 s)", Act(StartCatchGame));
-            NewMenuEntry(interact, "Toy ball (throw it, she fetches)", Act(() => SetBallShown(!ballShown)), () => ballShown);
-            NewMenuEntry(interact, "Chat with her...", Act(ShowChatWindow));
-            NewMenuEntry(interact, "Reminders...", Act(ShowReminderWindow));
-            NewMenuEntry(interact, "Leave a sticky note", Act(LeaveNote));
-            var focusMenu = NewSubMenu(interact, "Focus timer");
+            // The everyday things first; everything else is in the Settings window.
+            NewMenuEntry(menu, "Chat with her...", Act(ShowChatWindow));
+            NewMenuEntry(menu, "Reminders...", Act(ShowReminderWindow));
+            snoozeItem = NewMenuEntry(menu, "Snooze last reminder (10 min)", Act(() => SnoozeReminder(10)));
+            NewMenuEntry(menu, "Leave a sticky note", Act(LeaveNote));
+            var focusMenu = NewSubMenu(menu, "Focus timer");
             foreach (var minutes in new[] { 25, 45, 60 }) { int m = minutes; NewMenuEntry(focusMenu, m + " minutes", Act(() => StartFocus(m))); }
             focusStopItem = NewMenuEntry(focusMenu, "Stop focusing", Act(() => { if (focusActive) SetBusyMode(false); else EndFocusBreak(false); }));
             Separator(focusMenu);
             NewMenuEntry(focusMenu, "Short break after focus", Toggle("focusBreaks", () => { if (!focusBreaks) EndFocusBreak(false); }), Is("focusBreaks"));
-            NewMenuEntry(interact, "Possess a window", Act(() => InvokePossession(true)));
-            NewMenuEntry(interact, "Upgrade my cursor", Act(() => StartCursorRepair(true)));
-            NewMenuEntry(interact, "Use her own cursor", Act(() => StartHerCursor(true)));
-            NewMenuEntry(interact, "Peek from behind a window", State("peekbehind"));
-            snoozeItem = NewMenuEntry(interact, "Snooze last reminder (10 min)", Act(() => SnoozeReminder(10)));
-            friendItem = NewMenuEntry(interact, "Invite a friend (second Capri)", Act(() => { if (friendPresent) StopFriendCapri(); else StartFriendCapri(); }));
-            NewMenuEntry(interact, "Cartoon swat (Shift-click)", Act(InvokeSwat));
+            Separator(menu);
+
+            NewMenuEntry(menu, "Stay here", Act(() => SetStayPut(!stayPut)), () => stayPut);
+            NewMenuEntry(menu, "Let clicks through her", Act(() => SetClickThrough(true)));
+            NewMenuEntry(menu, "Busy (quiet corner)", () => SetBusyMode(!busyMode), () => busyMode);
+            NewMenuEntry(menu, "Pause", () => SetPaused(!paused), () => paused);
+            NewMenuEntry(menu, "Mute", () => SetMuted(!muted), () => muted);
+            hideItem = NewMenuEntry(menu, "Hide (tray icon brings her back)", Act(() => { SetHidden(true); try { tray?.ShowBalloonTip(4000, "Capri", "Hiding. Double-click the tray icon to bring me back.", WF.ToolTipIcon.Info); } catch { } }));
+            Separator(menu);
+
+            var play = NewSubMenu(menu, "Play");
+            NewMenuEntry(play, "Catch me (30 s)", Act(StartCatchGame));
+            NewMenuEntry(play, "Toy ball (throw it, she fetches)", Act(() => SetBallShown(!ballShown)), () => ballShown);
+            friendItem = NewMenuEntry(play, "Invite a friend (second Capri)", Act(() => { if (friendPresent) StopFriendCapri(); else StartFriendCapri(); }));
+            NewMenuEntry(play, "Pet her (Ctrl-click)", Act(InvokeHeadPat));
+            NewMenuEntry(play, "Cartoon swat (Shift-click)", Act(InvokeSwat));
+
+            var interact = NewSubMenu(menu, "Tricks");
+            NewMenuEntry(interact, "Do something!", Act(() => { PrepareManualAction(); routine.Clear(); ChooseState(); }));
             NewMenuEntry(interact, "Say a line now", Act(() => { PrepareManualAction(); voiceNext = 0; PlayVoice("random", true); }));
-            NewMenuEntry(interact, "Attack cursor (Blackwall)", Act(() => { PrepareManualAction(); routine.Clear(); chase = true; blackwallEnabled = true; caughtCooldown = Now + 12; BeginState("watch"); }));
-            NewMenuEntry(interact, "Sit on the active window", Act(() =>
+            NewMenuEntry(interact, "Sit on a window (or drop her on a title bar)", Act(() =>
             {
                 PrepareManualAction(); routine.Clear();
                 if (FindPerchWindow() == null) ShowStatus("No window to sit on. Click one first, and leave room above it."); else BeginState("windowperch");
             }));
             NewMenuEntry(interact, "Perch at taskbar", State("taskbar"));
+            NewMenuEntry(interact, "Peek from behind a window", State("peekbehind"));
+            NewMenuEntry(interact, "Use her own cursor", Act(() => StartHerCursor(true)));
+            NewMenuEntry(interact, "Upgrade my cursor", Act(() => StartCursorRepair(true)));
+            NewMenuEntry(interact, "Possess a window", Act(() => InvokePossession(true)));
+            NewMenuEntry(interact, "Attack cursor (Blackwall)", Act(() => { PrepareManualAction(); routine.Clear(); chase = true; blackwallEnabled = true; caughtCooldown = Now + 12; BeginState("watch"); }));
             NewMenuEntry(interact, "Fake sabotage / repair", State("sabotage"));
 
             var animations = NewSubMenu(menu, "Animations");
@@ -112,101 +119,12 @@ namespace Capri
             routineMenu = NewSubMenu(animations, "Little routines");
             foreach (var name in routineOrder.ToList()) { var n = name; NewMenuEntry(routineMenu, n, () => StartRoutineManual(n)); }
             NewMenuEntry(animations, "Stop routine", State("float"));
+            Separator(menu);
 
-            NewMenuEntry(menu, "Settings window...", Act(ShowSettingsWindow));
-            var settings = NewSubMenu(menu, "Settings");
-            var voiceMenu = NewSubMenu(settings, "Voice and subtitles");
-            foreach (var entry in new[] { new[] { "English", "en" }, new[] { "Japanese", "ja" } })
-            {
-                var code = entry[1];
-                NewMenuEntry(voiceMenu, entry[0], () => { StopVoice(); language = code; lastClip = ""; voiceNext = 0; ScheduleYap(); SaveSettings(); }, () => language == code);
-            }
-            Separator(voiceMenu);
-            var volumeMenu = NewSubMenu(voiceMenu, "Volume");
-            foreach (var level in new[] { 25, 50, 75, 100 }) { int l = level; NewMenuEntry(volumeMenu, l + "%", () => { SetVolume(l / 100.0); SaveSettings(); }, () => (int)Math.Round(volume * 100) == l); }
-            var chatterMenu = NewSubMenu(voiceMenu, "Random yapping");
-            foreach (var entry in new[] { new[] { "Off (reactions only)", "off" }, new[] { "Quiet: 100-180 seconds", "quiet" }, new[] { "Normal: 45-90 seconds", "normal" }, new[] { "Chatty: 18-35 seconds", "chatty" } })
-            {
-                var code = entry[1];
-                NewMenuEntry(chatterMenu, entry[0], () => { chatter = code; ScheduleYap(); SaveSettings(); }, () => chatter == code);
-            }
-            NewMenuEntry(voiceMenu, "Speech subtitles", () =>
-            {
-                subtitles = !subtitles;
-                if (subtitles && voiceBusy) { words.Text = activeCaption; bubble.Visibility = Visibility.Visible; subtitleUntil = double.PositiveInfinity; messageUntil = double.PositiveInfinity; }
-                else { subtitleUntil = 0; messageUntil = 0; bubble.Visibility = Visibility.Collapsed; }
-                SaveSettings();
-            }, () => subtitles);
-            NewMenuEntry(voiceMenu, "Character remarks", () =>
-            {
-                remarksEnabled = !remarksEnabled;
-                if (!voiceBusy && Now >= subtitleUntil) { bubble.Visibility = Visibility.Collapsed; messageUntil = 0; }
-                nextRemark = Now + 5; SaveSettings();
-            }, () => remarksEnabled);
-            NewMenuEntry(voiceMenu, "Read chat replies aloud", Toggle("chatVoice"), Is("chatVoice"));
-            Separator(voiceMenu);
-            NewMenuEntry(voiceMenu, "Voice library...", Act(ShowVoiceLibrary));
-
-            var appearance = NewSubMenu(settings, "Appearance");
-            var sizeMenu = NewSubMenu(appearance, "Size");
-            NewMenuSlider(sizeMenu, "Size: " + (int)petSize + "%", 65, 160, 5, petSize, (v, label) => { RegisterInteraction(); SetPetSize(v); label.Text = "Size: " + (int)petSize + "%"; });
-            NewMenuEntry(appearance, "Shadow when perched", Toggle("shadowEnabled"), Is("shadowEnabled"));
-            NewMenuEntry(appearance, "Eyes follow the cursor (original poses only)", Toggle("eyesFollow"), Is("eyesFollow"));
-            NewMenuEntry(appearance, "Talking mouth", Toggle("talkingMouth"), Is("talkingMouth"));
-            NewMenuEntry(appearance, "New per-animation sprites", Toggle("newSprites"), Is("newSprites"));
-            NewMenuEntry(appearance, "Smooth pose changes", Toggle("smoothPoses"), Is("smoothPoses"));
-            NewMenuEntry(appearance, "Animation effects (sparkles, z's, confetti)", Toggle("effectsEnabled"), Is("effectsEnabled"));
-            NewMenuEntry(appearance, "Idle blinking (original poses only)", Toggle("facialMotion"), Is("facialMotion"));
-            NewMenuEntry(appearance, "Blackwall effects", Toggle("blackwallEnabled"), Is("blackwallEnabled"));
-            NewMenuEntry(appearance, "Sound effects (swat, head pat)", Toggle("sfxEnabled", () => { if (!sfxEnabled) sfxPlayer.Close(); }), Is("sfxEnabled"));
-
-            var behaviour = NewSubMenu(settings, "Behaviour");
-            NewMenuEntry(behaviour, "Cursor chasing", () =>
-            {
-                chase = !chase;
-                if (!chase) { nextRetry = double.PositiveInfinity; if (spec.Has("needsChase")) BeginState("float"); }
-                autoBag.Clear(); until = 0;
-                ShowStatus("Cursor chasing " + (chase ? "on." : "off.")); SaveSettings();
-            }, () => chase);
-            NewMenuEntry(behaviour, "Cursor knockback (moves your pointer)", () => cursorKnockback = !cursorKnockback, () => cursorKnockback);
-            NewMenuEntry(behaviour, "Sit on windows", Toggle("windowPerch"), Is("windowPerch"));
-            NewMenuEntry(behaviour, "Throwing physics", Toggle("throwPhysics"), Is("throwPhysics"));
-            NewMenuEntry(behaviour, "Time-of-day moods", Toggle("timeOfDay"), Is("timeOfDay"));
-            NewMenuEntry(behaviour, "Quiet corner during Do Not Disturb / Focus", Toggle("dndAware", () => nextDndCheck = 0), Is("dndAware"));
-            NewMenuEntry(behaviour, "Possess windows sometimes (shakes them a little)", Toggle("possessWindows"), Is("possessWindows"));
-            NewMenuEntry(behaviour, "Glitch trail on the cursor sometimes", Toggle("cursorRepairs"), Is("cursorRepairs"));
-            NewMenuEntry(behaviour, "Battery reactions (laptops)", Toggle("batteryReactions"), Is("batteryReactions"));
-            NewMenuEntry(behaviour, "Bob to the real beat (listens to your PC's sound)", Toggle("beatSync"), Is("beatSync"));
-            NewMenuEntry(behaviour, "React to music", Toggle("musicEnabled", () => { if (musicEnabled && !musicAvailable) ShowStatus("Music reactions are not available here: " + musicError); }), Is("musicEnabled"));
-            NewMenuEntry(behaviour, "Notice which app I'm using (stays on this PC)", Toggle("appAware", () => { appCategory = ""; appAnnounced = ""; if (appAware) ShowStatus("I'll only look at which app is in front. Nothing leaves this PC.", 5); }), Is("appAware"));
-            hotkeyItem = NewMenuEntry(behaviour, "Summon hotkey", () =>
-            {
-                hotkeyEnabled = !hotkeyEnabled; RegisterSummonHotkey(); SaveSettings();
-                if (hotkeyEnabled) { if (hotkeyOk) ShowStatus(tuning.hotkey + " calls me over. Press it again next to me to hide me.", 5); else ShowProblem("Hotkey not set: " + hotkeyError); }
-            }, () => hotkeyEnabled);
-            Separator(behaviour);
-            var sleepMenu = NewSubMenu(behaviour, "Sleep after inactivity");
-            foreach (var minutes in new[] { 2, 5, 10, 0 }) { double s = minutes * 60; NewMenuEntry(sleepMenu, minutes == 0 ? "Never" : minutes + " minutes", () => { RegisterInteraction(); idleSleepAfter = s; SaveSettings(); }, () => idleSleepAfter == s); }
-            var breakMenu = NewSubMenu(behaviour, "Break reminders");
-            foreach (var minutes in new[] { 0, 25, 50, 90 }) { int m = minutes; NewMenuEntry(breakMenu, m == 0 ? "Off" : "Every " + m + " minutes of screen time", () => { breakMinutes = m; activeSince = Now; SaveSettings(); }, () => breakMinutes == m); }
-            var quietMenu = NewSubMenu(behaviour, "Quiet hours (no yapping, attacks or tricks)");
-            foreach (var q in QuietHourChoices) { var code = q; NewMenuEntry(quietMenu, QuietHoursLabel(code), () => { quietHours = code; SaveSettings(); }, () => quietHours == code); }
-            var fullscreenMenu = NewSubMenu(behaviour, "When a fullscreen app is open");
-            foreach (var entry in new[] { new[] { "Hide until it closes", "hide" }, new[] { "Sit quietly in the corner", "busy" }, new[] { "Stay on top", "ignore" } })
-            { var mode = entry[1]; NewMenuEntry(fullscreenMenu, entry[0], () => SetFullscreenMode(mode), () => fullscreenMode == mode); }
-            var ratesMenu = NewSubMenu(behaviour, "Activity frequency");
-            foreach (var entry in new[] { new[] { "Attacks", "attacks" }, new[] { "Wandering", "wandering" }, new[] { "Resting", "resting" }, new[] { "Antics", "antics" }, new[] { "Talking", "talking" }, new[] { "Rare antics", "rare" } })
-            {
-                var key = entry[1];
-                var rateMenu = NewSubMenu(ratesMenu, entry[0]);
-                NewMenuSlider(rateMenu, activityRates[key] + "%  (0 = off, 100 = normal)", 0, 200, 25, activityRates[key], (v, label) =>
-                {
-                    activityRates[key] = (int)v; label.Text = (int)v + "%  (0 = off, 100 = normal)";
-                    autoBag.Clear(); if (key == "talking") ScheduleYap(); if (key == "attacks" && v == 0) nextRetry = double.PositiveInfinity;
-                });
-            }
-            Separator(settings);
-            NewMenuEntry(settings, "Start with Windows", () => SetStartWithWindows(!StartsWithWindows), () => StartsWithWindows);
+            var settingsItem = NewMenuEntry(menu, "Settings...", Act(ShowSettingsWindow)); settingsItem.FontWeight = FontWeights.Bold;
+            var sizeMenu = NewSubMenu(menu, "Size");
+            NewMenuSlider(sizeMenu, "Size: " + (int)petSize + "%", 65, 160, 5, petSize, (v, label) => { RegisterInteraction(); SetPetSize(v); MarkStayHere(); label.Text = "Size: " + (int)petSize + "%"; });
+            NewMenuEntry(menu, "Voice library...", Act(ShowVoiceLibrary));
 
             var debug = NewSubMenu(menu, "Debug and help");
             NewMenuEntry(debug, "Movement status", () =>
@@ -257,8 +175,7 @@ namespace Capri
                 moodItem.Header = "Mood: " + mood;
                 rivalItem.Header = "Rivalry: " + rivalWins + " catches / " + rivalEscapes + " escapes";
                 hideItem.IsEnabled = tray != null;
-                hotkeyItem.Header = "Summon hotkey (" + tuning.hotkey + ")";
-                snoozeItem.IsEnabled = CanSnooze;
+                snoozeItem.Visibility = CanSnooze ? Visibility.Visible : Visibility.Collapsed;
                 focusStopItem.IsEnabled = focusActive || onFocusBreak;
                 focusStopItem.Header = onFocusBreak && !focusActive ? "Skip the break" : "Stop focusing";
                 updateItem.Header = updateVersion != null ? "Install update (" + updateVersion + ")" : "Install update (none found yet; version " + appVersion + ")";
@@ -375,6 +292,8 @@ namespace Capri
                 var pause = (WF.ToolStripMenuItem)trayMenu.Items.Add("Pause"); pause.Click += (s, e) => SetPaused(!paused);
                 var busy = (WF.ToolStripMenuItem)trayMenu.Items.Add("Busy (quiet corner)"); busy.Click += (s, e) => SetBusyMode(!busyMode);
                 var mute = (WF.ToolStripMenuItem)trayMenu.Items.Add("Mute"); mute.Click += (s, e) => SetMuted(!muted);
+                var stay = (WF.ToolStripMenuItem)trayMenu.Items.Add("Stay here"); stay.Click += (s, e) => SetStayPut(!stayPut);
+                var through = (WF.ToolStripMenuItem)trayMenu.Items.Add("Let clicks through her"); through.Click += (s, e) => SetClickThrough(!clickThrough);
                 trayMenu.Items.Add(new WF.ToolStripSeparator());
                 trayMenu.Items.Add("Remind me...").Click += (s, e) => ShowReminderWindow();
                 trayMenu.Items.Add("Chat with her...").Click += (s, e) => ShowChatWindow();
@@ -390,7 +309,7 @@ namespace Capri
                 trayMenu.Opening += (s, e) =>
                 {
                     show.Text = isHidden ? "Show Capri" : "Hide Capri";
-                    pause.Checked = paused; busy.Checked = busyMode; mute.Checked = muted;
+                    pause.Checked = paused; busy.Checked = busyMode; mute.Checked = muted; stay.Checked = stayPut; through.Checked = clickThrough;
                     focus.Text = focusActive ? "Stop focusing" : "Focus 25 minutes";
                 };
                 tray.ContextMenuStrip = trayMenu;

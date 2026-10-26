@@ -22,22 +22,24 @@ CONTROLS
   Right-click: the menu.  Escape or Quit: short dissolve and exit.
 
 MENU
-  Pause / Busy (quiet corner) / Mute / Hide
-  Interact      do something, pet, swat, say a line, cursor attack, sit on a window (or drop
-                her on a title bar),
-                perch at taskbar, fake sabotage
+  Chat with her... / Reminders... / Snooze (after a reminder) / Leave a sticky note / Focus timer
+  Stay here           she keeps animating and talking but stays in one spot (drag her to move it)
+  Let clicks through her   clicks go to whatever is underneath; the tray icon or the summon
+                      hotkey turns it off again
+  Busy (quiet corner) / Pause / Mute / Hide
+  Play          catch me, toy ball, invite a friend, pet, swat
+  Tricks        do something, say a line, sit on a window (or drop her on a title bar), taskbar,
+                peek, her own cursor, cursor glitch trail, possess a window, cursor attack,
+                fake sabotage
   Animations    every pose and antic by group, little routines, stop routine
-  Settings
-    Voice and subtitles   language, volume, random yapping, subtitles, remarks, voice library
-    Appearance            size, smooth pose changes, idle blinking, Blackwall effects, swat sound
-    Behaviour             cursor chasing, pointer knockback, sit on windows, throwing,
-                          time-of-day moods, react to music, notice which app I'm using,
-                          summon hotkey, sleep after inactivity, break reminders,
-                          fullscreen apps, activity frequency
-    Start with Windows
+  Settings...   every setting, in one window (also on the tray icon)
+  Size / Voice library...
   Debug and help  movement status, our history, run self-test, reload tuning.json,
                   wander now, cursor test, this guide, folders
   Mood and rivalry score (read only), Quit
+
+  By default she moves aside when she's sitting on top of the window you're working in
+  (Settings > Behaviour > "Keep off the window I'm working in").
 
 WHAT SHE DOES ON HER OWN
   - A shuffled rotation of antics, routines, perching and wandering (all defined in behaviours.json).

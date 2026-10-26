@@ -41,7 +41,7 @@ namespace Capri
         {
             if (exiting && name != "depart") return;
             KeyValuePair<long, Rect>? perch = null;
-            if (name == "perch" && windowPerch && rng.NextDouble() < tuning.perchChance) { perch = FindPerchWindow(); if (perch != null) name = "windowperch"; }
+            if (name == "perch" && windowPerch && !stayPut && rng.NextDouble() < tuning.perchChance) { perch = FindPerchWindow(); if (perch != null) name = "windowperch"; }
             else if (name == "windowperch") { perch = FindPerchWindow(); if (perch == null) name = "perch"; }
             var a = WorkArea();
             var others = new List<Rect>();
@@ -79,6 +79,7 @@ namespace Capri
                     }
                     break;
             }
+            if (s.speed != null && (s.target == "random" || s.target == "bottom" || s.target == "edge") && name != "roam") AvoidWorkTarget(a, s.target != "random");
             switch (name)
             {
                 case "teleport": teleported = false; break;
@@ -109,7 +110,7 @@ namespace Capri
                 var rare = specOrder.Where(id => specs[id].rare).ToList();
                 if (rare.Count > 0) { BeginState(rare[rng.Next(rare.Count)]); return; }
             }
-            if (BallAvailable && activityRates["antics"] > 0 && rng.NextDouble() < tuning.ballChance) { StartBallChase(); return; }
+            if (BallAvailable && !stayPut && activityRates["antics"] > 0 && rng.NextDouble() < tuning.ballChance) { StartBallChase(); return; }
             double powers = QuietNow ? 0 : tuning.powersChance;
             if (activityRates["antics"] > 0 && possessWindows && rng.NextDouble() < powers) { if (InvokePossession(false)) return; }
             if (activityRates["antics"] > 0 && herCursorEnabled && !herCursorActive && rng.NextDouble() < powers / 2) { StartHerCursor(false); if (herCursorActive) return; }
@@ -118,7 +119,7 @@ namespace Capri
             if (timeOfDay)
             {
                 var date = DateTime.Now;
-                if (date.Hour >= 14 && date.Hour < 17 && drinkBreakDay != date.Date && now > 600 && activityRates["antics"] > 0 && routines.ContainsKey("Drink break"))
+                if (!stayPut && date.Hour >= 14 && date.Hour < 17 && drinkBreakDay != date.Date && now > 600 && activityRates["antics"] > 0 && routines.ContainsKey("Drink break"))
                 { drinkBreakDay = date.Date; StartRoutine("Drink break"); return; }
                 if (date.Hour < 5 && activityRates["resting"] > 0 && rng.NextDouble() < 0.25)
                 { var sleepy = new[] { "yawn", "sleepy", "meditate" }; BeginState(sleepy[rng.Next(sleepy.Length)]); return; }
@@ -127,8 +128,8 @@ namespace Capri
             {
                 if (autoBag.Count == 0)
                 {
-                    var choices = specOrder.Where(id => specs[id].auto && (chase || !specs[id].Has("needsChase"))).ToList();
-                    choices.Add("__routine");
+                    var choices = specOrder.Where(id => specs[id].auto && (chase || !specs[id].Has("needsChase")) && (!stayPut || specs[id].speed == null)).ToList();
+                    if (!stayPut) choices.Add("__routine");
                     var weighted = new List<string>();
                     foreach (var choice in choices)
                     {
@@ -142,6 +143,7 @@ namespace Capri
                     AddShuffled(autoBag, weighted);
                 }
                 var next = autoBag.Dequeue();
+                if (stayPut && (next == "__routine" || GetSpec(next).speed != null)) { autoBag.Clear(); continue; }
                 if (next == "__routine")
                 {
                     if (activityRates["antics"] <= 0) continue;
@@ -446,7 +448,7 @@ namespace Capri
             SetHidden(false);
             PrepareManualAction(); routine.Clear();
             try { var c = LocalCursor(); w.Left = w.Left + c.X - w.Width / 2; w.Top = w.Top + c.Y - w.Height + 40; } catch { }
-            ClampPet(); BeginState("arrive");
+            ClampPet(); MarkStayHere(); BeginState("arrive");
         }
 
         // Start with Windows: a Startup-folder shortcut.

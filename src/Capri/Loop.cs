@@ -145,12 +145,13 @@ namespace Capri
             if (busyMode) { BusyFrame(t); return; }
             if (t >= nextUnlockCheck) { nextUnlockCheck = t + 30; TestUnlocks(); }
             if (t >= nextMood) { var moods = new[] { "bored", "curious", "smug", "irritated" }.Where(m => m != mood).ToArray(); mood = moods[rng.Next(moods.Length)]; nextMood = t + rng.Next(90, 181); }
-            if (activityRates["attacks"] > 0 && t >= nextRetry && spec.Has("calm") && chase && idleRest == "awake" && !voiceBusy && !away && !QuietNow)
+            if (activityRates["attacks"] > 0 && !stayPut && t >= nextRetry && spec.Has("calm") && chase && idleRest == "awake" && !voiceBusy && !away && !QuietNow)
             { nextRetry = double.PositiveInfinity; rivalRetries++; BeginState("rivalsneak"); }
             mouse = LocalCursor();
             cursorX = w.Left + mouse.X; cursorY = w.Top + mouse.Y;
             bool cursorMoved = cursorLastX != null && Math.Abs(cursorX - cursorLastX.Value) + Math.Abs(cursorY - cursorLastY.Value) > 2;
             cursorLastX = cursorX; cursorLastY = cursorY;
+            ScootFromWork(t, sysIdle);
             if (idleRest == "sleeping" && sleepReason == "away" && sysIdle < 2) WakeFromAway();
             if (sprite.IsMouseOver && cursorMoved) RegisterInteraction();
             if (idleSleepAfter > 0 && idleRest == "awake" && t - lastInteraction >= idleSleepAfter && !spec.Has("noSleep") && !voiceBusy)
@@ -240,6 +241,7 @@ namespace Capri
                     if (Math.Abs(dx) > 4) direction = dx < 0 ? 1.0 : -1.0;
                 }
             }
+            ApplyStayPut();
             effect.Opacity = 1;
             Action motion;
             if (motions.TryGetValue(s.motion, out motion)) motion();

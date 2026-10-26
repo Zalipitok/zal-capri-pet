@@ -125,6 +125,7 @@ namespace Capri
             BuildTray();
             InitInput();
             InitLoop();
+            RestoreStayPut();
             activeSince = Now;
             StartMemorySession();
             BeginState("arrive");
