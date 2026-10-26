@@ -26,7 +26,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $lines = Get-Content build.log | Where-Object { $_ -match ': (error|warning) [A-Z]+[0-9]+' } | ForEach-Object { ($_ -replace '^.*src[\\/]Capri[\\/]', '') -replace '\s*\[.*\]$','' } | Select-Object -Unique
+          $lines = Get-Content build.log | Where-Object { $_ -match ': (error|warning) [A-Z]+[0-9]+' } | ForEach-Object { ($_ -replace '\s*\[[^\]]*\]\s*$','') -replace '^.*?src[\\/]Capri[\\/]', '' } | Select-Object -Unique
           $errors = @($lines | Where-Object { $_ -match ': error ' })
           $text = if ($lines) { ($lines -join "`n") } else { (Get-Content build.log -Tail 60) -join "`n" }
           if ($text.Length -gt 60000) { $text = $text.Substring(0, 60000) }
