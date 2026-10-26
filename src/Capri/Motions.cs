@@ -185,6 +185,9 @@ namespace Capri
                 sabotagePanel.Visibility = Visibility.Visible;
                 sabotageText.Text = "THREAT LEVEL " + scanScore + "/10  //  SIMULATION\n" + scanName;
             };
+            // Sitting: no hover bob, just breathing.
+            motions["perch"] = () => { shift.Y = 0; scale.ScaleY = 1 + Sin(phase * 1.6) * 0.008; };
+            motions["taskbar"] = () => { shift.Y = 0; scale.ScaleY = 1 + Sin(phase * 1.6) * 0.008; };
             motions["windowperch"] = () => { if (perchArrived) { shift.Y = Sin(phase * 1.5) * 1.2; rotation.Angle = 0; } };
             motions["thrown"] = () =>
             {

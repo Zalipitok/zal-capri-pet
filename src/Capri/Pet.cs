@@ -288,6 +288,8 @@ namespace Capri
             if (anims != null) foreach (var kv in anims)
                 {
                     var info = kv.Value; double feet = Json.Num(Json.Get(info, "feet"), 0.9);
+                    // Sitting drawings rest on their seat, not their feet (legs hang over the edge).
+                    if (Json.Get(info, "seat") != null) feet = Json.Num(Json.Get(info, "seat"), feet);
                     if (Json.Get(info, "use") != null) continue; // borrows another animation's drawing (below)
                     var set = AddFrameSet(new[] { "anim-" + kv.Key + ".png" }, feet);
                     if (set == null) continue;
