@@ -7,7 +7,8 @@ import numpy as np
 from PIL import Image, ImageDraw
 from scipy import ndimage
 FX, FY = 338, 367
-DRAWN_OPEN = {'caught', 'dance', 'friendtalk', 'gamerwin', 'spin', 'casting'}   # already open-mouthed, or no clean spot
+DRAWN_OPEN = {'caught', 'dance', 'friendtalk', 'gamerwin', 'spin', 'casting',   # already open-mouthed, or no clean spot
+              'celebrate', 'laughing', 'peek', 'zigzag', 'tumble'}
 
 def axis(m):
     ys, xs = np.nonzero(m); cx, cy = xs.mean(), ys.mean()
@@ -17,11 +18,11 @@ def axis(m):
     along = (xs - cx) * ux + (ys - cy) * uy; across = -(xs - cx) * uy + (ys - cy) * ux
     return cx, cy, math.degrees(math.atan2(uy, ux)), along.max() - along.min() + 1, across.min(), across.max()
 
-def eyes(a):
+def eyes(a, reach=(70, 60)):
     A = a.astype(int)
     blue = (A[..., 2] > 140) & (A[..., 2] > A[..., 0] + 50) & (A[..., 2] > A[..., 1] + 20) & (A[..., 3] > 200)
     yy, xx = np.mgrid[0:A.shape[0], 0:A.shape[1]]
-    blue &= (abs(xx - FX) < 70) & (abs(yy - FY) < 60)
+    blue &= (abs(xx - FX) < reach[0]) & (abs(yy - FY) < reach[1])
     lab, n = ndimage.label(ndimage.binary_dilation(blue, iterations=2))
     if n < 1: return None
     sizes = ndimage.sum(blue, lab, range(1, n + 1))
@@ -29,12 +30,19 @@ def eyes(a):
     pts = [tuple(np.array(np.nonzero(lab == k))[::-1].mean(1)) for k in order]
     return pts
 
-def find_mouth(a):
+def find_mouth(a, faint=False):
     A = a.astype(int)
     yy, xx = np.mgrid[0:A.shape[0], 0:A.shape[1]]
-    zone = (abs(xx - FX) < 55) & (yy > FY - 5) & (yy < FY + 70)
+    # The face isn't always at the anchor: look under her eyes when they can be found.
+    fx, fy = FX, FY
+    ey = eyes(a, (130, 120))
+    if ey and len(ey) == 2 and 15 < math.dist(*ey) < 110:
+        fx, fy = (ey[0][0] + ey[1][0]) / 2, (ey[0][1] + ey[1][1]) / 2
+    zone = (abs(xx - fx) < 55) & (yy > fy - 5) & (yy < fy + 70)
     lum = A[..., :3].min(-1)
     white = zone & (lum > 85) & (A[..., 3] > 200)
+    if faint:   # some drawings have a dim grey zigzag
+        white = zone & (lum > 48) & ((A[..., :3].max(-1) - lum) < 45) & (A[..., 3] > 200)
     dark = (A[..., :3].sum(-1) < 220) & (A[..., 3] > 200)
     # thin white strokes on black: most of the 5x5 neighbourhood is dark
     darkfrac = ndimage.uniform_filter(dark.astype(float), 7)
@@ -49,8 +57,9 @@ def find_mouth(a):
         if sz < 5 or sz > 500: continue
         ys, xs = np.nonzero(m); w, h = xs.max() - xs.min() + 1, ys.max() - ys.min() + 1
         if w < 8 or w < h * 1.2: continue
-        d = np.hypot(xs.mean() - FX, ys.mean() - (FY + 22))
+        d = np.hypot(xs.mean() - fx, ys.mean() - (fy + 22))
         if best is None or d < best[0]: best = (d, m)
+    if best is None and not faint: return find_mouth(a, True)
     return best[1] if best else None
 
 def talk(a, m, level):
@@ -117,6 +126,11 @@ if __name__ == '__main__':
     meta_path = os.path.join(dst, 'frames.json'); meta = json.load(open(meta_path))
     for n, rec in info.items():
         if n in meta['anims']: meta['anims'][n].update(rec)
+    for n in DRAWN_OPEN:   # drop talking frames made by an earlier run
+        if n in meta['anims']: meta['anims'][n].pop('mouth', None)
+        for lvl in (1, 2):
+            f = os.path.join(dst, f'anim-{n}-mouth-{lvl}.png')
+            if os.path.exists(f): os.remove(f)
     json.dump(meta, open(meta_path, 'w'), indent=1)
     for f in os.listdir(dst):
         if f.startswith('anim-') and (f.endswith('-hp.png') or '-mouth-' in f):

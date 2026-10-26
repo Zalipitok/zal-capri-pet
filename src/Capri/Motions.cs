@@ -31,12 +31,12 @@ namespace Capri
             };
             paths["chase"] = () => { targetX = w.Left + mouse.X - w.Width / 2; targetY = w.Top + mouse.Y + 25; };
             paths["orbit"] = () => { targetX = anchorX + Cos(phase * 1.4) * 85; targetY = anchorY + Sin(phase * 1.4) * 60; };
-            paths["patrol"] = () => { targetX = area.Left + (area.Width - w.Width) * (0.5 + 0.45 * Sin(phase * 0.8)); targetY = area.Bottom - w.Height; };
+            paths["patrol"] = () => { targetX = area.Left + (area.Width - w.Width) * (0.5 + 0.45 * Sin(phase * 0.8)); targetY = FloorTop(area, PoseFor("patrol")); };
             paths["zigzag"] = () => { targetX = anchorX + Sin(phase * 2) * 140; targetY = anchorY + Sin(phase * 3) * 65; };
             paths["figure8"] = () => { targetX = anchorX + Sin(phase) * 110; targetY = anchorY + Sin(phase * 2) * 50; };
             paths["bounce"] = () => { targetX = anchorX + Sin(phase) * 120; targetY = anchorY - Abs(Sin(phase * 2)) * 70; };
             paths["rocket"] = () => { targetX = anchorX; targetY = anchorY - 180; };
-            paths["landing"] = () => { targetX = anchorX; targetY = area.Bottom - w.Height; };
+            paths["landing"] = () => { targetX = anchorX; targetY = FloorTop(area, PoseFor("landing")); };
             // Sit on a window's title bar and ride along when it moves; fall off when it goes away.
             paths["windowperch"] = () =>
             {
@@ -52,7 +52,7 @@ namespace Capri
                 throwVY += tuning.gravity * dt;
                 throwVX *= Max(0.0, 1 - 0.5 * dt);
                 double nx = w.Left + throwVX * dt, ny = w.Top + throwVY * dt;
-                double maxX = area.Right - w.Width, floor = area.Bottom - w.Height;
+                double maxX = area.Right - w.Width, floor = Min(FloorTop(area, PoseFor("landing")), FloorTop(area));
                 if (nx < area.Left) { nx = area.Left; throwVX = Abs(throwVX) * tuning.wallBounce; throwSquash = 1; }
                 else if (nx > maxX) { nx = maxX; throwVX = -Abs(throwVX) * tuning.wallBounce; throwSquash = 1; }
                 if (ny < area.Top) { ny = area.Top; throwVY = Abs(throwVY) * 0.4; }

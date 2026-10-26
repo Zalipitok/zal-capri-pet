@@ -97,7 +97,7 @@ namespace Capri
             if (k >= 1)
             {
                 if (now >= herNextClick) { HerClick(now); herNextClick = double.PositiveInfinity; }
-                if (now - herClickAt > 0.7 || herNextClick == double.PositiveInfinity && now >= herCursorUntil)
+                if (herNextClick == double.PositiveInfinity && now - herClickAt > 0.7)   // clicked (or a leg home): move on
                 {
                     if (now >= herCursorUntil && Sqrt(Pow(herPos.X - HerHand().X, 2) + Pow(herPos.Y - HerHand().Y, 2)) < 30) { StopHerCursor(); ChooseState(); return; }
                     NextHerLeg();

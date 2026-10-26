@@ -135,7 +135,7 @@ namespace Capri
             {
                 ballCarried = true; ballVX = 0; ballVY = 0;
                 var a = WorkArea();
-                ballStashX = rng.Next(2) == 0 ? a.Left : a.Right - w.Width; ballStashY = a.Bottom - w.Height;
+                ballStashX = rng.Next(2) == 0 ? a.Left : a.Right - w.Width; ballStashY = FloorTop(a);
                 BeginState("ballsteal");
                 ShowRemark("ballsteal", true);
                 return;

@@ -199,7 +199,7 @@ namespace Capri
             dndOn = on;
             if (on)
             {
-                if (!busyMode) { busyByDnd = true; SetBusyMode(true, true); ShowStatus("Do Not Disturb. Got it, I'll be quiet over here.", 4); }
+                if (!busyMode) { busyByDnd = true; SetBusyMode(true, true); ShowStatus(DndMessage(), 7); }
             }
             else if (busyByDnd)
             {
@@ -209,6 +209,12 @@ namespace Capri
         }
 
         // --- Apps (opt-in): only the name and title of the window in front; nothing stored or sent.
+        string DndMessage()
+        {
+            string what = CapriQuiet.Source == "presentation" ? "Presentation mode" : CapriQuiet.Source == "dnd" ? "Windows notifications are off" : "Do Not Disturb / Focus";
+            return what + ". Got it, I'll be quiet over here. (Drag me out or untick Busy to bring me back.)";
+        }
+
         object appRules; public string appCategory = ""; double appCategorySince; string appAnnounced = ""; double lastAppRemark = -1000, nextAppPoll;
         void ImportAppRules()
         {

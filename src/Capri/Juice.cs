@@ -203,7 +203,7 @@ namespace Capri
         void Emit(double t)
         {
             if (busyMode || isHidden || paused) return;
-            Point head = Body(0.5, 0.36), top = Body(0.5, 0.12), chest = Body(0.5, 0.55), feet = Body(0.5, -1);
+            Point head = Body(0.5, visorFraction - 0.04), top = Body(0.5, Min(0.4, ArtTop(poseIndex) + 0.02)), chest = Body(0.5, 0.55), feet = Body(0.5, -1);
             switch (state)
             {
                 case "nap":

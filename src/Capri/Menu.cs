@@ -151,12 +151,12 @@ namespace Capri
             var sizeMenu = NewSubMenu(appearance, "Size");
             NewMenuSlider(sizeMenu, "Size: " + (int)petSize + "%", 65, 160, 5, petSize, (v, label) => { RegisterInteraction(); SetPetSize(v); label.Text = "Size: " + (int)petSize + "%"; });
             NewMenuEntry(appearance, "Shadow when perched", Toggle("shadowEnabled"), Is("shadowEnabled"));
-            NewMenuEntry(appearance, "Eyes follow the cursor", Toggle("eyesFollow"), Is("eyesFollow"));
+            NewMenuEntry(appearance, "Eyes follow the cursor (original poses only)", Toggle("eyesFollow"), Is("eyesFollow"));
             NewMenuEntry(appearance, "Talking mouth", Toggle("talkingMouth"), Is("talkingMouth"));
             NewMenuEntry(appearance, "New per-animation sprites", Toggle("newSprites"), Is("newSprites"));
             NewMenuEntry(appearance, "Smooth pose changes", Toggle("smoothPoses"), Is("smoothPoses"));
             NewMenuEntry(appearance, "Animation effects (sparkles, z's, confetti)", Toggle("effectsEnabled"), Is("effectsEnabled"));
-            NewMenuEntry(appearance, "Idle blinking", Toggle("facialMotion"), Is("facialMotion"));
+            NewMenuEntry(appearance, "Idle blinking (original poses only)", Toggle("facialMotion"), Is("facialMotion"));
             NewMenuEntry(appearance, "Blackwall effects", Toggle("blackwallEnabled"), Is("blackwallEnabled"));
             NewMenuEntry(appearance, "Sound effects (swat, head pat)", Toggle("sfxEnabled", () => { if (!sfxEnabled) sfxPlayer.Close(); }), Is("sfxEnabled"));
 
@@ -213,7 +213,7 @@ namespace Capri
             {
                 double idle = 0; try { idle = CapriDesktop.IdleSeconds(); } catch { }
                 string beat; try { beat = CapriBeat.Running ? string.Format("{0:0} BPM, confidence {1:0.00}", CapriBeat.Bpm, CapriBeat.Confidence) : "not listening"; } catch { beat = "unavailable"; }
-                MessageBox.Show("State: " + state + "\nPaused: " + paused + "\nBusy mode: " + busyMode + "\nHidden: " + isHidden + " (fullscreen: " + hiddenFullscreen + ")\nSleep: " + idleRest + " " + sleepReason +
+                MessageBox.Show("State: " + state + "\nPaused: " + paused + "\nBusy mode: " + busyMode + (busyMode ? " (" + (focusActive ? "focus timer" : busyByDnd ? "Windows " + CapriQuiet.Source : busyByFullscreen ? "fullscreen app" : "by hand") + ")" : "") + "\nHidden: " + isHidden + " (fullscreen: " + hiddenFullscreen + ")\nSleep: " + idleRest + " " + sleepReason +
                     "\nDragging: " + dragging + "\nVoice playing: " + voiceBusy + "\nLive volume: " + liveVolume + "\nMonitors: " + AllWorkAreas().Count + "\nYou idle for: " + (int)idle + " s\nBeat: " + beat +
                     "\nFrame time: " + tickMs + " ms\nVersion: " + appVersion + " (native)", "Capri movement status");
             });

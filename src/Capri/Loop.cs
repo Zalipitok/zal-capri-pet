@@ -57,7 +57,7 @@ namespace Capri
 
         public void Tick()
         {
-            try { TickBody(); }
+            try { TickBody(); PlaceBubble(dt); }
             catch (Exception ex)
             {
                 if (Now - lastRuntimeError > 5) { lastRuntimeError = Now; App.Log("runtime-error.log", ex.ToString()); }
@@ -227,7 +227,7 @@ namespace Capri
             if (s.clampTarget)
             {
                 targetX = Math.Max(area.Left, Math.Min(targetX, area.Right - w.Width));
-                targetY = Math.Max(area.Top, Math.Min(targetY, area.Bottom - w.Height));
+                targetY = Math.Max(area.Top, Math.Min(targetY, FloorTop(area)));
             }
             if (s.speed != null)
             {
@@ -250,7 +250,6 @@ namespace Capri
             if (state == "pounce" && phase > 0.12 && CursorContact()) { attackContact = true; until = t; }
             ApplySpeechPose();
             ClampPet();
-            PlaceBubble(dt);
             UpdateShadow(spec.Has("grounded") && (state != "windowperch" || perchArrived), state == "windowperch");
             if (!spec.Has("noFace"))
             {
@@ -264,7 +263,7 @@ namespace Capri
         void BusyFrame(double now)
         {
             lastInteraction = now;
-            var a = WorkArea(); w.Left = a.Right - w.Width - 12; w.Top = a.Bottom - w.Height;
+            var a = WorkArea(); w.Left = a.Right - w.Width - 12; w.Top = FloorTop(a);
             if (now >= busyUntil)
             {
                 if (busyBag.Count == 0)

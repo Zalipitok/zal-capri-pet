@@ -91,7 +91,8 @@
    "mouth": true
   },
   "baitjudge": {
-   "feet": 0.9331
+   "feet": 0.9331,
+   "mouth": true
   },
   "ballbat": {
    "feet": 0.845,
@@ -144,27 +145,32 @@
    "mouth": true
   },
   "chase": {
-   "feet": 0.8149
+   "feet": 0.8149,
+   "mouth": true
   },
   "chaseball": {
-   "feet": 0.7547
+   "feet": 0.7547,
+   "mouth": true
   },
   "chatreply": {
    "feet": 0.9911,
-   "headphones": true
+   "headphones": true,
+   "mouth": true
   },
   "cheers": {
    "feet": 0.9309,
    "mouth": true
   },
   "creep": {
-   "feet": 0.7804
+   "feet": 0.7804,
+   "mouth": true
   },
   "dance": {
    "feet": 0.8963
   },
   "dash": {
-   "feet": 0.7514
+   "feet": 0.7514,
+   "mouth": true
   },
   "depart": {
    "feet": 0.8785,
@@ -192,7 +198,8 @@
    "headphones": true
   },
   "friendchase": {
-   "feet": 0.9643
+   "feet": 0.9643,
+   "mouth": true
   },
   "friendflee": {
    "feet": 0.854,
@@ -242,7 +249,8 @@
    "mouth": true
   },
   "impact": {
-   "feet": 0.7046
+   "feet": 0.7046,
+   "mouth": true
   },
   "jelly": {
    "feet": 0.9119,
@@ -294,7 +302,8 @@
    "mouth": true
   },
   "rain": {
-   "feet": 0.9911
+   "feet": 0.9911,
+   "mouth": true
   },
   "remind": {
    "feet": 0.9431,
@@ -318,17 +327,20 @@
   },
   "roam": {
    "feet": 0.9799,
-   "headphones": true
+   "headphones": true,
+   "mouth": true
   },
   "rocket": {
-   "feet": 0.8428
+   "feet": 0.8428,
+   "mouth": true
   },
   "sabotage": {
    "feet": 0.8517,
    "mouth": true
   },
   "scan": {
-   "feet": 0.9186
+   "feet": 0.9186,
+   "mouth": true
   },
   "scanverdict": {
    "feet": 0.961,
@@ -361,7 +373,8 @@
   },
   "smug": {
    "feet": 0.9331,
-   "headphones": true
+   "headphones": true,
+   "mouth": true
   },
   "sneak": {
    "feet": 0.8785,
@@ -389,7 +402,8 @@
    "headphones": true
   },
   "teleport": {
-   "feet": 0.6421
+   "feet": 0.6421,
+   "mouth": true
   },
   "thrown": {
    "feet": 0.8339,
@@ -415,7 +429,8 @@
    "headphones": true
   },
   "watch": {
-   "feet": 0.8685
+   "feet": 0.8685,
+   "mouth": true
   },
   "wave": {
    "feet": 0.9777,
@@ -438,7 +453,8 @@
    "headphones": true
   },
   "windup": {
-   "feet": 0.6934
+   "feet": 0.6934,
+   "mouth": true
   },
   "yawn": {
    "feet": 0.9889

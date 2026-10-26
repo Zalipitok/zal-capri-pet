@@ -54,8 +54,8 @@ namespace Capri
             targetY = a.Top + rng.NextDouble() * Math.Max(1.0, a.Height - w.Height);
             switch (s.target)
             {
-                case "bottom": targetY = a.Bottom - w.Height; break;
-                case "taskbar": targetX = w.Left; targetY = a.Bottom - w.Height; break;
+                case "bottom": targetY = FloorTop(a, PoseFor(name)); break;
+                case "taskbar": targetX = w.Left; targetY = FloorTop(a, PoseFor(name)); break;
                 case "edge": targetX = rng.Next(2) == 0 ? a.Left : a.Right - w.Width; break;
                 case "cursor": { var c = LocalCursor(); targetX = w.Left + c.X - w.Width / 2; targetY = w.Top + c.Y - (w.Height + 100) / 2; break; }
                 case "cursorAnchor": { var c = LocalCursor(); anchorX = w.Left + c.X - w.Width / 2; anchorY = w.Top + c.Y - w.Height / 2; break; }
@@ -277,7 +277,7 @@ namespace Capri
             if (on)
             {
                 StopVoice(); sfxPlayer.Close(); nextRetry = double.PositiveInfinity;
-                var a = WorkArea(); w.Left = a.Right - w.Width - 12; w.Top = a.Bottom - w.Height;
+                var a = WorkArea(); w.Left = a.Right - w.Width - 12; w.Top = FloorTop(a, PoseFor("taskbar"));
                 busyUntil = 0; busyBag.Clear();
                 activeSince = Now;
                 BeginState("taskbar");

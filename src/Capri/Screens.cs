@@ -64,7 +64,7 @@ namespace Capri
             w.Left = Math.Max(a.Left, Math.Min(w.Left, Math.Max(a.Left, a.Right - w.Width)));
             // the transparent space above her head may go off the top of the screen
             double above = Math.Max(0.0, EmptyAbove(poseIndex) - 4);
-            w.Top = Math.Max(a.Top - above, Math.Min(w.Top, Math.Max(a.Top - above, a.Bottom - w.Height)));
+            w.Top = Math.Max(a.Top - above, Math.Min(w.Top, Math.Max(a.Top - above, FloorTop(a))));
         }
 
         // Where the drawing starts in each frame (fraction of the frame height from the top).
@@ -100,6 +100,10 @@ namespace Capri
             }
             catch { return 0.0; }
         }
+        // The window top that stands her feet (in the given pose) on the bottom of the work area.
+        // The drawings have empty space under the feet, different in every pose.
+        public double FloorTop(Rect a, int pose = -1) { return a.Bottom - w.Height + Math.Max(0.0, SpriteFoot(pose < 0 ? poseIndex : pose) - 3); }
+        public int PoseFor(string st) { int p; return newSprites && animPoses.TryGetValue(st, out p) ? p : poseIndex; }
         public int PerchPose { get { return AnimPose("windowperch", 12); } }
         // How much room she needs above a window's top edge to sit on it (just her drawn height).
         public double PerchRoom() { return w.Height - SpriteFoot(PerchPose) - EmptyAbove(PerchPose) + 4; }
@@ -133,7 +137,7 @@ namespace Capri
         {
             if (!shadowEnabled || !grounded || isHidden) { if (shadow.Visibility != Visibility.Collapsed) shadow.Visibility = Visibility.Collapsed; return; }
             double foot = SpriteFoot(poseIndex);
-            double surface = onWindow ? SpriteFoot(PerchPose) : 8.0;
+            double surface = onWindow ? SpriteFoot(PerchPose) : Math.Max(0.0, w.Top + w.Height - WorkArea().Bottom);
             double height = Math.Max(0.0, foot - surface);
             double width = Math.Max(20.0, sprite.ActualWidth * 0.42 * (1.0 - Math.Min(0.5, height / 400.0)));
             shadow.Width = width; shadow.Height = width * 0.16;
