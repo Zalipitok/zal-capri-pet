@@ -152,6 +152,7 @@ sprites\frames.json records where her feet are in each frame, which is how she s
 After editing a sheet, rebuild the frames (needs Python):
   pip install pillow numpy scipy scikit-image
   python tools\normalize_sprites.py
+  python tools\enhance_sprites.py       (one visor green, sharper edges, the show's eyes)
   python tools\make_music_frames.py     (headphones)
   python tools\make_mouth_frames.py     (talking mouth)
   python tools\make_eye_frames.py       (eyes)
