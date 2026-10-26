@@ -165,12 +165,14 @@ namespace Capri
         public void StartThrow(double vx, double vy, string reason)
         {
             throwVX = vx; throwVY = vy; throwSquash = 0; throwReason = reason;
+            if (stayPut) stayAway = true;   // Stay here doesn't stop a throw; where she lands is her new spot
             routine.Clear(); BeginState("thrown");
         }
 
         void FinishThrow()
         {
             rotation.Angle = 0;
+            if (stayPut && throwReason != "fell") { stayX = w.Left; stayY = FloorTop(WorkArea(), PoseFor("landing")); stayAway = false; SaveSettings(); }
             if (shakeAngry) { shakeAngry = false; BeginState("shaken"); caughtCooldown = until + 1; }
             else
             {
