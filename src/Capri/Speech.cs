@@ -120,7 +120,7 @@ namespace Capri
         public string settingsPath;
         public bool sfxEnabled = true, talkingMouth = true;
 
-        static readonly string[] SavedBools = { "facialMotion", "chase", "blackwallEnabled", "sfxEnabled", "windowPerch", "throwPhysics", "timeOfDay", "remarksEnabled", "subtitles", "muted", "smoothPoses", "musicEnabled", "appAware", "hotkeyEnabled", "talkingMouth", "eyesFollow", "batteryReactions", "shadowEnabled", "beatSync", "dndAware", "weatherEnabled", "chatEnabled", "chatVoice", "possessWindows", "cursorRepairs", "autoUpdate" };
+        static readonly string[] SavedBools = { "facialMotion", "chase", "blackwallEnabled", "sfxEnabled", "windowPerch", "throwPhysics", "timeOfDay", "remarksEnabled", "subtitles", "muted", "smoothPoses", "musicEnabled", "appAware", "hotkeyEnabled", "talkingMouth", "eyesFollow", "batteryReactions", "shadowEnabled", "beatSync", "dndAware", "weatherEnabled", "chatEnabled", "chatVoice", "possessWindows", "cursorRepairs", "autoUpdate", "focusBreaks" };
 
         void InitSpeech()
         {
@@ -171,6 +171,7 @@ namespace Capri
                     if (Json.Get(saved, "volume") != null) volume = Math.Max(0.0, Math.Min(1.0, Json.Num(Json.Get(saved, "volume"))));
                     var city = Json.Get(saved, "weatherCity") as string; if (city != null && city.Length <= 80) weatherCity = city;
                     var unit = Json.Str(Json.Get(saved, "weatherUnit")); if (unit == "C" || unit == "F") weatherUnit = unit;
+                    var qh = Json.Str(Json.Get(saved, "quietHours")); if (QuietHourChoices.Contains(qh)) quietHours = qh;
                 }
             }
             catch { } // Invalid settings reset to defaults.
@@ -199,7 +200,7 @@ namespace Capri
                     ["rivalEscapes"] = rivalEscapes, ["rivalWins"] = rivalWins, ["escapeStreak"] = escapeStreak,
                     ["idleSleepAfter"] = idleSleepAfter, ["petSize"] = petSize, ["language"] = language, ["volume"] = volume, ["chatter"] = chatter,
                     ["approvedVoices"] = approvedVoices.ToArray(), ["voicePackRevision"] = 3, ["fullscreenMode"] = fullscreenMode, ["breakMinutes"] = breakMinutes,
-                    ["weatherCity"] = weatherCity, ["weatherUnit"] = weatherUnit
+                    ["weatherCity"] = weatherCity, ["weatherUnit"] = weatherUnit, ["quietHours"] = quietHours
                 };
                 foreach (var name in SavedBools) d[name] = GetBoolSetting(name);
                 Json.Save(settingsPath, d);

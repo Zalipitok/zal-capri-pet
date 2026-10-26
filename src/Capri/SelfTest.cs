@@ -175,6 +175,30 @@ namespace Capri
                 if (remindersError != "") bad.Add("reminders.json: " + remindersError);
                 return bad.Count > 0 ? string.Join("; ", bad) : null;
             });
+            Step("Repeating reminders", () =>
+            {
+                var b = new DateTime(2026, 10, 24, 10, 0, 0); // a Saturday
+                var bad = new List<string>();
+                var r = ParseRepeating("every day at 9", b); if (r == null || r.Item1 != b.Date.AddDays(1).AddHours(9) || r.Item2 != "daily") bad.Add("every day at 9");
+                r = ParseRepeating("weekdays at 8:30", b); if (r == null || r.Item1 != new DateTime(2026, 10, 26, 8, 30, 0) || r.Item2 != "weekdays") bad.Add("weekdays at 8:30");
+                r = ParseRepeating("every monday at 18:00", b); if (r == null || r.Item1 != new DateTime(2026, 10, 26, 18, 0, 0) || r.Item2 != "weekly") bad.Add("every monday at 18:00");
+                if (ParseRepeating("monday at 9", b) != null) bad.Add("\"monday at 9\" should not repeat");
+                if (NextOccurrence(new DateTime(2026, 10, 23, 9, 0, 0), "weekdays", new DateTime(2026, 10, 23, 9, 0, 1)).DayOfWeek != DayOfWeek.Monday) bad.Add("weekdays skip the weekend");
+                return bad.Count > 0 ? "not understood: " + string.Join(", ", bad) : null;
+            });
+            Step("Quiet hours", () =>
+            {
+                if (!InQuietHours("22-7", 23) || !InQuietHours("22-7", 3) || InQuietHours("22-7", 7) || InQuietHours("22-7", 15)) return "22-7 is wrong";
+                if (!InQuietHours("0-8", 0) || InQuietHours("0-8", 8) || InQuietHours("off", 2)) return "0-8 or off is wrong";
+                return null;
+            });
+            Step("Hotkey parsing", () =>
+            {
+                var a = ParseHotkey("Ctrl+Alt+C"); var f = ParseHotkey("ctrl+shift+f9");
+                if (a == null || a[0] != 3 || a[1] != 'C') return "Ctrl+Alt+C";
+                if (f == null || f[0] != 6 || f[1] != 0x78) return "Ctrl+Shift+F9";
+                return ParseHotkey("Ctrl+Alt") != null ? "a hotkey without a key was accepted" : null;
+            });
             Step("Reminder delivery", () =>
             {
                 selfTestErrors.Clear();

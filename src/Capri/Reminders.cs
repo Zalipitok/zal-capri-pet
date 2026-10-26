@@ -10,7 +10,7 @@ using System.Windows.Media;
 
 namespace Capri
 {
-    class Reminder { public DateTime at; public string text; }
+    class Reminder { public DateTime at; public string text; public string repeat = ""; } // repeat: "", daily, weekdays, weekly
 
     // Reminders: she flies over and tells you, with a chime and a Windows notification (reminders.json).
     partial class Pet
@@ -30,7 +30,7 @@ namespace Capri
                     {
                         var text = Json.Str(Json.Get(e, "text")); var at = Json.Str(Json.Get(e, "at"));
                         DateTime when;
-                        if (text != "" && DateTime.TryParse(at, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out when)) reminders.Add(new Reminder { at = when.Kind == DateTimeKind.Utc ? when.ToLocalTime() : when, text = text });
+                        if (text != "" && DateTime.TryParse(at, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out when)) reminders.Add(new Reminder { at = when.Kind == DateTimeKind.Utc ? when.ToLocalTime() : when, text = text, repeat = Json.Str(Json.Get(e, "repeat")) });
                     }
             }
             catch (Exception e) { remindersError = e.Message; }
@@ -42,7 +42,7 @@ namespace Capri
             try
             {
                 if (reminders.Count == 0) { if (File.Exists(remindersPath)) File.Delete(remindersPath); return; }
-                Json.Save(remindersPath, reminders.OrderBy(r => r.at).Select(r => new Dictionary<string, object> { { "at", r.at.ToString("o") }, { "text", r.text } }).ToList());
+                Json.Save(remindersPath, reminders.OrderBy(r => r.at).Select(r => new Dictionary<string, object> { { "at", r.at.ToString("o") }, { "text", r.text }, { "repeat", r.repeat } }).ToList());
             }
             catch (Exception e) { ShowProblem("Reminders could not be saved: " + e.Message); }
         }
@@ -89,6 +89,49 @@ namespace Capri
             return now.AddSeconds(seconds);
         }
 
+        static readonly string[] DayNames = { "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday" };
+
+        // "every day at 9", "daily 8am", "every weekday at 8:30", "weekdays at 9", "every monday at 18:00".
+        // Returns the first time and the repeat kind (daily, weekdays, weekly), or null.
+        public static Tuple<DateTime, string> ParseRepeating(string text, DateTime now)
+        {
+            var m = Regex.Match(text.Trim().ToLowerInvariant(), @"^(?:every\s+)?(?<kind>daily|day|weekdays|weekday|monday|tuesday|wednesday|thursday|friday|saturday|sunday)s?\s*(?:at\s+)?(?<time>.*)$");
+            if (!m.Success) return null;
+            string kind = m.Groups["kind"].Value, timeText = m.Groups["time"].Value.Trim();
+            if (timeText == "") timeText = "9:00";
+            if (!text.Trim().ToLowerInvariant().StartsWith("every") && kind != "daily" && kind != "weekdays" && kind != "weekday") return null;
+            var at = ParseWhen(timeText, now);
+            if (at == null || !Regex.IsMatch(timeText, @"\d[:.]\d|am|pm|^\d{1,2}$")) return null;
+            // A bare number here means an hour of the day, not minutes from now.
+            if (Regex.IsMatch(timeText, @"^\d{1,2}$")) { int h = int.Parse(timeText); if (h > 23) return null; at = now.Date.AddHours(h); }
+            var first = now.Date.Add(at.Value.TimeOfDay);
+            string repeat = kind == "day" || kind == "daily" ? "daily" : kind.StartsWith("weekday") ? "weekdays" : "weekly";
+            if (repeat == "weekly")
+            {
+                int target = Array.IndexOf(DayNames, kind);
+                while ((int)first.DayOfWeek != target || first <= now) first = first.AddDays(1);
+            }
+            else
+            {
+                while (first <= now || (repeat == "weekdays" && (first.DayOfWeek == DayOfWeek.Saturday || first.DayOfWeek == DayOfWeek.Sunday))) first = first.AddDays(1);
+            }
+            return Tuple.Create(first, repeat);
+        }
+
+        public static DateTime NextOccurrence(DateTime at, string repeat, DateTime now)
+        {
+            var next = at;
+            do
+            {
+                next = next.AddDays(repeat == "weekly" ? 7 : 1);
+                while (repeat == "weekdays" && (next.DayOfWeek == DayOfWeek.Saturday || next.DayOfWeek == DayOfWeek.Sunday)) next = next.AddDays(1);
+            } while (next <= now);
+            return next;
+        }
+
+        public static string RepeatLabel(Reminder r) =>
+            r.repeat == "daily" ? "  (every day)" : r.repeat == "weekdays" ? "  (weekdays)" : r.repeat == "weekly" ? "  (every " + r.at.ToString("dddd", CultureInfo.InvariantCulture) + ")" : "";
+
         public static string FormatReminderTime(DateTime at)
         {
             var now = DateTime.Now; string clockText = at.ToString("HH:mm");
@@ -97,13 +140,14 @@ namespace Capri
             return at.ToString("ddd d MMM HH:mm", CultureInfo.InvariantCulture);
         }
 
-        public void AddReminder(DateTime at, string text)
+        public void AddReminder(DateTime at, string text, string repeat = "")
         {
             text = (text ?? "").Trim(); if (text == "") text = "Time's up.";
             if (text.Length > 140) text = text.Substring(0, 140);
-            reminders.Add(new Reminder { at = at, text = text });
+            var r = new Reminder { at = at, text = text, repeat = repeat ?? "" };
+            reminders.Add(r);
             SaveReminders(); RefreshReminderList();
-            ShowStatus("Got it. " + FormatReminderTime(at) + ": " + text, 4);
+            ShowStatus("Got it. " + FormatReminderTime(at) + RepeatLabel(r) + ": " + text, 4);
         }
 
         void UpdateReminders(double now)
@@ -112,8 +156,12 @@ namespace Capri
             nextReminderCheck = now + 1;
             var due = reminders.Where(r => r.at <= DateTime.Now).OrderBy(r => r.at).FirstOrDefault();
             if (due == null) return;
-            reminders.Remove(due); SaveReminders(); RefreshReminderList();
-            SendReminder(due, (DateTime.Now - due.at).TotalMinutes);
+            double late = (DateTime.Now - due.at).TotalMinutes;
+            reminders.Remove(due);
+            // A repeating one comes back for its next time.
+            if (due.repeat != "") reminders.Add(new Reminder { at = NextOccurrence(due.at, due.repeat, DateTime.Now), text = due.text, repeat = due.repeat });
+            SaveReminders(); RefreshReminderList();
+            SendReminder(due, late);
         }
 
         public void SendReminder(Reminder r, double minutesLate)
@@ -141,7 +189,7 @@ namespace Capri
         {
             if (remList == null) return;
             remList.Items.Clear();
-            foreach (var r in reminders.OrderBy(x => x.at)) remList.Items.Add(new ListBoxItem { Content = FormatReminderTime(r.at) + "   " + r.text, Tag = r });
+            foreach (var r in reminders.OrderBy(x => x.at)) remList.Items.Add(new ListBoxItem { Content = FormatReminderTime(r.at) + RepeatLabel(r) + "   " + r.text, Tag = r });
             if (remList.Items.Count == 0) remList.Items.Add("(nothing yet)");
         }
 
@@ -157,7 +205,7 @@ namespace Capri
             remWhat = new TextBox { Padding = new Thickness(4) }; stack.Children.Add(remWhat);
             stack.Children.Add(label("When:"));
             remWhen = new TextBox { Padding = new Thickness(4), Text = "20" }; stack.Children.Add(remWhen);
-            stack.Children.Add(new TextBlock { Text = "20 = in 20 minutes.  Also: 1h30, 45 min, 17:45, 5pm, tomorrow 9:00", FontSize = 11, Opacity = 0.65, Margin = new Thickness(0, 3, 0, 6) });
+            stack.Children.Add(new TextBlock { Text = "20 = in 20 minutes.  Also: 1h30, 45 min, 17:45, 5pm, tomorrow 9:00, every day at 9, weekdays at 8:30, every monday at 18:00", FontSize = 11, Opacity = 0.65, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 3, 0, 6) });
             var quick = new WrapPanel(); stack.Children.Add(quick);
             foreach (var q in new[] { "5", "10", "25", "1h", "2h" })
             {
@@ -174,10 +222,11 @@ namespace Capri
             RefreshReminderList();
             add.Click += (s, e) =>
             {
-                var at = ParseWhen(remWhen.Text, DateTime.Now);
-                if (at == null) { remStatus.Text = "I don't understand \"" + remWhen.Text + "\". Try 20, 1h30 or 17:45."; return; }
-                AddReminder(at.Value, remWhat.Text);
-                remStatus.Text = "Added for " + FormatReminderTime(at.Value) + "."; remWhat.Text = ""; remWhat.Focus();
+                var repeating = ParseRepeating(remWhen.Text, DateTime.Now);
+                var at = repeating != null ? repeating.Item1 : ParseWhen(remWhen.Text, DateTime.Now);
+                if (at == null) { remStatus.Text = "I don't understand \"" + remWhen.Text + "\". Try 20, 1h30, 17:45 or every day at 9."; return; }
+                AddReminder(at.Value, remWhat.Text, repeating?.Item2 ?? "");
+                remStatus.Text = "Added for " + FormatReminderTime(at.Value) + (repeating != null ? RepeatLabel(new Reminder { at = at.Value, repeat = repeating.Item2 }) : "") + "."; remWhat.Text = ""; remWhat.Focus();
             };
             remove.Click += (s, e) =>
             {

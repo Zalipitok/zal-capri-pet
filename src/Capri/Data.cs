@@ -21,6 +21,7 @@ namespace Capri
         public string chatVoiceName = "", chatVoicePitch = "high", chatVoiceRate = "medium";
         public double powersChance = 0.04;
         public string updateRepo = "Zalipitok/zal-capri-pet";
+        public double focusBreakMinutes = 5;
 
         public string Load(string path)
         {

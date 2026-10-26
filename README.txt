@@ -117,6 +117,23 @@ LATEST
                     Debug and help > Install update keeps your settings, memory, notes, reminders,
                     voices and tuning.json, and backs up every file it replaces.
 
+NEW IN 3.2
+  Repeating reminders  "every day at 9", "weekdays at 8:30", "every monday at 18:00" in the
+                    Reminders window or the chat ("remind me every day at 9 to drink water").
+                    After she tells you, the next one is set up by itself.
+  Chat memory       she remembers your chat after a restart (chat-history.json, this PC only).
+                    Type /clear or /forget in the chat to wipe it.
+  Focus breaks      after a finished focus session she counts down a 5-minute break, stretches,
+                    and chimes when it's over (Interact > Focus timer > Short break after focus;
+                    focusBreakMinutes in tuning.json sets the length).
+  Quiet hours       Settings > Behaviour > Quiet hours (e.g. 10 pm to 7 am): no random yapping,
+                    idle remarks, cursor attacks or window tricks. Reminders still come.
+  Hotkey keys       Settings window > General > Hotkey keys: type a new one (Ctrl+Alt+C, Alt+F9...)
+                    and press Apply. She tells you if it's taken.
+  Pinned notes      click PIN on a sticky note's yellow bar to keep it on top of other windows.
+  Our history       Debug and help > Our history opens a proper page: days together, pats, throws,
+                    rivals, focus streak, and how close you are to every unlock.
+
 FILES YOU CAN EDIT
   behaviours.json      every state: pose, timing, movement, what comes next, routines
   remarks.json         her text lines, by situation ({0} is filled in with a number or name)
@@ -127,7 +144,7 @@ FILES YOU CAN EDIT
   unlocks.json         what can be unlocked and what it takes
   games.json           trivia questions for the chat games
 Saved automatically: voice-settings.json (preferences), memory.json (history), reminders.json,
-notes.json, chat-key.dat (only if you save an API key).
+notes.json, chat-history.json, chat-key.dat (only if you save an API key).
 sprite-cache\ is rebuilt from the sprite sheets when they change; safe to delete.
 
 SELF-TEST
@@ -178,6 +195,7 @@ CODE LAYOUT (src\Capri)
   Update.cs          updates from GitHub             Chat.cs      chat, chat games, Claude API
   SettingsWindow.cs  the settings window             Menu.cs      menu, tray, voice library
   Input.cs           mouse                           Loop.cs      the per-frame loop
-  SelfTest.cs        the self-test
+  SelfTest.cs        the self-test                   Quiet.cs     quiet hours
+  History.cs         the "Our history" window
   Native.cs, Effects.cs, Tts.cs   Windows APIs, effect drawing, hotkey, speech
   Ui\*.xml           window layouts

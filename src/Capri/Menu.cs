@@ -72,7 +72,9 @@ namespace Capri
             NewMenuEntry(interact, "Leave a sticky note", Act(LeaveNote));
             var focusMenu = NewSubMenu(interact, "Focus timer");
             foreach (var minutes in new[] { 25, 45, 60 }) { int m = minutes; NewMenuEntry(focusMenu, m + " minutes", Act(() => StartFocus(m))); }
-            focusStopItem = NewMenuEntry(focusMenu, "Stop focusing", Act(() => { if (focusActive) SetBusyMode(false); }));
+            focusStopItem = NewMenuEntry(focusMenu, "Stop focusing", Act(() => { if (focusActive) SetBusyMode(false); else EndFocusBreak(false); }));
+            Separator(focusMenu);
+            NewMenuEntry(focusMenu, "Short break after focus", Toggle("focusBreaks", () => { if (!focusBreaks) EndFocusBreak(false); }), Is("focusBreaks"));
             NewMenuEntry(interact, "Possess a window", Act(() => InvokePossession(true)));
             NewMenuEntry(interact, "Upgrade my cursor", Act(() => StartCursorRepair(true)));
             NewMenuEntry(interact, "Peek from behind a window", State("peekbehind"));
@@ -177,6 +179,8 @@ namespace Capri
             foreach (var minutes in new[] { 2, 5, 10, 0 }) { double s = minutes * 60; NewMenuEntry(sleepMenu, minutes == 0 ? "Never" : minutes + " minutes", () => { RegisterInteraction(); idleSleepAfter = s; SaveSettings(); }, () => idleSleepAfter == s); }
             var breakMenu = NewSubMenu(behaviour, "Break reminders");
             foreach (var minutes in new[] { 0, 25, 50, 90 }) { int m = minutes; NewMenuEntry(breakMenu, m == 0 ? "Off" : "Every " + m + " minutes of screen time", () => { breakMinutes = m; activeSince = Now; SaveSettings(); }, () => breakMinutes == m); }
+            var quietMenu = NewSubMenu(behaviour, "Quiet hours (no yapping, attacks or tricks)");
+            foreach (var q in QuietHourChoices) { var code = q; NewMenuEntry(quietMenu, QuietHoursLabel(code), () => { quietHours = code; SaveSettings(); }, () => quietHours == code); }
             var fullscreenMenu = NewSubMenu(behaviour, "When a fullscreen app is open");
             foreach (var entry in new[] { new[] { "Hide until it closes", "hide" }, new[] { "Sit quietly in the corner", "busy" }, new[] { "Stay on top", "ignore" } })
             { var mode = entry[1]; NewMenuEntry(fullscreenMenu, entry[0], () => SetFullscreenMode(mode), () => fullscreenMode == mode); }
@@ -203,7 +207,7 @@ namespace Capri
                     "\nDragging: " + dragging + "\nVoice playing: " + voiceBusy + "\nLive volume: " + liveVolume + "\nMonitors: " + AllWorkAreas().Count + "\nYou idle for: " + (int)idle + " s\nBeat: " + beat +
                     "\nFrame time: " + tickMs + " ms\nVersion: " + appVersion + " (native)", "Capri movement status");
             });
-            NewMenuEntry(debug, "Our history", () => MessageBox.Show(MemorySummary() + "\n\nBest catch-me score: " + Mem("bestCatch") + "\n\n" + UnlockSummary(), "What Capri remembers"));
+            NewMenuEntry(debug, "Our history", Act(ShowHistoryWindow));
             NewMenuEntry(debug, "Run self-test", Act(StartSelfTestRun));
             NewMenuEntry(debug, "Reload tuning.json", () =>
             {
@@ -245,7 +249,8 @@ namespace Capri
                 hideItem.IsEnabled = tray != null;
                 hotkeyItem.Header = "Summon hotkey (" + tuning.hotkey + ")";
                 snoozeItem.IsEnabled = CanSnooze;
-                focusStopItem.IsEnabled = focusActive;
+                focusStopItem.IsEnabled = focusActive || onFocusBreak;
+                focusStopItem.Header = onFocusBreak && !focusActive ? "Skip the break" : "Stop focusing";
                 updateItem.Header = updateVersion != null ? "Install update (" + updateVersion + ")" : "Install update (none found yet; version " + appVersion + ")";
                 updateItem.IsEnabled = updateVersion != null;
                 friendItem.Header = App.Friend ? "(I'm the friend: Quit sends me home)" : friendPresent ? "Send her friend home" : "Invite a friend (second Capri)";

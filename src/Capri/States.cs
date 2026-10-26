@@ -109,7 +109,7 @@ namespace Capri
                 if (rare.Count > 0) { BeginState(rare[rng.Next(rare.Count)]); return; }
             }
             if (BallAvailable && activityRates["antics"] > 0 && rng.NextDouble() < tuning.ballChance) { StartBallChase(); return; }
-            double powers = tuning.powersChance;
+            double powers = QuietNow ? 0 : tuning.powersChance;
             if (activityRates["antics"] > 0 && possessWindows && rng.NextDouble() < powers) { if (InvokePossession(false)) return; }
             if (activityRates["antics"] > 0 && cursorRepairs && Now > trailUntil + 600 && rng.NextDouble() < powers / 2) { StartCursorRepair(false); return; }
             if (musicEnabled && musicPlaying && activityRates["antics"] > 0 && rng.NextDouble() < 0.2) { BeginState("dance"); return; }

@@ -145,7 +145,7 @@ namespace Capri
             if (busyMode) { BusyFrame(t); return; }
             if (t >= nextUnlockCheck) { nextUnlockCheck = t + 30; TestUnlocks(); }
             if (t >= nextMood) { var moods = new[] { "bored", "curious", "smug", "irritated" }.Where(m => m != mood).ToArray(); mood = moods[rng.Next(moods.Length)]; nextMood = t + rng.Next(90, 181); }
-            if (activityRates["attacks"] > 0 && t >= nextRetry && spec.Has("calm") && chase && idleRest == "awake" && !voiceBusy && !away)
+            if (activityRates["attacks"] > 0 && t >= nextRetry && spec.Has("calm") && chase && idleRest == "awake" && !voiceBusy && !away && !QuietNow)
             { nextRetry = double.PositiveInfinity; rivalRetries++; BeginState("rivalsneak"); }
             mouse = LocalCursor();
             cursorX = w.Left + mouse.X; cursorY = w.Top + mouse.Y;
@@ -173,12 +173,12 @@ namespace Capri
             }
             // This session's greeting (first meeting, a long absence, an anniversary).
             if (greeting != null && t > 3 && state != "arrive" && !voiceBusy) { ShowRemark((string)greeting[0], false, greeting[1]); greeting = null; }
-            if (idleRest == "awake" && !away && !QuietApp && chatter != "off" && t > nextYap && !spec.Has("noYap"))
+            if (idleRest == "awake" && !away && !QuietApp && !QuietNow && chatter != "off" && t > nextYap && !spec.Has("noYap"))
             {
                 PlayVoice("random");
                 if (t > nextYap) ScheduleYap();
             }
-            if (idleRest == "awake" && !away && t >= nextRemark && t > messageUntil && !spec.Has("noRemark"))
+            if (idleRest == "awake" && !away && !QuietNow && t >= nextRemark && t > messageUntil && !spec.Has("noRemark"))
             {
                 if (!voiceBusy && (chatter == "off" || muted || nextYap - t > 6 || voicePack.Count == 0))
                 {

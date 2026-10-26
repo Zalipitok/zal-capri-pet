@@ -19,13 +19,37 @@ namespace Capri
     partial class Pet
     {
         List<KeyValuePair<string, string>> chatHistory = new List<KeyValuePair<string, string>>();
-        string chatKeyPath; Window chatWindow; StackPanel chatLog; ScrollViewer chatScroll; TextBlock chatTyping; TextBox chatInput; PasswordBox chatKeyBox;
+        string chatKeyPath, chatHistoryPath; Window chatWindow;
+
+        void SaveChatHistory()
+        {
+            if (App.SelfTest || App.Friend) return;
+            try
+            {
+                if (chatHistory.Count == 0) { if (File.Exists(chatHistoryPath)) File.Delete(chatHistoryPath); return; }
+                Json.Save(chatHistoryPath, chatHistory.Skip(Math.Max(0, chatHistory.Count - 16)).Select(h => new Dictionary<string, object> { { "role", h.Key }, { "content", h.Value } }).ToList());
+            }
+            catch { }
+        } StackPanel chatLog; ScrollViewer chatScroll; TextBlock chatTyping; TextBox chatInput; PasswordBox chatKeyBox;
         bool chatWaiting; public string chatError = "", ttsError = "";
         public bool ttsAvailable = true;
 
         void InitChat()
         {
             chatKeyPath = App.PathOf("chat-key.dat");
+            chatHistoryPath = App.PathOf("chat-history.json");
+            // The conversation survives a restart (kept only on this PC; /clear forgets it).
+            try
+            {
+                if (!App.SelfTest && !App.Friend && File.Exists(chatHistoryPath))
+                    foreach (var e in Json.List(Json.Load(chatHistoryPath)))
+                    {
+                        var role = Json.Str(Json.Get(e, "role")); var content = Json.Str(Json.Get(e, "content"));
+                        if ((role == "user" || role == "assistant") && content != "") chatHistory.Add(new KeyValuePair<string, string>(role, content));
+                    }
+                while (chatHistory.Count > 0 && chatHistory[0].Key != "user") chatHistory.RemoveAt(0);
+            }
+            catch { }
             try { var t = typeof(System.Speech.Synthesis.SpeechSynthesizer); } catch (Exception e) { ttsAvailable = false; ttsError = e.Message; }
             try
             {
@@ -113,16 +137,17 @@ namespace Capri
         void SayChat(string text) { AddChatLine("Capri", text); ShowChatReply(text); }
 
         // "remind me in 20 minutes to stretch", "remind me to call mum at 18:30".
-        static readonly Regex ReminderPattern = new Regex(@"^\s*(?:please\s+)?remind me\s+(?:to\s+(?<what>.+?)\s+(?<when>(?:in|at|tomorrow)\b.+?)|(?<when>(?:in|at|tomorrow)\b.+?)\s+(?:to|that|about)\s+(?<what>.+?))\s*[.!]*\s*$", RegexOptions.IgnoreCase);
+        static readonly Regex ReminderPattern = new Regex(@"^\s*(?:please\s+)?remind me\s+(?:to\s+(?<what>.+?)\s+(?<when>(?:in|at|tomorrow|every|daily|weekdays)\b.+?)|(?<when>(?:in|at|tomorrow|every|daily|weekdays)\b.+?)\s+(?:to|that|about)\s+(?<what>.+?))\s*[.!]*\s*$", RegexOptions.IgnoreCase);
         public static Match MatchReminder(string text) => ReminderPattern.Match(text);
 
         bool ChatReminder(string text)
         {
             var m = ReminderPattern.Match(text);
             if (!m.Success) return false;
-            var at = ParseWhen(m.Groups["when"].Value, DateTime.Now);
-            if (at == null) { SayChat("\"" + m.Groups["when"].Value + "\"? Give me something like \"in 20 minutes\" or \"at 17:45\"."); return true; }
-            AddReminder(at.Value, m.Groups["what"].Value);
+            var repeating = ParseRepeating(m.Groups["when"].Value, DateTime.Now);
+            var at = repeating != null ? repeating.Item1 : ParseWhen(m.Groups["when"].Value, DateTime.Now);
+            if (at == null) { SayChat("\"" + m.Groups["when"].Value + "\"? Give me something like \"in 20 minutes\", \"at 17:45\" or \"every day at 9\"."); return true; }
+            AddReminder(at.Value, m.Groups["what"].Value, repeating?.Item2 ?? "");
             SayChat(RemarkText("reminderset", new object[] { FormatReminderTime(at.Value), m.Groups["what"].Value }));
             return true;
         }
@@ -152,7 +177,7 @@ namespace Capri
             text = (text ?? "").Trim(); if (text == "") return;
             RegisterInteraction();
             AddChatLine("You", text);
-            if (text == "/clear") { chatHistory.Clear(); chatLog.Children.Clear(); AddChatLine("", "Conversation cleared."); return; }
+            if (text == "/clear" || text == "/forget") { chatHistory.Clear(); SaveChatHistory(); chatLog.Children.Clear(); AddChatLine("", "Conversation cleared. She's forgotten it."); return; }
             if (ChatReminder(text) || ChatCommand(text) || ChatGame(text)) return;
             if (!chatEnabled) { AddChatLine("", "Her own replies are off. Tick \"Let her reply\" below (uses your Claude API key). Reminders and games work either way."); return; }
             var key = GetChatKey();
@@ -209,6 +234,7 @@ namespace Capri
             }
             chatError = "";
             chatHistory.Add(new KeyValuePair<string, string>("assistant", reply));
+            SaveChatHistory();
             SayChat(reply);
         }
 
@@ -243,7 +269,7 @@ namespace Capri
                 catch (Exception ex) { AddChatLine("", "Could not save the key: " + ex.Message); }
             };
             panel.Children.Add(keyRow);
-            panel.Children.Add(new TextBlock { TextWrapping = TextWrapping.Wrap, FontSize = 11, Opacity = 0.65, Margin = new Thickness(0, 4, 0, 0), Text = "Get a key at console.anthropic.com (usage is billed to that account). Save an empty box to remove it. Type \"play\" for games, \"note: ...\", \"focus 25\", or /clear to start over." });
+            panel.Children.Add(new TextBlock { TextWrapping = TextWrapping.Wrap, FontSize = 11, Opacity = 0.65, Margin = new Thickness(0, 4, 0, 0), Text = "Get a key at console.anthropic.com (usage is billed to that account). Save an empty box to remove it. Type \"play\" for games, \"note: ...\", \"focus 25\". She remembers this chat between restarts (on this PC only); /clear makes her forget it." });
             Grid.SetRow(panel, 3); grid.Children.Add(panel);
             dialog.Closed += (s, e) => { chatWindow = null; chatLog = null; chatTyping = null; RegisterInteraction(); };
             chatWindow = dialog;

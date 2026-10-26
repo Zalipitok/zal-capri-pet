@@ -16,7 +16,7 @@ namespace Capri
         public Version appVersion = new Version(0, 0, 0);
         public Version updateVersion; string updateUrl = ""; public string updateError = "";
         double nextUpdateCheck = 90; bool updateBusy;
-        static readonly string[] KeepOnUpdate = { "voice-settings.json", "memory.json", "reminders.json", "notes.json", "chat-key.dat", "tuning.json" };
+        static readonly string[] KeepOnUpdate = { "voice-settings.json", "memory.json", "reminders.json", "notes.json", "chat-key.dat", "chat-history.json", "tuning.json" };
 
         void InitUpdate()
         {

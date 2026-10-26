@@ -14,12 +14,12 @@ namespace Capri
     {
         public string tab, type, label, hint = "", unit = "%";
         public Func<object> get; public Action<object> set; public Action click;
-        public object[][] options; public double min, max, step;
+        public object[][] options; public double min, max, step; public Func<string> error;
     }
 
     partial class Pet
     {
-        List<SettingDef> settingDefs;
+        List<SettingDef> settingDefs; string hotkeyChangeError = "";
         Window settingsWindow;
 
         SettingDef Bool(string tab, string label, Func<bool> get, Action<bool> set, string hint = "") => new SettingDef { tab = tab, type = "bool", label = label, get = () => get(), set = v => set((bool)v), hint = hint };
@@ -39,7 +39,9 @@ namespace Capri
                 Choice("General", "When a fullscreen app is open", new[] { Opt("Hide until it closes", "hide"), Opt("Sit quietly in the corner", "busy"), Opt("Stay on top", "ignore") }, () => fullscreenMode, v => SetFullscreenMode((string)v)),
                 BoolField("General", "Quiet corner during Do Not Disturb / Focus", "dndAware", "When Windows Do Not Disturb, Focus or presentation mode is on, she sits quietly in the corner.", () => nextDndCheck = 0),
                 BoolField("General", "Check for updates once a day", "autoUpdate", "Asks GitHub whether a newer Capri is out. Debug and help > Install update installs it."),
-                Bool("General", "Summon hotkey (" + tuning.hotkey + ")", () => hotkeyEnabled, v => { hotkeyEnabled = v; RegisterSummonHotkey(); }, "Calls her to the pointer; press again next to her to hide her."),
+                Bool("General", "Summon hotkey", () => hotkeyEnabled, v => { hotkeyEnabled = v; RegisterSummonHotkey(); }, "Calls her to the pointer; press again next to her to hide her."),
+                new SettingDef { tab = "General", type = "text", label = "Hotkey keys", get = () => tuning.hotkey, set = v => hotkeyChangeError = ChangeHotkey((string)v), error = () => hotkeyChangeError, hint = "For example Ctrl+Alt+C, Ctrl+Shift+K or Alt+F9. Saved in tuning.json." },
+                Choice("General", "Quiet hours (no yapping, attacks or tricks)", QuietHourChoices.Select(q => Opt(QuietHoursLabel(q), q)).ToArray(), () => quietHours, v => quietHours = (string)v),
                 Choice("General", "Sleep after inactivity", new[] { Opt("2 minutes", 120.0), Opt("5 minutes", 300.0), Opt("10 minutes", 600.0), Opt("Never", 0.0) }, () => idleSleepAfter, v => idleSleepAfter = (double)v),
                 Choice("General", "Break reminders", new[] { Opt("Off", 0), Opt("Every 25 minutes", 25), Opt("Every 50 minutes", 50), Opt("Every 90 minutes", 90) }, () => breakMinutes, v => { breakMinutes = (int)v; activeSince = Now; }),
                 Choice("Voice", "Language", new[] { Opt("English", "en"), Opt("Japanese", "ja") }, () => language, v => { StopVoice(); language = (string)v; lastClip = ""; voiceNext = 0; ScheduleYap(); }),
@@ -82,11 +84,12 @@ namespace Capri
                 BoolField("Fun", "Read her chat replies aloud", "chatVoice", "Uses a voice installed in Windows (Settings > Time and language > Speech adds more). chatVoiceName in tuning.json picks one."),
                 ButtonDef("Fun", "Leave a sticky note", () => Defer(LeaveNote)),
                 ButtonDef("Fun", "Focus timer (25 minutes)", () => Defer(() => StartFocus(25))),
+                BoolField("Fun", "Short break after focus", "focusBreaks", "After a finished focus session she counts down a " + tuning.focusBreakMinutes + "-minute break (focusBreakMinutes in tuning.json) and chimes when it's over."),
                 BoolField("Fun", "Weather reactions", "weatherEnabled", "Checks open-meteo.com about once an hour. Only the city name and its coordinates are sent.", ResetWeather),
                 Text("Fun", "City for the weather", () => weatherCity, v => { weatherCity = v.Trim(); ResetWeather(); }, "For example: Istanbul, or Paris, France"),
                 Choice("Fun", "Temperature", new[] { Opt("Celsius", "C"), Opt("Fahrenheit", "F") }, () => weatherUnit, v => { weatherUnit = (string)v; ResetWeather(); }),
                 ButtonDef("Fun", "Weather now", () => { RequestWeatherReport(); MessageBox.Show(WeatherSummary(), "Capri - weather"); }),
-                ButtonDef("Fun", "Our history and unlocks...", () => MessageBox.Show(MemorySummary() + "\n\nBest catch-me score: " + Mem("bestCatch") + "\n\n" + UnlockSummary(), "What Capri remembers")),
+                ButtonDef("Fun", "Our history and unlocks...", () => Defer(ShowHistoryWindow)),
                 ButtonDef("Fun", "Run self-test", () => Defer(StartSelfTestRun)),
             };
         }
@@ -145,7 +148,14 @@ namespace Capri
                             var apply = new Button { Content = "Apply", Padding = new Thickness(10, 2, 10, 2), Margin = new Thickness(6, 0, 0, 0) };
                             DockPanel.SetDock(apply, Dock.Right); line.Children.Add(apply);
                             var tb = new TextBox { Text = (string)d.get(), Padding = new Thickness(3) }; line.Children.Add(tb);
-                            apply.Click += (s, e) => { d.set(tb.Text); SaveSettings(); ShowStatus("Saved.", 2); };
+                            apply.Click += (s, e) =>
+                            {
+                                d.set(tb.Text); SaveSettings();
+                                var problem = d.error?.Invoke() ?? "";
+                                if (problem != "") MessageBox.Show(dialog, problem, "Capri", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                else ShowStatus("Saved.", 2);
+                                tb.Text = (string)d.get();
+                            };
                             row.Children.Add(line); break;
                         }
                     case "button":

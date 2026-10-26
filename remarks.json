@@ -499,6 +499,16 @@
     "Good kid. {0} minutes. That's {1} days in a row.",
     "Done! {0} minutes. Streak at {1}. Did you have some fun?"
   ],
+  "focusbreak": [
+    "{0} minutes done, streak {1}. Now {2} minutes off. Stretch, drink something. I'm timing you.",
+    "Good kid. {0} minutes. Take {2}, stand up, look at something that isn't a screen.",
+    "Done! Streak at {1}. Break for {2} minutes. Don't make me drag you out of that chair."
+  ],
+  "breakover": [
+    "Break's over. Ready for another round?",
+    "Time's up! Back to it. I'll guard the corner again.",
+    "Okie doke, break done. Want to go again?"
+  ],
   "focusquit": [
     "Giving up already? Now that could be a problem.",
     "Quitter. Cute, though.",

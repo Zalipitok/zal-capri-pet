@@ -17,3 +17,4 @@ __pycache__/
 notes.json
 backup-before-*/
 Capri.exe.old
+chat-history.json

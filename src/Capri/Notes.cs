@@ -9,7 +9,7 @@ using System.Windows.Media;
 
 namespace Capri
 {
-    class StickyNote { public string id; public Window win; public TextBox box; }
+    class StickyNote { public string id; public Window win; public TextBox box; public bool pinned; }
 
     // Sticky notes she leaves on your screen; they come back after a restart (notes.json).
     partial class Pet
@@ -34,12 +34,12 @@ namespace Capri
             try
             {
                 if (notes.Count == 0) { if (File.Exists(notesPath)) File.Delete(notesPath); return; }
-                Json.Save(notesPath, notes.Select(n => new Dictionary<string, object> { { "text", n.box.Text }, { "x", Math.Round(n.win.Left) }, { "y", Math.Round(n.win.Top) } }).ToList());
+                Json.Save(notesPath, notes.Select(n => new Dictionary<string, object> { { "text", n.box.Text }, { "x", Math.Round(n.win.Left) }, { "y", Math.Round(n.win.Top) }, { "pinned", n.pinned } }).ToList());
             }
             catch { }
         }
 
-        public bool NewStickyNote(string text, double? x = null, double? y = null, bool restore = false)
+        public bool NewStickyNote(string text, double? x = null, double? y = null, bool restore = false, bool pinned = false)
         {
             if (notes.Count >= 20) return false;
             var note = new StickyNote { id = Guid.NewGuid().ToString("N") };
@@ -49,6 +49,19 @@ namespace Capri
             var header = new DockPanel { Background = HexBrush("#FCEE0A"), Cursor = Cursors.SizeAll };
             var close = new TextBlock { Text = " x ", FontFamily = new FontFamily("Consolas"), FontWeight = FontWeights.Bold, Cursor = Cursors.Hand };
             DockPanel.SetDock(close, Dock.Right); header.Children.Add(close);
+            // Pinned notes stay on top of other windows.
+            var pin = new TextBlock { FontFamily = new FontFamily("Consolas"), FontSize = 10, FontWeight = FontWeights.Bold, Cursor = Cursors.Hand, Padding = new Thickness(4, 2, 4, 2), VerticalAlignment = VerticalAlignment.Center };
+            DockPanel.SetDock(pin, Dock.Right); header.Children.Add(pin);
+            Action showPin = () =>
+            {
+                pin.Text = note.pinned ? "PINNED" : "PIN";
+                pin.Background = note.pinned ? HexBrush("#101722") : Brushes.Transparent;
+                pin.Foreground = note.pinned ? HexBrush("#FCEE0A") : Brushes.Black;
+                pin.ToolTip = note.pinned ? "Stays on top. Click to unpin." : "Keep this note on top of other windows";
+                win.Topmost = note.pinned;
+            };
+            note.pinned = pinned;
+            pin.MouseLeftButtonDown += (s, e) => { e.Handled = true; note.pinned = !note.pinned; showPin(); SaveNotes(); };
             header.Children.Add(new TextBlock { Text = "CAPRI // NOTE", FontFamily = new FontFamily("Consolas"), FontSize = 10, FontWeight = FontWeights.Bold, Padding = new Thickness(6, 2, 0, 2) });
             stack.Children.Add(header);
             var box = new TextBox
@@ -59,6 +72,7 @@ namespace Capri
             stack.Children.Add(box);
             win.Content = frame;
             note.win = win; note.box = box;
+            showPin();
             header.MouseLeftButtonDown += (s, e) => { try { win.DragMove(); } catch { } SaveNotes(); };
             close.MouseLeftButtonDown += (s, e) => { e.Handled = true; RemoveStickyNote(note); };
             box.TextChanged += (s, e) => noteSaveDue = Now + 2;
@@ -101,7 +115,7 @@ namespace Capri
             foreach (var n in pendingNotes)
             {
                 double x = Math.Max(left, Math.Min(right, Json.Num(Json.Get(n, "x")))), y = Math.Max(top, Math.Min(bottom, Json.Num(Json.Get(n, "y"))));
-                NewStickyNote(Json.Str(Json.Get(n, "text")), x, y, true);
+                NewStickyNote(Json.Str(Json.Get(n, "text")), x, y, true, Json.Bool(Json.Get(n, "pinned")) == true);
             }
             pendingNotes.Clear();
         }

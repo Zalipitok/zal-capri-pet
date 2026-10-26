@@ -297,6 +297,32 @@ namespace Capri
             try { hotkeyOk = CapriHotkey.Register(petHandle, parsed[0], parsed[1]); } catch (Exception e) { hotkeyError = e.Message; }
             if (!hotkeyOk && hotkeyError == "") hotkeyError = tuning.hotkey + " is already used by another app";
         }
+        // Settings > Summon hotkey: checks the new keys, tries them, and keeps them in tuning.json.
+        public string ChangeHotkey(string text)
+        {
+            text = (text ?? "").Trim();
+            var parsed = ParseHotkey(text);
+            if (parsed == null) return "Use something like Ctrl+Alt+C or Ctrl+Shift+F9: Ctrl, Alt, Shift or Win, plus a letter, digit or F1-F12.";
+            if (parsed[0] == 0) return "Add Ctrl, Alt, Shift or Win, or the key would stop typing anywhere else.";
+            var parts = text.Split('+').Select(p => p.Trim()).Select(p => p.Length == 1 ? p.ToUpperInvariant() : char.ToUpperInvariant(p[0]) + p.Substring(1).ToLowerInvariant());
+            string tidy = string.Join("+", parts).Replace("Control", "Ctrl");
+            string old = tuning.hotkey;
+            tuning.hotkey = tidy;
+            bool wasEnabled = hotkeyEnabled; hotkeyEnabled = true;
+            RegisterSummonHotkey();
+            if (!hotkeyOk) { var why = hotkeyError; tuning.hotkey = old; hotkeyEnabled = wasEnabled; RegisterSummonHotkey(); return tidy + " didn't work: " + why + "."; }
+            try
+            {
+                var path = App.PathOf("tuning.json");
+                var saved = System.IO.File.Exists(path) ? (Json.LoadDict(path) ?? new Dictionary<string, object>()) : new Dictionary<string, object>();
+                saved["hotkey"] = tidy;
+                Json.Save(path, saved);
+            }
+            catch (Exception e) { return "It works now, but tuning.json could not be saved: " + e.Message; }
+            if (hotkeyItem != null) hotkeyItem.Header = "Summon hotkey (" + tidy + ")";
+            return "";
+        }
+
         // Hidden or far away: come here. Already next to the pointer: hide.
         void InvokeSummon()
         {
