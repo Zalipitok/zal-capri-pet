@@ -117,6 +117,16 @@ LATEST
                     Debug and help > Install update keeps your settings, memory, notes, reminders,
                     voices and tuning.json, and backs up every file it replaces.
 
+NEW IN 3.4
+  New drawings      every animation has its own drawing now (sprites\anim-<animation>.png), with
+                    the same head size across all of them, blinking for the idle ones, a talking
+                    mouth for most and headphones for the ones she does while music plays.
+                    Settings > Look > "New per-animation sprites" switches back to the old poses.
+  Animation polish  a springy pop when an animation starts, a squash when she lands, a lean and
+                    afterimages when she zooms around, and small effects: z's when she sleeps,
+                    confetti, sparkles, dust when she stomps, steam from her drink, digital rain...
+                    Settings > Look > "Animation effects" turns them off.
+
 NEW IN 3.2
   Repeating reminders  "every day at 9", "weekdays at 8:30", "every monday at 18:00" in the
                     Reminders window or the chat ("remind me every day at 9 to drink water").

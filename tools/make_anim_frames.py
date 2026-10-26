@@ -19,7 +19,49 @@ SPR = os.path.join(ROOT, 'sprites')
 CENTER = (338, 367)
 HEADPHONES = ['float', 'wander', 'perch', 'windowperch', 'roam', 'taskbar', 'taskpeek', 'dance', 'gaming', 'sip', 'nap',
               'smug', 'wave', 'sleepy', 'meditate', 'chatreply', 'bossfight', 'gamerwin', 'yawn', 'stretch', 'sideglance']
-NO_MOUTH = {'laughing', 'sip', 'nap'}   # mouth covered or asleep
+# Drawings that came out chopped at the edges: these animations borrow a clean one instead.
+ALIASES = {'float': 'perch', 'peek': 'watch', 'dance': 'celebrate'}
+NO_MOUTH = {'laughing', 'sip', 'nap', 'spin', 'thrown', 'upsidedown', 'tumble', 'yawn', 'dash', 'stretch', 'peek', 'rivalsneak', 'zigzag', 'ballsteal', 'pendulum'}  # mouth hidden, asleep, upside down or already wide open
+
+
+def find_mouth2(a, vx, vy):
+    """Her mouth: a white shape just below the visor with black all around it (hair highlights
+    have pink around them instead)."""
+    h, w = a.shape[:2]
+    x0, x1, y0, y1 = vx - 75, vx + 75, vy + 10, vy + 100
+    reg = a[y0:y1, x0:x1].astype(int)
+    white = (reg[..., :3].min(-1) > 110) & (reg[..., 3] > 200)
+    parts = visor_parts(a)
+    if parts is not None:   # eye whites and highlights are in the eye holes: not the mouth
+        comp, filled = parts
+        holes = filled & ~comp
+        hl, hn = ndimage.label(holes)
+        if hn:
+            ai = a.astype(int)
+            blue = (ai[..., 2] > 130) & (ai[..., 2] > ai[..., 0] + 40) & (ai[..., 2] > ai[..., 1] + 20)
+            blues = ndimage.sum(blue & holes, hl, range(1, hn + 1))
+            eyes = np.isin(hl, [k + 1 for k in range(hn) if blues[k] >= 15])
+            white &= ~ndimage.binary_dilation(eyes, iterations=3)[y0:y1, x0:x1]
+    lab, n = ndimage.label(white, structure=np.ones((3, 3)))
+    best, bestscore = None, 0
+    for k in range(1, n + 1):
+        m = lab == k
+        size = m.sum()
+        if size < 10:
+            continue
+        ring = ndimage.binary_dilation(m, iterations=3) & ~m
+        px = reg[ring][:, :3]
+        dark = ((px[:, 0] * 0.3 + px[:, 1] * 0.59 + px[:, 2] * 0.11) < 100).mean()
+        if dark < 0.55:
+            continue
+        score = size * dark
+        if score > bestscore:
+            best, bestscore = m, score
+    if best is None:
+        return None
+    mask = np.zeros((h, w), bool)
+    mask[y0:y1, x0:x1] = best
+    return mask
 
 
 def visor_parts(a):
@@ -88,6 +130,8 @@ def main():
         if not (f.startswith('anim-') and f.endswith('.png')) or f.count('-') != 1:
             continue
         name = f[5:-4]
+        if name in ALIASES:
+            continue
         a = np.array(Image.open(os.path.join(SPR, f)).convert('RGBA'))
         info = {'feet': feet[name]}
         if name in blinkers:
@@ -96,8 +140,8 @@ def main():
                 b.save(os.path.join(SPR, f'anim-{name}-blink.png'), optimize=True)
                 info['blink'] = True
         if name not in NO_MOUTH:
-            mouth = find_mouth(a, vx, vy)
-            if mouth is not None and mouth.sum() >= 40:
+            mouth = find_mouth2(a, vx, vy)
+            if mouth is not None:
                 clean = erase(a, mouth)
                 for level, ratio in HEIGHTS.items():
                     paint(clean, template, mouth, ratio).save(os.path.join(SPR, f'anim-{name}-mouth-{level}.png'), optimize=True)
@@ -110,6 +154,15 @@ def main():
             except Exception as e:
                 print(name, 'no headphones:', e)
         anims[name] = info
+    for name, target in ALIASES.items():
+        anims[name] = {'use': target}
+    # 256-colour palettes keep the files (and the download) about five times smaller.
+    for f in os.listdir(SPR):
+        if f.startswith('anim-') and f.endswith('.png'):
+            path = os.path.join(SPR, f)
+            im = Image.open(path)
+            if im.mode != 'P':
+                im.convert('RGBA').quantize(256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.NONE).save(path, optimize=True)
     meta['anims'] = anims
     json.dump(meta, open(meta_path, 'w'), indent=1)
     print(len(anims), 'animations;', sum('blink' in v for v in anims.values()), 'blink,',

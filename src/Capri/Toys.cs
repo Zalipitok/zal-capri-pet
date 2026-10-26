@@ -16,6 +16,9 @@ namespace Capri
         double ballSquash, ballLastHit = -10; int ballHits, ballHitsAllowed = 3;
         List<double[]> ballSamples = new List<double[]>();
         const double BallSize = 44;
+        Grid ballGrid;
+        // Where the ball sits in the drawings that hold it (fractions of the sprite canvas).
+        static readonly Dictionary<string, Point> BallHold = new Dictionary<string, Point> { { "ballsteal", new Point(0.464, 0.488) }, { "ballguard", new Point(0.409, 0.524) } };
         double ballStashX, ballStashY;
 
         public bool BallAvailable => ballShown && !ballCarried && !ballDragging;
@@ -23,7 +26,7 @@ namespace Capri
         void InitToys()
         {
             ballWin = LoadXaml<Window>("Ball.xml");
-            var grid = (Grid)ballWin.FindName("Ball");
+            var grid = (Grid)ballWin.FindName("Ball"); ballGrid = grid;
             var group = (TransformGroup)grid.RenderTransform;
             ballSquashT = (ScaleTransform)group.Children[0]; ballSpin = (RotateTransform)group.Children[1];
             ballWin.LocationChanged += (s, e) =>
@@ -34,6 +37,7 @@ namespace Capri
             };
             ballWin.MouseLeftButtonDown += (s, e) =>
             {
+                if (state == "ballguard" && CanReact) { BeginState("grumpy"); ShowRemark("balltaken", true); }
                 if (ballCarried)
                 {
                     ballCarried = false;
@@ -149,6 +153,22 @@ namespace Capri
             if (!ballWin.IsVisible) ballWin.Show();
             if (ballDragging) return;
             if (ballCarried && state != "ballsteal" && !dragging) { ballCarried = false; ballVX = 0; ballVY = 0; }
+            // Her own drawing shows the ball in her arms: the real one sits on top of it, almost
+            // invisible but still there to grab.
+            Point hold;
+            bool drawn = newSprites && animPoses.ContainsKey(state) && BallHold.TryGetValue(state, out hold) && (state == "ballguard" || ballCarried) && !isHidden;
+            ballGrid.Opacity = drawn ? 0.02 : 1;
+            if (drawn)
+            {
+                try
+                {
+                    var p = sprite.TransformToVisual(w).Transform(new Point(hold.X * sprite.ActualWidth, hold.Y * sprite.ActualHeight));
+                    ballX = w.Left + p.X - BallSize / 2; ballY = w.Top + p.Y - BallSize / 2; ballVX = 0; ballVY = 0;
+                    ballWin.Left = ballX; ballWin.Top = ballY; ballSpin.Angle = 0;
+                    return;
+                }
+                catch { }
+            }
             if (ballCarried)
             {
                 double feet = w.Top + w.Height - SpriteFoot(poseIndex);

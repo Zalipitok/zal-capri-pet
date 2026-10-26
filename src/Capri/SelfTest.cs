@@ -55,7 +55,7 @@ namespace Capri
             Step("Music frames", () => musicPoseStart < 0 ? "WARN: no headphone frames; she sways to music instead" : null);
             Step("Normalised sprites", () =>
             {
-                var sizes = poses.Select(p => p.PixelWidth + "x" + p.PixelHeight).Distinct().ToList();
+                var sizes = Enumerable.Range(0, poses.Count).Select(i => Frame(i)).Select(p => p.PixelWidth + "x" + p.PixelHeight).Distinct().ToList();
                 if (sizes.Count != 1) return "frames have different sizes: " + string.Join(", ", sizes);
                 return spriteFeet.Count != poses.Count ? "frames.json lists " + spriteFeet.Count + " feet positions for " + poses.Count + " frames" : null;
             });

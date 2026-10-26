@@ -44,6 +44,12 @@ namespace Capri
 
         // Sprites
         public List<BitmapSource> poses = new List<BitmapSource>();
+        List<string> posePaths = new List<string>();
+        public BitmapSource Frame(int index)
+        {
+            if (poses[index] == null) poses[index] = ReadPng(posePaths[index]);
+            return poses[index];
+        }
         public List<double> spriteFeet;
         public int musicPoseStart = -1;
         public Dictionary<int, int[]> mouthPoses = new Dictionary<int, int[]>();
@@ -196,7 +202,8 @@ namespace Capri
             var paths = names.Select(n => System.IO.Path.Combine(dir, n)).ToArray();
             if (paths.Any(p => !File.Exists(p))) return null;
             int first = poses.Count;
-            foreach (var p in paths) { poses.Add(ReadPng(p)); spriteFeet.Add(feet); }
+            // Decoded the first time she shows them: most of these frames are rarely needed.
+            foreach (var p in paths) { poses.Add(null); posePaths.Add(p); spriteFeet.Add(feet); }
             return Enumerable.Range(first, paths.Length).ToArray();
         }
 
@@ -211,7 +218,7 @@ namespace Capri
             double dpi = 1.0;
             try { using (var g = System.Drawing.Graphics.FromHwnd(IntPtr.Zero)) dpi = g.DpiY / 96.0; } catch { }
             decodeHeight = (int)Math.Min(metaHeight, Math.Max(320.0, Math.Ceiling(300.0 * (metaHeight / 768.0) * savedSize / 100.0 * dpi * 1.25)));
-            for (int n = 0; n <= 32; n++) poses.Add(ReadPng(System.IO.Path.Combine(dir, "frame-" + n.ToString("D2") + ".png")));
+            for (int n = 0; n <= 32; n++) { var path = System.IO.Path.Combine(dir, "frame-" + n.ToString("D2") + ".png"); poses.Add(null); posePaths.Add(path); }
             spriteFeet = Json.List(Json.Get(meta, "feet")).Select(f => Json.Num(f)).ToList();
             var visor = Json.List(Json.Get(meta, "visor"));
             if (visor.Count > 1) visorFraction = Json.Num(visor[1]);
@@ -252,6 +259,7 @@ namespace Capri
             if (anims != null) foreach (var kv in anims)
                 {
                     var info = kv.Value; double feet = Json.Num(Json.Get(info, "feet"), 0.9);
+                    if (Json.Get(info, "use") != null) continue; // borrows another animation's drawing (below)
                     var set = AddFrameSet(new[] { "anim-" + kv.Key + ".png" }, feet);
                     if (set == null) continue;
                     int basePose = set[0]; animPoses[kv.Key] = basePose;
@@ -259,9 +267,14 @@ namespace Capri
                     if (Json.Bool(Json.Get(info, "mouth")) == true) { var m = AddFrameSet(new[] { "anim-" + kv.Key + "-mouth-1.png", "anim-" + kv.Key + "-mouth-2.png" }, feet); if (m != null) mouthPoses[basePose] = m; }
                     if (Json.Bool(Json.Get(info, "headphones")) == true) { var h = AddFrameSet(new[] { "anim-" + kv.Key + "-hp.png" }, feet); if (h != null) hpPoses[basePose] = h[0]; }
                 }
+            if (anims != null) foreach (var kv in anims)
+                {
+                    int target; var use = Json.Str(Json.Get(kv.Value, "use"));
+                    if (use != "" && animPoses.TryGetValue(use, out target)) animPoses[kv.Key] = target;
+                }
             // The shared canvas has more room around her than the old 768 px cells.
             spriteScale = metaHeight / 768.0;
-            sprite.Source = poses[0]; poseIndex = 0;
+            sprite.Source = Frame(0); poseIndex = 0;
         }
 
         // Smooth pose changes: the previous frame fades out on top of the new one.
@@ -285,7 +298,7 @@ namespace Capri
             {
                 ghost.Source = sprite.Source; ghost.Opacity = sprite.Opacity; ghost.Visibility = Visibility.Visible; fadeStart = now;
             }
-            sprite.Source = poses[index]; poseIndex = index; lastPoseChange = now;
+            sprite.Source = Frame(index); poseIndex = index; lastPoseChange = now;
         }
 
         void UpdatePoseFade()
