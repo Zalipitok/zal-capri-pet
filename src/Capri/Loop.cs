@@ -231,6 +231,7 @@ namespace Capri
                 targetX = Math.Max(area.Left, Math.Min(targetX, area.Right - w.Width));
                 targetY = Math.Max(area.Top, Math.Min(targetY, FloorTop(area)));
             }
+            bool travelling = false;
             if (s.speed != null)
             {
                 double dx = targetX - w.Left, dy = targetY - w.Top, distance = Math.Sqrt(dx * dx + dy * dy);
@@ -239,7 +240,7 @@ namespace Capri
                     double step = Math.Min(distance, s.speed.Value * dt);
                     w.Left += dx / distance * step; w.Top += dy / distance * step;
                     if (step > 0.05) { travelFxUntil = t + 0.12; travelFxDirection = dx >= 0 ? 1.0 : -1.0; }
-                    if (Math.Abs(dx) > 4) direction = dx < 0 ? 1.0 : -1.0;
+                    if (Math.Abs(dx) > 4) { direction = dx < 0 ? 1.0 : -1.0; travelling = step > 0.3; }
                 }
             }
             ApplyStayPut();
@@ -254,12 +255,14 @@ namespace Capri
             ApplySpeechPose();
             ClampPet();
             UpdateShadow(spec.Has("grounded") && (state != "windowperch" || perchArrived), state == "windowperch");
-            if (!spec.Has("noFace"))
+            // On the way somewhere she looks where she's going; otherwise she watches your cursor.
+            if (!spec.Has("noFace") && !travelling)
             {
                 double faceDelta = cursorX - (w.Left + w.Width / 2);
                 if (faceDelta < -6) direction = 1.0; else if (faceDelta > 6) direction = -1.0;
                 scale.ScaleX = Math.Abs(scale.ScaleX) * direction;
             }
+            else if (travelling) scale.ScaleX = Math.Abs(scale.ScaleX) * direction;
         }
 
         // Busy mode: quietly in the corner, cycling through a few calm activities.
