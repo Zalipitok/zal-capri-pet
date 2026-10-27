@@ -72,12 +72,9 @@ namespace Capri
                     if (!string.IsNullOrEmpty(title) && title != musicTitle)
                     {
                         musicTitle = title; musicArtist = artist;
-                        if (musicPlaying && Now - lastSongRemark >= tuning.songRemarkMinutes * 60 && rng.NextDouble() < 0.6)
-                        {
-                            string name = string.IsNullOrEmpty(artist) ? title : title + " by " + artist;
-                            if (name.Length > 60) name = name.Substring(0, 57) + "...";
-                            if (ShowRemark("song", false, name)) lastSongRemark = Now;
-                        }
+                        // Her opinion of the new song (most songs, not more often than songRemarkMinutes).
+                        if (musicPlaying && Now - lastSongRemark >= tuning.songRemarkMinutes * 60 && rng.NextDouble() < 0.85)
+                            ReactToSong(title, artist);
                     }
                 }
                 if (session == null) videoPlaying = false;

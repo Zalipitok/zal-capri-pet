@@ -552,5 +552,34 @@
   "updating": [
     "Okie doke, upgrading myself. Back in a sec.",
     "Hold still. I'm getting some repairs."
+  ],
+  "songlove": [
+    "Oh, {0}! Now THAT is a choice. Turn it up.",
+    "{0}? Okie doke, you have taste. I'm keeping you.",
+    "Ooh, {0}. My engrams are dancing.",
+    "{0}! Good kid. Play it again after.",
+    "Yes. {0}. This is the one.",
+    "{0}... okay, you win today."
+  ],
+  "songlike": [
+    "{0}. Not bad, not bad at all.",
+    "Mm, {0}. I'll bob along.",
+    "{0}? Solid. I approve.",
+    "{0}. Pleasant. Suspiciously pleasant.",
+    "Huh, {0}. You're growing on me."
+  ],
+  "songmeh": [
+    "{0}. Sure. Fine. Whatever.",
+    "{0}? It's... a song. Technically.",
+    "Hm. {0}. I've heard worse. Recently, even.",
+    "{0}. Background noise for my evil plans, I guess.",
+    "{0}. Ask me again in a minute."
+  ],
+  "songhate": [
+    "{0}? Ain't you a strange cookie.",
+    "{0}. Skip. Please. I'm begging.",
+    "Oh no. {0}. Who hurt you?",
+    "{0}?? I'm telling the other engrams about this.",
+    "{0}. Bold choice. Wrong, but bold."
   ]
 }
