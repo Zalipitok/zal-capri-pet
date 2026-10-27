@@ -456,10 +456,7 @@
    "mouth": true
   },
   "windowperch": {
-   "feet": 0.9443,
-   "mouth": true,
-   "headphones": true,
-   "seat": 0.645
+   "use": "perch"
   },
   "windup": {
    "feet": 0.6934,
