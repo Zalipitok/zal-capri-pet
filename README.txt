@@ -19,6 +19,7 @@ PLAYING WITH HER
   Flick and let go  throw her; she bounces and lands
   Shake her         while dragging: she gets angry
   Ctrl-click        head pat          Shift-click   cartoon swat
+  Scroll the wheel  over her: tickles    Click her nonstop: she gets annoyed
   Drop a file       a pretend "threat scan" of its name (the file is never opened or touched)
   Right-click       her menu
 

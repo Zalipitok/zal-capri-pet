@@ -107,3 +107,7 @@ save('zap.wav', lowpass(crush(zap, 10, 3), 5000), 0.45)
 # something unlocked: a sparkly arpeggio
 notes = [1046, 1318, 1568, 2093, 2637]
 save('unlock.wav', mix(*[(i * 0.07, chime(f, 0.6, 0.2)) for i, f in enumerate(notes)]), 0.6)
+
+# tickle: a giggly trill (quick hops up and down in pitch)
+gig = np.concatenate([tone(f, 0.055, 'tri') * env(int(SR * 0.055), 0.004, 0.03) for f in [880, 1175, 990, 1320, 1047, 1480, 1175, 1568]])
+save('tickle.wav', gig, 0.55)

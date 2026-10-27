@@ -114,7 +114,7 @@ namespace Capri
             return string.IsNullOrEmpty(album);
         }
 
-        bool MusicGroove => musicEnabled && musicPlaying && !voiceBusy && spec.Has("calm");
+        bool MusicGroove => musicEnabled && musicPlaying && !voiceBusy && spec.Has("calm");   // (old frame-based nodding only)
 
         double BeatPhase() { if (!beatSync) return -1; try { return CapriBeat.Phase(); } catch { return -1; } }
 
@@ -142,19 +142,28 @@ namespace Capri
         }
 
         bool musicFrameActive;
+        // Bobbing to the music: a nod down on every beat, a sway that swaps sides each beat and a
+        // little squash, following the real beat when the beat detector is sure of it and its last
+        // tempo (or musicBpm in tuning.json) when it isn't. Fades in and out with the music.
+        static readonly HashSet<string> NoGroove = new HashSet<string> { "thrown", "spin", "tumble", "catchgame", "peekbehind", "possess", "teleport", "landing", "upsidedown", "failedattack", "dance" };
+        double grooveMix, lastGoodBpm;
         void ApplyMusicGroove(double now)
         {
-            if (musicFrameActive || !MusicGroove) return;
-            double k = tuning.musicBob, p = BeatPhase();
-            if (p >= 0)
+            bool on = musicEnabled && musicPlaying && !musicFrameActive && !NoGroove.Contains(state) && !spec.Has("noWobble") && !dragging;
+            grooveMix = Math.Max(0.0, Math.Min(1.0, grooveMix + (on ? dt * 1.5 : -dt * 3)));
+            if (grooveMix <= 0) return;
+            double p = BeatPhase(); long beat;
+            if (p >= 0) { beat = CapriBeat.BeatNumber(); if (CapriBeat.Bpm > 40) lastGoodBpm = CapriBeat.Bpm; }
+            else
             {
-                double side = CapriBeat.BeatNumber() % 2 == 0 ? 1.0 : -1.0;
-                shift.Y += Math.Cos(2 * Math.PI * p) * 3.0 * k;
-                rotation.Angle += side * Math.Sin(Math.PI * p) * 2.5 * k;
-                return;
+                double period = 60.0 / Math.Max(40.0, lastGoodBpm > 0 ? lastGoodBpm : tuning.musicBpm);
+                p = (now / period) % 1.0; beat = (long)Math.Floor(now / period);
             }
-            shift.Y += Math.Sin(now * 11.3) * 3.0 * k;
-            rotation.Angle += Math.Sin(now * 5.65) * 2.5 * k;
+            double k = tuning.musicBob * grooveMix * (voiceBusy ? 0.5 : 1.0);
+            double hit = Math.Exp(-p * 5.0), side = beat % 2 == 0 ? 1.0 : -1.0;
+            shift.Y = shift.Y * (1 - 0.75 * grooveMix) + k * (8.0 * hit - 2.5);
+            rotation.Angle += k * side * 4.5 * Math.Sin(Math.PI * p);
+            scale.ScaleY *= 1 - 0.04 * k * hit; scale.ScaleX *= 1 + 0.025 * k * hit;
         }
 
         // --- Battery (laptops)

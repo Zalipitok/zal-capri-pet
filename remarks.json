@@ -581,5 +581,20 @@
     "Oh no. {0}. Who hurt you?",
     "{0}?? I'm telling the other engrams about this.",
     "{0}. Bold choice. Wrong, but bold."
+  ],
+  "tickle": [
+    "Hey! Hehe, stop that!",
+    "Hahaha, no fair!",
+    "Tickling a digital entity? Bold.",
+    "Eeek! Okay, okay, you win!",
+    "I am NOT ticklish. ...Hehe.",
+    "Do that again and I'm hacking your mouse."
+  ],
+  "clickspam": [
+    "Okay, OKAY. I'm right here.",
+    "Click me one more time. I dare you.",
+    "Is your mouse broken, or are you?",
+    "Woodpecker mode, huh?",
+    "Stop poking the netrunner."
   ]
 }

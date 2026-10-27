@@ -9,6 +9,7 @@ namespace Capri
     partial class Pet
     {
         public bool mouseDown; Point? downPoint;
+        double nextTickle; System.Collections.Generic.List<double> clickTimes = new System.Collections.Generic.List<double>();
         bool shakeAngry; double shakeNext; int shakeDirection, shakeTurns; double shakeTravel, shakeWindow, shakeLastX;
 
         void InitInput()
@@ -67,12 +68,29 @@ namespace Capri
                     else { BeginState("smug"); ShowRemark("release"); }
                 }
             };
+            // Scroll the wheel over her: tickles.
+            w.MouseWheel += (s, e) =>
+            {
+                RegisterInteraction();
+                if (Now < nextTickle || dragging || busyMode || !CanReact) return;
+                nextTickle = Now + 2.5; PrepareManualAction(); routine.Clear();
+                BeginState("giggle"); until = Now + 3; PlaySfx("tickle.wav", 0.7);
+                AddMemory("tickles");
+                ShowRemark("tickle", true);
+            };
             w.MouseLeftButtonUp += (s, e) =>
             {
                 RegisterInteraction();
                 if (mouseDown)
                 {
-                    mouseDown = false;
+                    // Clicking her over and over gets on her nerves.
+                    clickTimes.Add(Now); clickTimes.RemoveAll(c => Now - c > 2.5);
+                    if (clickTimes.Count >= 5 && !spec.Has("noCaught"))
+                    {
+                        clickTimes.Clear(); mouseDown = false; routine.Clear();
+                        BeginState("grumpy"); caughtCooldown = until + 1; ShowRemark("clickspam", true); PlaySfx("swat.wav", 0.5);
+                        return;
+                    }
                     // A click (not a drag): the startled "caught" reaction that used to happen on hover.
                     if (state != "wakeglare" && !spec.Has("noCaught")) { routine.Clear(); BeginState("caught"); PlaySfx("caught.wav", 0.7); }
                     if (heldLongEnough) ShowRemark("release"); else PlayVoice("click");

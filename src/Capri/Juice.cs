@@ -224,6 +224,7 @@ namespace Capri
                     if (Every("pulse", 0.75)) Spawn(Ring(Pink, 26), chest.X, chest.Y, 0, 0, 0.9, 0, 0, 3.5);
                     break;
                 case "headpat":
+                    if (Every("heart", 0.5)) Spawn(Glyph("♥", Pink, R(14, 20)), head.X + R(-45, 45) * Unit, head.Y - R(10, 40) * Unit, R(-10, 10), -R(35, 60), 1.3, 0, R(-20, 20), 0.3).wobble = 4;
                     if (Every("spark", 0.3)) Spawn(Glyph("✦", Yellow, R(10, 16)), top.X + R(-50, 50) * Unit, top.Y + R(0, 40) * Unit, R(-15, 15), -R(30, 55), 1.0, 0, R(-90, 90));
                     break;
                 case "celebrate":
