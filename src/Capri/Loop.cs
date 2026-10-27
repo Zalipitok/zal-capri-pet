@@ -194,6 +194,8 @@ namespace Capri
             int? pose = s.PoseAt(phase);
             int animPose = -1; curAnimPose = -1;
             if (newSprites && animPoses.TryGetValue(state, out animPose)) { pose = animPose; curAnimPose = animPose; }
+            // Most of the time she floats from place to place instead of walking.
+            int floatPose; if (travelFloat && animPoses.TryGetValue("float", out floatPose)) { pose = animPose = curAnimPose = floatPose; }
             bool moodPose = s.Has("mood") && !voiceBusy;
             // (not on the perch: a standing mood drawing would float off her seat)
             if (moodPose && curAnimPose >= 0 && state != "perch") { if (mood == "smug") pose = curAnimPose = AnimPose("smug", animPose); else if (mood == "irritated") pose = curAnimPose = AnimPose("rivalglare", animPose); }

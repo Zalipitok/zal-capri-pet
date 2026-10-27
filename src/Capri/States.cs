@@ -13,6 +13,9 @@ namespace Capri
         public Queue<string> routine = new Queue<string>();
         Queue<string> autoBag = new Queue<string>(), routineBag = new Queue<string>(), busyBag = new Queue<string>();
         bool hoverLatched, attackContact;
+        // Walking animations; she floats through most of them instead (travelFloat).
+        static readonly HashSet<string> WalkStates = new HashSet<string> { "wander", "roam", "patrol", "tiptoe", "sneak", "hop" };
+        bool travelFloat;
         string busyActivity = "gaming"; double busyUntil, busyStart;
         double lastFxError = -60, travelFxUntil, travelFxDirection = 1.0;
         double nextPet;
@@ -48,6 +51,7 @@ namespace Capri
             if (name == "roam") { others = AllWorkAreas().Where(r => !r.Equals(a)).ToList(); if (others.Count == 0) name = "wander"; }
             var s = GetSpec(name);
             state = name; spec = s; stateStart = Now;
+            travelFloat = newSprites && WalkStates.Contains(name) && rng.NextDouble() < 0.8;
             until = stateStart + (double.IsNaN(s.secondsFixed) ? rng.Next(s.secondsMin, s.secondsMax + 1) : s.secondsFixed);
             anchorX = w.Left; anchorY = w.Top;
             targetX = a.Left + rng.NextDouble() * Math.Max(1.0, a.Width - w.Width);
