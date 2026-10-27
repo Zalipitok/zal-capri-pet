@@ -95,6 +95,8 @@ namespace Capri
         }
 
         string ActivityCategory(string name) => GetSpec(name).category;
+        public bool MusicOn => musicEnabled && musicPlaying;
+        bool HasHeadphones(string id) { int p; return animPoses.TryGetValue(id, out p) && hpPoses.ContainsKey(p); }
 
         void AddShuffled(Queue<string> queue, List<string> items)
         {
@@ -108,6 +110,12 @@ namespace Capri
             if (busyMode) { BeginState("taskbar"); return; }
             if (routine.Count > 0) { BeginState(routine.Dequeue()); return; }
             double now = Now;
+            // While you listen to music she sticks to the animations that have her headphones on.
+            if (MusicOn && newSprites)
+            {
+                var withPhones = specOrder.Where(id => specs[id].auto && HasHeadphones(id) && (!stayPut || specs[id].speed == null)).ToList();
+                if (withPhones.Count > 0) { var pick = withPhones[rng.Next(withPhones.Count)]; if (pick == state && withPhones.Count > 1) pick = withPhones[rng.Next(withPhones.Count)]; BeginState(pick); return; }
+            }
             if (activityRates["rare"] > 0 && now > nextRare && !voiceBusy)
             {
                 nextRare = now + rng.Next(180, 361) * 100.0 / activityRates["rare"];

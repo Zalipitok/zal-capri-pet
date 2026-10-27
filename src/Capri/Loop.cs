@@ -145,7 +145,7 @@ namespace Capri
             if (busyMode) { BusyFrame(t); return; }
             if (t >= nextUnlockCheck) { nextUnlockCheck = t + 30; TestUnlocks(); }
             if (t >= nextMood) { var moods = new[] { "bored", "curious", "smug", "irritated" }.Where(m => m != mood).ToArray(); mood = moods[rng.Next(moods.Length)]; nextMood = t + rng.Next(90, 181); }
-            if (activityRates["attacks"] > 0 && !stayPut && t >= nextRetry && spec.Has("calm") && chase && idleRest == "awake" && !voiceBusy && !away && !QuietNow)
+            if (activityRates["attacks"] > 0 && !stayPut && !MusicOn && t >= nextRetry && spec.Has("calm") && chase && idleRest == "awake" && !voiceBusy && !away && !QuietNow)
             { nextRetry = double.PositiveInfinity; rivalRetries++; BeginState("rivalsneak"); }
             mouse = LocalCursor();
             cursorX = w.Left + mouse.X; cursorY = w.Top + mouse.Y;
@@ -198,7 +198,7 @@ namespace Capri
             int floatPose; if (travelFloat && animPoses.TryGetValue("float", out floatPose)) { pose = animPose = curAnimPose = floatPose; }
             bool moodPose = s.Has("mood") && !voiceBusy;
             // (not on the perch: a standing mood drawing would float off her seat)
-            if (moodPose && curAnimPose >= 0 && state != "perch") { if (mood == "smug") pose = curAnimPose = AnimPose("smug", animPose); else if (mood == "irritated") pose = curAnimPose = AnimPose("rivalglare", animPose); }
+            if (moodPose && curAnimPose >= 0 && state != "perch" && !MusicOn) { if (mood == "smug") pose = curAnimPose = AnimPose("smug", animPose); else if (mood == "irritated") pose = curAnimPose = AnimPose("rivalglare", animPose); }
             else if (moodPose && curAnimPose < 0 && s.timeline == null) { if (mood == "smug") pose = 5; else if (mood == "irritated") pose = 2; }
             if (facialMotion && s.Has("blink"))
             {

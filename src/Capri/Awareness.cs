@@ -78,7 +78,12 @@ namespace Capri
                     }
                 }
                 if (session == null) videoPlaying = false;
-                if (musicPlaying && !was) musicPlayingSince = Now;
+                if (musicPlaying && !was)
+                {
+                    musicPlayingSince = Now;
+                    // put the headphones on: wrap up what she's doing if it has no headphone drawing
+                    if (musicEnabled && newSprites && CanReact && spec.Has("calm") && routine.Count == 0 && !HasHeadphones(state)) until = Math.Min(until, Now + 1);
+                }
                 if (was && !musicPlaying && Now - musicPlayingSince > 60 && rng.NextDouble() < 0.5) ShowRemark("musicstop");
                 musicFailures = 0;
             }

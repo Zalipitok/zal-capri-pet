@@ -341,7 +341,7 @@ namespace Capri
         public void SetPose(int index, bool instant = false)
         {
             // While music plays she keeps her headphones on (not mid-sentence); some poses nod on the beat.
-            if (musicEnabled && musicPlaying && !voiceBusy && hpPoses.ContainsKey(index))
+            if (musicEnabled && musicPlaying && hpPoses.ContainsKey(index))
             {
                 int b = index; index = hpPoses[b];
                 int[] bob;

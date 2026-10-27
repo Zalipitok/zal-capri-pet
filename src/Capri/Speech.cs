@@ -242,7 +242,7 @@ namespace Capri
             if (dragging || mouseDown || spec.Has("noSpeechPose")) return;
             int pose = curAnimPose >= 0 ? curAnimPose : speechPose;
             int[] mouth;
-            if (talkingMouth && speechEnvelope != null && mouthPoses.TryGetValue(pose, out mouth))
+            if (talkingMouth && speechEnvelope != null && !(MusicOn && hpPoses.ContainsKey(pose)) && mouthPoses.TryGetValue(pose, out mouth))
             {
                 int i = (int)Math.Floor((Now - speechStarted - tuning.mouthDelay) * 30.0);
                 if (i >= 0 && i < speechEnvelope.Length && speechEnvelope[i] > 0) pose = mouth[speechEnvelope[i] - 1];
