@@ -25,7 +25,7 @@ HEADPHONES_ON = False
 HEADPHONES = ['float', 'wander', 'perch', 'windowperch', 'roam', 'taskbar', 'taskpeek', 'dance', 'gaming', 'sip', 'nap',
               'smug', 'wave', 'sleepy', 'meditate', 'chatreply', 'bossfight', 'gamerwin', 'yawn', 'stretch', 'sideglance']
 # Drawings that came out chopped at the edges: these animations borrow a clean one instead.
-ALIASES = {'windowperch': 'perch'}   # its own drawing is missing an arm
+ALIASES = {'windowperch': 'taskbar'}   # its own drawing is missing an arm; the taskbar one looks happier
 NO_MOUTH = {'laughing', 'sip', 'nap', 'spin', 'thrown', 'upsidedown', 'tumble', 'yawn', 'dash', 'stretch', 'peek', 'rivalsneak', 'zigzag', 'ballsteal', 'pendulum'}  # mouth hidden, asleep, upside down or already wide open
 
 
