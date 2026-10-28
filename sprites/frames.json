@@ -375,7 +375,8 @@
    "headphones": true
   },
   "sleepy": {
-   "feet": 0.8785
+   "feet": 0.8785,
+   "headphones": true
   },
   "smug": {
    "feet": 0.9331,
