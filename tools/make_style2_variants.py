@@ -130,11 +130,11 @@ if __name__ == '__main__':
         info[n] = rec
     meta_path = os.path.join(dst, 'frames.json'); meta = json.load(open(meta_path))
     for n, rec in info.items():
-        if n in meta['anims']: meta['anims'][n].update(rec)
+        if n in meta['anims'] and 'use' not in meta['anims'][n]: meta['anims'][n].update(rec)
     for n in FACING_LEFT:
         if n in meta['anims']: meta['anims'][n]['facing'] = 'left'
     for n, v in SEATS.items():
-        if n in meta['anims']: meta['anims'][n]['seat'] = v
+        if n in meta['anims'] and 'use' not in meta['anims'][n]: meta['anims'][n]['seat'] = v
     for n in DRAWN_OPEN:   # drop talking frames made by an earlier run
         if n in meta['anims']: meta['anims'][n].pop('mouth', None)
         for lvl in (1, 2):
